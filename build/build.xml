@@ -1,0 +1,148 @@
+<!--
+ | Copyright 2008-2011 ThoughtWorks, Inc.
+ |
+ | Licensed under the Apache License, Version 2.0 (the "License");
+ | you may not use this file except in compliance with the License.
+ | You may obtain a copy of the License at
+ |
+ |     http://www.apache.org/licenses/LICENSE-2.0
+ |
+ | Unless required by applicable law or agreed to in writing, software
+ | distributed under the License is distributed on an "AS IS" BASIS,
+ | WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ | See the License for the specific language governing permissions and
+ | limitations under the License.
+ |
+ | Initial Contributors:
+ |   Håkan Råberg
+ |   Manish Chakravarty
+ |   Pavan K S
+ +-->
+<project name="twist-osgi-spike" default="build-feature">
+	<taskdef resource="net/sf/ant4eclipse/antlib.xml" />
+	<taskdef resource="net/sf/antcontrib/antlib.xml" />
+
+	<property file="build.developer.properties" />
+	<property file="build.properties" />
+
+	<property name="workspace.dir" value="${basedir}/.." />
+	<property name="target.eclipse.dir" value="${workspace.dir}/target-eclipse" />
+	<property name="dist.dir" value="${workspace.dir}/dist" />
+	<property name="dist.archive.dir" value="${dist.dir}/archive" />
+
+	<exec executable="bash" outputproperty="revision">
+		<arg value="-c" />
+		<arg value="svn info | grep Revision | sed -e 's/Revision: //g'" />
+	</exec>
+
+	<path id="bundles">
+		<dirset dir="${workspace.dir}">
+			<include name="${outer.project}*" />
+		</dirset>
+	</path>
+	<pathconvert property="bundle.list" refid="bundles" pathsep=",">
+		<flattenmapper />
+	</pathconvert>
+
+	<target name="init">
+		<echo message="Building project ${outer.project}, revision ${revision}" />
+		<mkdir dir="${dist.dir}" />
+	</target>
+
+	<target name="clean" depends="clean-dist">
+		<foreach list="${bundle.list}" target="clean-bundle" param="bundle.name" />
+	</target>
+
+	<target name="build-all" depends="init">
+		<foreach list="${bundle.list}" target="build-bundle" param="bundle.name" />
+	</target>
+
+	<target name="build-bundle" depends="init">
+		<buildPlugin destDir="${dist.dir}" projectName="${bundle.name}" packageAsJar="true" workspace="${workspace.dir}">
+			<javacLibraryCompiler />
+			<targetPlatform>
+				<location dir="${target.eclipse.dir}/eclipse" />
+			</targetPlatform>
+		</buildPlugin>
+	</target>
+
+	<target name="-build-bundle" depends="init">
+		<if>
+			<and>
+				<isset property="plugin.windowingsystem" />
+				<isset property="plugin.operatingsystem" />
+			</and>
+			<then>
+				<exec executable="${workspace.dir}/ant.sh">
+					<env key="ANT_OPTS" value="-Dosgi.ws=${plugin.windowingsystem} -Dosgi.os=${plugin.operatingsystem}" />
+					<arg value="-Dbundle.name=${plugin.id}" />
+					<arg value="build-bundle" />
+				</exec>
+			</then>
+			<else>
+				<antcall target="build-bundle">
+					<param name="bundle.name" value="${plugin.id}" />
+				</antcall>
+			</else>
+		</if>
+	</target>
+
+	<target name="build-feature" depends="init">
+		<buildFeature destDir="${dist.dir}" projectName="com.thoughtworks.twist.driver.web.feature" workspace="${workspace.dir}" buildPluginTarget="-build-bundle" skipBuildFeature="true">
+			<targetPlatform>
+				<location dir="${target.eclipse.dir}/eclipse" />
+			</targetPlatform>
+		</buildFeature>
+	</target>
+
+	<target name="clean-bundle">
+		<if>
+			<hasNature workspace="${workspace.dir}" projectName="${bundle.name}" nature="java" />
+			<then>
+				<getOutputpath property="output.dir" workspace="${workspace.dir}" projectName="${bundle.name}" />
+				<delete dir="${output.dir}" />
+			</then>
+		</if>
+	</target>
+
+	<target name="clean-dist">
+		<delete dir="${dist.dir}" />
+	</target>
+
+	<target name="dist" depends="clean, build-feature">
+		<delete dir="${dist.archive.dir}" />
+		<mkdir dir="${dist.archive.dir}" />
+
+		<unjar dest="${dist.archive.dir}">
+			<fileset dir="${dist.dir}/plugins">
+				<include name="${outer.project}_*.jar" />
+			</fileset>
+		</unjar>
+
+		<copy todir="${dist.archive.dir}">
+			<fileset dir="${target.eclipse.dir}">
+				<exclude name="**/*.source_*.jar" />
+				<exclude name=".*" />
+			</fileset>
+		</copy>
+		<copy todir="${dist.archive.dir}/eclipse/plugins">
+			<fileset dir="${dist.dir}/plugins">
+				<include name="*.jar" />
+				<exclude name="${outer.project}_*.jar" />
+				<exclude name="*.test*.jar" />
+			</fileset>
+		</copy>
+
+		<jar basedir="${dist.archive.dir}" destfile="${dist.dir}/${outer.project}-full-${revision}.jar">
+			<manifest>
+				<attribute name="Main-Class" value="${main.class}" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="run" depends="dist">
+		<java jar="${dist.dir}/${outer.project}-full-${revision}.jar" fork="true">
+			<jvmarg value="-XstartOnFirstThread" />
+		</java>
+	</target>
+</project>

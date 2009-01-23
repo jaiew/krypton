@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: com.thoughtworks.twist.driver.web.user.gtk
+Bundle-SymbolicName: com.thoughtworks.twist.driver.web.user.gtk
+Bundle-Version: 1.0.0
+Export-Package: com.thoughtworks.twist.driver.web.user.gtk
+Require-Bundle: org.eclipse.swt;bundle-version="3.5.0"
+Eclipse-PlatformFilter: (& (osgi.ws=gtk) (osgi.os=linux))
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Fragment-Host: com.thoughtworks.twist.driver.web.user

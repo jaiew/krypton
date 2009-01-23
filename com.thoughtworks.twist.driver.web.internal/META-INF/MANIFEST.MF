@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: com.thoughtworks.twist.driver.web.internal
+Bundle-SymbolicName: com.thoughtworks.twist.driver.web.internal
+Bundle-Version: 1.0.0
+Bundle-ClassPath: lib/commons-logging-1.1.1.jar
+Export-Package: com.thoughtworks.twist.driver.web.browser,
+ com.thoughtworks.twist.driver.web.browser.locator,
+ com.thoughtworks.twist.driver.web.browser.wait,
+ org.apache.commons.logging,
+ org.apache.commons.logging.impl
+Require-Bundle: org.eclipse.swt;bundle-version="3.5.0",
+ com.thoughtworks.twist.driver.web.user;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

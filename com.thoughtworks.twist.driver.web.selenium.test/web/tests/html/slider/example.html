@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head><title>Javascript Slider Control - Example</title>
+
+
+
+<link rel="stylesheet" type="text/css" href="example_files/slider.css">
+<style>
+.slider {
+	margin: 0.5em auto;
+	position: relative;
+	width: 300px;
+	height: 15px;
+	background: url(img/bg.png) 50% 50% repeat-x;
+}
+.slider img {
+	position: absolute;
+	top: 0px;
+	left: 85px;
+}
+.slider .left, .slider .right {
+	height: 12px;
+	width: 2px;
+	position: absolute;
+	top: 0px;
+}
+.slider .left {
+	left: 0px;
+	background: url(img/left.png) 0px 1px no-repeat;
+}
+.slider .right {
+	right: 0px;
+	background: url(img/right.png) 0px 1px no-repeat;
+}
+</style>
+
+<script type="text/javascript" src="example_files/addanevent.js"></script>
+<script type="text/javascript" src="example_files/slider.js"></script>
+<script type="text/javascript" src="example_files/slider-setup.js"></script></head><body>
+
+Slider 1:
+<div class="slider" id="slider01">
+	<div class="left"></div>
+	<div class="right"></div>
+	<img style="left: 207px;" src="example_files/knob.png" height="15" width="31">
+</div>
+Box 1:
+<input id="output1">
+<hr>
+
+</body></html>
