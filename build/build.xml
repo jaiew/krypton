@@ -19,8 +19,15 @@
  |   Pavan K S
  +-->
 <project name="twist-osgi-spike" default="build-feature">
-	<taskdef resource="net/sf/ant4eclipse/antlib.xml" />
-	<taskdef resource="net/sf/antcontrib/antlib.xml" />
+	<path id="ant.tasks.classpath">
+		<fileset dir="lib">
+			<include name="ant4eclipse-*.jar" />
+			<include name="ant-contrib-*.jar" />
+		</fileset>
+	</path>
+
+	<taskdef resource="net/sf/ant4eclipse/antlib.xml" classpathref="ant.tasks.classpath" />
+	<taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="ant.tasks.classpath"  />
 
 	<property file="build.developer.properties" />
 	<property file="build.properties" />
@@ -73,7 +80,7 @@
 				<isset property="plugin.operatingsystem" />
 			</and>
 			<then>
-				<exec executable="${workspace.dir}/ant.sh">
+				<exec executable="ant">
 					<env key="ANT_OPTS" value="-Dosgi.ws=${plugin.windowingsystem} -Dosgi.os=${plugin.operatingsystem}" />
 					<arg value="-Dbundle.name=${plugin.id}" />
 					<arg value="build-bundle" />
