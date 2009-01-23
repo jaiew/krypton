@@ -95,7 +95,7 @@
 	</target>
 
 	<target name="build-feature" depends="init">
-		<buildFeature destDir="${dist.dir}" projectName="com.thoughtworks.twist.driver.web.feature" workspace="${workspace.dir}" buildPluginTarget="-build-bundle" skipBuildFeature="true">
+		<buildFeature destDir="${dist.dir}" projectName="${feature.project}" workspace="${workspace.dir}" buildPluginTarget="-build-bundle" skipBuildFeature="true">
 			<targetPlatform>
 				<location dir="${target.eclipse.dir}/eclipse" />
 			</targetPlatform>

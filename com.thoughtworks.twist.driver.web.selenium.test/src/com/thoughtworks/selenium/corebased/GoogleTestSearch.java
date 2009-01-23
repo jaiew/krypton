@@ -28,7 +28,7 @@ public class GoogleTestSearch extends SeleneseTestCase
 {
    public void testGoogleTestSearch() throws Throwable {
 //       for (int i = 0; i < 50; i++) {           
-//           runGoogleTest();
+           runGoogleTest();
 //           System.out.println(i);
 //       }
 	}
