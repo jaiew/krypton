@@ -18,29 +18,33 @@
  |   Manish Chakravarty
  |   Pavan K S
  +-->
-<project name="twist-osgi-spike" default="build-feature">
+<project name="twist-osgi-spike" default="dist">
 	<path id="ant.tasks.classpath">
 		<fileset dir="lib">
-			<include name="ant4eclipse-*.jar" />
-			<include name="ant-contrib-*.jar" />
+			<include name="*.jar" />
 		</fileset>
 	</path>
 
 	<taskdef resource="net/sf/ant4eclipse/antlib.xml" classpathref="ant.tasks.classpath" />
-	<taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="ant.tasks.classpath"  />
-
-	<property file="build.developer.properties" />
-	<property file="build.properties" />
-
-	<property name="workspace.dir" value="${basedir}/.." />
-	<property name="target.eclipse.dir" value="${workspace.dir}/target-eclipse" />
-	<property name="dist.dir" value="${workspace.dir}/dist" />
-	<property name="dist.archive.dir" value="${dist.dir}/archive" />
+	<taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="ant.tasks.classpath" />
 
 	<exec executable="bash" outputproperty="revision">
 		<arg value="-c" />
 		<arg value="svn info | grep Revision | sed -e 's/Revision: //g'" />
 	</exec>
+
+	<property file="build.developer.properties" />
+	<property file="build.properties" />
+
+	<pathconvert property="workspace.dir">
+		<path location="${basedir}/.." />
+	</pathconvert>
+	<property name="target.eclipse.dir" value="${workspace.dir}/target-eclipse" />
+
+	<property name="dist.dir" value="${workspace.dir}/dist" />
+	<property name="dist.archive.dir" value="${dist.dir}/archive" />
+	<property name="dist.jar.name" value="${outer.project}-full-${revision}.jar" />
+	<property name="dist.jar" value="${dist.dir}/${dist.jar.name}" />
 
 	<path id="bundles">
 		<dirset dir="${workspace.dir}">
@@ -52,20 +56,15 @@
 	</pathconvert>
 
 	<target name="init">
-		<echo message="Building project ${outer.project}, revision ${revision}" />
 		<mkdir dir="${dist.dir}" />
 	</target>
 
 	<target name="clean" depends="clean-dist">
-		<foreach list="${bundle.list}" target="clean-bundle" param="bundle.name" />
-	</target>
-
-	<target name="build-all" depends="init">
-		<foreach list="${bundle.list}" target="build-bundle" param="bundle.name" />
+		<all-plugins target="clean-bundle" />
 	</target>
 
 	<target name="build-bundle" depends="init">
-		<buildPlugin destDir="${dist.dir}" projectName="${bundle.name}" packageAsJar="true" workspace="${workspace.dir}">
+		<buildPlugin destDir="${dist.dir}" projectName="${plugin.id}" packageAsJar="true" workspace="${workspace.dir}">
 			<javacLibraryCompiler />
 			<targetPlatform>
 				<location dir="${target.eclipse.dir}/eclipse" />
@@ -74,39 +73,34 @@
 	</target>
 
 	<target name="-build-bundle" depends="init">
+		<echo message="${plugin.id}" />
 		<if>
 			<and>
 				<isset property="plugin.windowingsystem" />
 				<isset property="plugin.operatingsystem" />
 			</and>
 			<then>
-				<exec executable="ant">
+				<exec executable="ant" failonerror="true">
 					<env key="ANT_OPTS" value="-Dosgi.ws=${plugin.windowingsystem} -Dosgi.os=${plugin.operatingsystem}" />
-					<arg value="-Dbundle.name=${plugin.id}" />
+					<arg value="-Dplugin.id=${plugin.id}" />
 					<arg value="build-bundle" />
 				</exec>
 			</then>
 			<else>
-				<antcall target="build-bundle">
-					<param name="bundle.name" value="${plugin.id}" />
-				</antcall>
+				<antcall target="build-bundle" />
 			</else>
 		</if>
 	</target>
 
 	<target name="build-feature" depends="init">
-		<buildFeature destDir="${dist.dir}" projectName="${feature.project}" workspace="${workspace.dir}" buildPluginTarget="-build-bundle" skipBuildFeature="true">
-			<targetPlatform>
-				<location dir="${target.eclipse.dir}/eclipse" />
-			</targetPlatform>
-		</buildFeature>
+		<all-plugins target="-build-bundle" />
 	</target>
 
 	<target name="clean-bundle">
 		<if>
-			<hasNature workspace="${workspace.dir}" projectName="${bundle.name}" nature="java" />
+			<hasNature workspace="${workspace.dir}" projectName="${plugin.id}" nature="java" />
 			<then>
-				<getOutputpath property="output.dir" workspace="${workspace.dir}" projectName="${bundle.name}" />
+				<getOutputpath property="output.dir" workspace="${workspace.dir}" projectName="${plugin.id}" />
 				<delete dir="${output.dir}" />
 			</then>
 		</if>
@@ -118,6 +112,7 @@
 
 	<target name="dist" depends="clean, build-feature">
 		<delete dir="${dist.archive.dir}" />
+		<delete dir="${java.io.tmpdir}/${dist.jar.name}" />
 		<mkdir dir="${dist.archive.dir}" />
 
 		<unjar dest="${dist.archive.dir}">
@@ -140,11 +135,14 @@
 			</fileset>
 		</copy>
 
-		<jar basedir="${dist.archive.dir}" destfile="${dist.dir}/${outer.project}-full-${revision}.jar">
+		<jar basedir="${dist.archive.dir}" destfile="${dist.jar}">
 			<manifest>
 				<attribute name="Main-Class" value="${main.class}" />
 			</manifest>
 		</jar>
+
+		<echo message="" />
+		<echo message="${dist.jar}" />
 	</target>
 
 	<target name="run" depends="dist">
@@ -152,4 +150,11 @@
 			<jvmarg value="-XstartOnFirstThread" />
 		</java>
 	</target>
+
+	<macrodef name="all-plugins">
+		<attribute name="target" />
+		<sequential>
+			<buildFeature destDir="${dist.dir}" projectName="${feature.project}" workspace="${workspace.dir}" buildPluginTarget="@{target}" skipBuildFeature="true" targetPlatformLocation="${target.eclipse.dir}/eclipse" />
+		</sequential>
+	</macrodef>
 </project>

@@ -18,6 +18,6 @@
  |   Manish Chakravarty
  |   Pavan K S
  +-->
-<project name="twist-osgi-wrapper" basedir="build" default="build-feature">
+<project name="twist-osgi-wrapper" basedir="build" default="dist">
   <import file="build/build.xml"/>
 </project>
