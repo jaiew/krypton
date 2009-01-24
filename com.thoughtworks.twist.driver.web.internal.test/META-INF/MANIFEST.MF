@@ -6,7 +6,8 @@ Bundle-Version: 1.0.0
 Bundle-ClassPath: lib/junit-4.4.jar,
  lib/jetty-6.1.9.jar,
  lib/jetty-util-6.1.9.jar,
- lib/servlet-api-2.5-6.1.9.jar
+ lib/servlet-api-2.5-6.1.9.jar,
+ .
 Export-Package:  com.thoughtworks.twist.driver.web.browser,
  com.thoughtworks.twist.driver.web.browser.locator,
  com.thoughtworks.twist.driver.web.browser.wait,

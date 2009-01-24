@@ -1,4 +1,5 @@
 Manifest-Version: 1.0
+Eclipse-ExtensibleAPI: true
 Bundle-ManifestVersion: 2
 Bundle-Name: com.thoughtworks.twist.driver.web.user
 Bundle-SymbolicName: com.thoughtworks.twist.driver.web.user
@@ -7,4 +8,3 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: com.thoughtworks.twist.driver.web.user
 Require-Bundle: org.eclipse.swt;bundle-version="3.5.0"
 Import-Package: org.osgi.framework;version="1.5.0"
-Bundle-ActivationPolicy: lazy

@@ -73,7 +73,7 @@ public class EmbeddedEquinoxLauncher {
 
 		configuration = configureInstallArea(eclipseUrl);
 	}
-	
+
 	public void addProperty(String key, String value) {
 		configuration.put(key, value);
 	}
