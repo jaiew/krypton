@@ -40,6 +40,7 @@ public class Main {
 			launcher.startup();
 			
 			Selenium web = launcher.create(Selenium.class);
+
 			web.start();
 			web.open("http://www.google.com");
 

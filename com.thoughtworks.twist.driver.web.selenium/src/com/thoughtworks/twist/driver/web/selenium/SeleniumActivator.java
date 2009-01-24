@@ -30,17 +30,19 @@ import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 
 public class SeleniumActivator implements BundleActivator {
-	public void start(BundleContext context) throws Exception {
-		context.registerService(Selenium.class.getName(), new ServiceFactory() {
-			public Object getService(Bundle bundle,
-					ServiceRegistration registration) {
-				return new TwistSelenium("", BrowserSession.create());
-			}
+	private final class SeleniumServiceFactory implements ServiceFactory {
+		public Object getService(Bundle bundle, ServiceRegistration registration) {
+			return new TwistSelenium("", BrowserSession.create());
+		}
 
-			public void ungetService(Bundle bundle,
-					ServiceRegistration registration, Object service) {
-			}
-		}, null);
+		public void ungetService(Bundle bundle,
+				ServiceRegistration registration, Object service) {
+		}
+	}
+
+	public void start(BundleContext context) throws Exception {
+		context.registerService(Selenium.class.getName(),
+				new SeleniumServiceFactory(), null);
 	}
 
 	public void stop(BundleContext context) throws Exception {
