@@ -45,6 +45,7 @@
 	<property name="dist.archive.dir" value="${dist.dir}/archive" />
 	<property name="dist.jar.name" value="${outer.project}-full-${revision}.jar" />
 	<property name="dist.jar" value="${dist.dir}/${dist.jar.name}" />
+	<property name="reports.dir" value="${workspace.dir}/reports" />
 
 	<path id="bundles">
 		<dirset dir="${workspace.dir}">
@@ -151,6 +152,52 @@
 			<jvmarg value="-Dtwist.driver.web.browser=${twist.driver.web.browser}" />
 			<jvmarg value="-XstartOnFirstThread" />
 		</java>
+	</target>
+
+	<target name="selenium-tests">
+		<property name="project.id" value="com.thoughtworks.twist.driver.web.selenium.test" />
+
+		<getEclipseClasspath property="selenium.tests.classpath" workspace="${workspace.dir}" projectName="${project.id}" targetPlatformLocation="${target.eclipse.dir}/eclipse" />
+		<getSourcepath property="src.path" workspace="${workspace.dir}" projectName="${project.id}" />
+
+		<if>
+			<os family="mac" />
+			<then>
+				<property name="extra.jvm.arg" value="-XstartOnFirstThread" />
+			</then>
+			<else>
+				<property name="extra.jvm.arg" value="" />
+			</else>
+		</if>
+
+		<delete dir="${reports.dir}" />
+		<mkdir dir="${reports.dir}" />
+
+		<junit printsummary="yes" failureproperty="failure" fork="yes" forkmode="once">
+			<classpath>
+				<pathelement path="${selenium.tests.classpath}" />
+				<pathelement location="${workspace.dir}/build/lib/junit.jar" />
+			</classpath>
+
+			<jvmarg value="${extra.jvm.arg}" />
+
+			<formatter type="xml" />
+
+			<batchtest todir="${reports.dir}">
+				<fileset dir="${src.path}">
+					<include name="**/corebased/*Test*.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+
+		<junitreport todir="${reports.dir}">
+			<fileset dir="${reports.dir}">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report format="noframes" todir="${reports.dir}/html" />
+		</junitreport>
+
+		<fail if="failure" message="Tests Failed" />
 	</target>
 
 	<macrodef name="all-plugins">
