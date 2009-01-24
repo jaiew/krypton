@@ -18,11 +18,12 @@
  *   Manish Chakravarty
  *   Pavan K S
  ***************************************************************************/
-package com.thoughtworks.twist.osgi.examples.helloworld;
+package com.thoughtworks.twist.osgi;
 
 import java.io.File;
 
-import com.thoughtworks.twist.osgi.EmbeddedEquinoxLauncher;
+import com.thoughtworks.selenium.Selenium;
+
 
 public class Main {
 	public static void main(String[] args) throws Exception {
@@ -37,13 +38,13 @@ public class Main {
 			}
 
 			launcher.startup();
-
-			HelloWorld helloWorld = launcher.create(HelloWorld.class);
-			helloWorld.hello();
+			
+			Selenium web = launcher.create(Selenium.class);
+			web.start();
+			web.open("http://www.google.com");
 
 			launcher.shutdown();
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw e;
 		}
 	}

@@ -66,6 +66,7 @@ import com.thoughtworks.twist.driver.web.user.LoggingUser;
 import com.thoughtworks.twist.driver.web.user.User;
 
 public class BrowserSession {
+    
     private static final String XHTML1_STRICT_DOCTYPE = "<!DOCTYPE html\n" + "PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n"
             + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n";
 

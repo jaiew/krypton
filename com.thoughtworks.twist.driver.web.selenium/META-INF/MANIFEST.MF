@@ -3,6 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: com.thoughtworks.twist.driver.web.selenium
 Bundle-SymbolicName: com.thoughtworks.twist.driver.web.selenium
 Bundle-Version: 1.0.0
+Bundle-Activator: com.thoughtworks.twist.driver.web.selenium.SeleniumActivator
 Export-Package: com.thoughtworks.twist.driver.web.selenium,
  com.thoughtworks.twist.driver.web.selenium.dialog,
  com.thoughtworks.twist.driver.web.selenium.locator,
@@ -11,4 +12,7 @@ Require-Bundle: com.thoughtworks.twist.driver.web.internal;bundle-version="1.0.0
  org.eclipse.swt;bundle-version="3.5.0",
  com.thoughtworks.twist.driver.web.user;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Import-Package: com.thoughtworks.selenium
+Import-Package: com.thoughtworks.selenium,
+ com.thoughtworks.twist.driver.web.browser,
+ org.osgi.framework;version="1.5.0"
+Bundle-ActivationPolicy: lazy

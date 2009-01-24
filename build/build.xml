@@ -110,7 +110,7 @@
 		<delete dir="${dist.dir}" />
 	</target>
 
-	<target name="dist" depends="clean, build-feature">
+	<target name="dist" depends="clean-dist, build-feature">
 		<delete dir="${dist.archive.dir}" />
 		<delete dir="${java.io.tmpdir}/${dist.jar.name}" />
 		<mkdir dir="${dist.archive.dir}" />
@@ -145,8 +145,10 @@
 		<echo message="${dist.jar}" />
 	</target>
 
-	<target name="run" depends="dist">
+	<target name="run">
+		<property name="twist.driver.web.browser" value="mozilla" />
 		<java jar="${dist.dir}/${outer.project}-full-${revision}.jar" fork="true">
+			<jvmarg value="-Dtwist.driver.web.browser=${twist.driver.web.browser}" />
 			<jvmarg value="-XstartOnFirstThread" />
 		</java>
 	</target>

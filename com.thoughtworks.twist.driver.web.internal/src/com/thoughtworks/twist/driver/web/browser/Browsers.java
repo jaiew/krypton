@@ -146,8 +146,8 @@ public enum Browsers {
     };
 
     static {
-//        Logger.getLogger("").setLevel(Level.FINEST);
-//        Logger.getLogger("").getHandlers()[0].setLevel(Level.FINEST);
+        Logger.getLogger("").setLevel(Level.FINEST);
+        Logger.getLogger("").getHandlers()[0].setLevel(Level.FINEST);
     }
     
     Log log = LogFactory.getLog(getClass());
