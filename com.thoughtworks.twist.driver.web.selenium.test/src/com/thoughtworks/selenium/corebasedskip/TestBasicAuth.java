@@ -33,7 +33,7 @@ public class TestBasicAuth extends SeleneseTestCase
 
 /* TestBasicAuth */
 //			 open|http://alice:foo@localhost:4444/selenium-server/tests/html/basicAuth/index.html|
-			selenium.open("http://alice:foo@localhost:" + WEBSERVER_PORT + "/selenium-server/tests/html/basicAuth/index.html");
+			selenium.open("http://alice:foo@localhost:" + getWebServerPort() + "/selenium-server/tests/html/basicAuth/index.html");
 			// assertTitle|welcome|
 			assertEquals("*Welcome", selenium.getTitle());
 
