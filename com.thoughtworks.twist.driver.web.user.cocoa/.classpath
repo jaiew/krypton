@@ -3,7 +3,16 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="/System/Library/Java"/>
+	<classpathentry exported="true" kind="lib" path="/System/Library/Java">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/com.thoughtworks.twist.driver.web.user.cocoa/lib/javadoc/com.apple.cocoa-javadoc.zip!/cocoa-javadoc"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="/target-eclipse/eclipse/plugins/org.eclipse.swt.carbon.macosx_3.5.0.v3525.jar"/>
+	<classpathentry kind="lib" path="lib/com.apple.cocoa.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/com.thoughtworks.twist.driver.web.user.cocoa/lib/javadoc/com.apple.cocoa-javadoc.zip!/cocoa-javadoc"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
