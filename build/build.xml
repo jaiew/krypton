@@ -202,10 +202,10 @@
 					<pathelement path="${selenium.tests.classpath}" />
 					<pathelement location="${workspace.dir}/build/lib/junit.jar" />
 				</classpath>
-				
+
 				<jvmarg value="${extra.jvm.arg}" />
 				<jvmarg value="-Dtwist.driver.web.browser=@{browser}" />
-				
+
 				<formatter type="xml" />
 
 				<batchtest todir="${junit.output.dir}/@{browser}">
@@ -229,6 +229,10 @@
 	<macrodef name="wine-ant">
 		<attribute name="target" />
 		<sequential>
+			<pathconvert property="wine.ant.home" targetos="windows">
+				<path location="${ant.home}" />
+				<map from="" to="${wine.rootdrive}" />
+			</pathconvert>
 			<exec executable="wine" timeout="120000" error="/tmp/wine.stderr.ie" errorproperty="wine.failed">
 				<env key="WINEPREFIX" value="${wine.prefix}" />
 				<arg value="java" />
