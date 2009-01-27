@@ -38,15 +38,9 @@
 package com.thoughtworks.selenium;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
 import java.util.regex.Pattern;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.Assert;
 import junit.framework.AssertionFailedError;
@@ -81,6 +75,10 @@ public class SeleneseTestCase extends TestCase {
     /** Use this object to run all of your selenium tests */
     protected static TwistSelenium selenium;
     private static int port = WEBSERVER_PORT;
+    
+    public static void main(String[] args) {
+        
+    }
     
     static {
         try {
@@ -148,17 +146,11 @@ public class SeleneseTestCase extends TestCase {
         }
     }
 
-    @SuppressWarnings("serial")
-    public static class KillJettyServlet extends HttpServlet {
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            System.exit(0);
-        }
-    }
-
     private static void startJetty() throws Exception {
         try {
             server = new Server();
             SelectChannelConnector connector = new SelectChannelConnector();
+
             port = findAvailablePort();
             connector.setPort(port);
             server.addConnector(connector);
@@ -173,10 +165,10 @@ public class SeleneseTestCase extends TestCase {
             } else {
                 context.setWar(new File("web").getAbsolutePath());
             }
-            context.addServlet(KillJettyServlet.class, "/killJetty");
             server.addHandler(context);
 
             server.setStopAtShutdown(true);
+
             server.start();
         } catch (BindException alreadyRunning) {
         }

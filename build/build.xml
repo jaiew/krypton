@@ -50,7 +50,7 @@
 	<condition property="isMac">
 		<os family="mac" />
 	</condition>
-	<condition property="extra.jvm.arg" value="-XstartOnFirstThread">
+	<condition property="extra.jvm.arg" value="-XstartOnFirstThread" else="">
 		<os family="mac" />
 	</condition>
 	<condition property="isWindows">
@@ -59,18 +59,8 @@
 	<condition property="hasWine">
 		<available file="${wine.prefix}" />
 	</condition>
-	<property name="extra.jvm.arg" value="" />
 
 	<property name="twist.driver.web.browser" value="mozilla" />
-
-	<path id="bundles">
-		<dirset dir="${workspace.dir}">
-			<include name="${outer.project}*" />
-		</dirset>
-	</path>
-	<pathconvert property="bundle.list" refid="bundles" pathsep=",">
-		<flattenmapper />
-	</pathconvert>
 
 	<target name="init">
 		<mkdir dir="${dist.dir}" />
@@ -206,15 +196,16 @@
 			<getSourcepath property="src.path" workspace="${workspace.dir}" projectName="${project.id}" />
 
 			<mkdir dir="${junit.output.dir}/@{browser}" />
+
 			<junit printsummary="yes" failureproperty="failure" fork="true" forkmode="once">
 				<classpath>
 					<pathelement path="${selenium.tests.classpath}" />
 					<pathelement location="${workspace.dir}/build/lib/junit.jar" />
 				</classpath>
-
+				
 				<jvmarg value="${extra.jvm.arg}" />
 				<jvmarg value="-Dtwist.driver.web.browser=@{browser}" />
-
+				
 				<formatter type="xml" />
 
 				<batchtest todir="${junit.output.dir}/@{browser}">
@@ -243,8 +234,6 @@
 				<arg value="java" />
 				<arg value="-cp" />
 				<arg value="${wine.ant.home}\lib\ant.jar;${wine.ant.home}\lib\ant-launcher.jar;${wine.ant.home}\lib\ant-junit.jar " />
-				<arg value="-Dant.home=${wine.ant.home}" />
-				<arg value="-Djava.home=${wine.java.home}" />
 				<arg value="-Drevision=${revision}" />
 				<arg value="org.apache.tools.ant.launch.Launcher" />
 				<arg value="@{target}" />
