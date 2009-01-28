@@ -21,6 +21,7 @@ Requirements:
  Mac OS X, Linux (with GTK) or Windows
  Java 5
  Ant 1.7
+ svn
 
 Mozilla:
  XULRunner 1.8.1.3 or higher for Mozilla - Firefox 2 support.
@@ -44,6 +45,7 @@ Building:
 =========
 
 Run ant -q to build all the projects. Runt ant all-tests to run the Selenium suite in parallel in all installed and supported browsers.
+Ant and svn have to both be on the path.
 
 
 Unit/Integration Testing:
