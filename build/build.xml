@@ -156,7 +156,7 @@
 		<property name="twist.driver.web.browser" value="mozilla" />
 		<java jar="${dist.dir}/${outer.project}-full-${revision}.jar" fork="true">
 			<jvmarg value="-Dtwist.driver.web.browser=${twist.driver.web.browser}" />
-			<jvmarg value="-XstartOnFirstThread" />
+			<jvmarg value="${extra.jvm.arg}" />
 		</java>
 	</target>
 
@@ -202,7 +202,7 @@
 					<pathelement path="${selenium.tests.classpath}" />
 					<pathelement location="${workspace.dir}/build/lib/junit.jar" />
 				</classpath>
-
+				
 				<jvmarg value="${extra.jvm.arg}" />
 				<jvmarg value="-Dtwist.driver.web.browser=@{browser}" />
 
