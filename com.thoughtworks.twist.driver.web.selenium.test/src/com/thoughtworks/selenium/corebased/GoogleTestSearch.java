@@ -59,7 +59,6 @@ private void runGoogleTest() {
 		selenium.waitForPageToLoad("30000");
 		assertTrue(selenium.isTextPresent("openqa.org"));
 		// verifyTitle|Selenium OpenQA - Google Search|
-		System.out.println(selenium.getBrowserSession().browser.getShell().getText());
 		verifyEquals("*Selenium OpenQA - Google Search", selenium.getTitle());
 
 		checkForVerificationErrors();
