@@ -50,7 +50,7 @@
 	<condition property="isMac">
 		<os family="mac" />
 	</condition>
-	<condition property="extra.jvm.arg" value="-XstartOnFirstThread" else="">
+	<condition property="extra.jvm.arg" value="-XstartOnFirstThread" else="-DstartOnFirstThread=false">
 		<os family="mac" />
 	</condition>
 	<condition property="isWindows">
@@ -192,7 +192,7 @@
 		<sequential>
 			<property name="project.id" value="com.thoughtworks.twist.driver.web.selenium.test" />
 
-			<getEclipseClasspath property="selenium.tests.classpath" workspace="${workspace.dir}" projectName="${project.id}" targetPlatformLocation="${target.eclipse.dir}/eclipse" />
+			<getEclipseClasspath property="selenium.tests.classpath" workspace="${workspace.dir}" projectName="${project.id}" targetPlatformLocation="${target.eclipse.dir}/eclipse" runtime="true" />
 			<getSourcepath property="src.path" workspace="${workspace.dir}" projectName="${project.id}" />
 
 			<mkdir dir="${junit.output.dir}/@{browser}" />
