@@ -28,11 +28,6 @@
 	<taskdef resource="net/sf/ant4eclipse/antlib.xml" classpathref="ant.tasks.classpath" />
 	<taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="ant.tasks.classpath" />
 
-	<exec executable="bash" outputproperty="revision" failifexecutionfails="false">
-		<arg value="-c" />
-		<arg value="svn info | grep Revision | sed -e 's/Revision: //g'" />
-	</exec>
-
 	<property file="build.developer.properties" />
 	<property file="build.properties" />
 
@@ -43,8 +38,6 @@
 
 	<property name="dist.dir" value="${workspace.dir}/dist" />
 	<property name="dist.archive.dir" value="${dist.dir}/archive" />
-	<property name="dist.jar.name" value="${outer.project}-full-${revision}.jar" />
-	<property name="dist.jar" value="${dist.dir}/${dist.jar.name}" />
 	<property name="junit.output.dir" value="${workspace.dir}/reports" />
 
 	<condition property="isMac">
@@ -56,13 +49,31 @@
 	<condition property="isWindows">
 		<os family="windows" />
 	</condition>
+	<condition property="ant.script" value="ant.bat" else="ant">
+		<os family="windows" />
+	</condition>
 	<condition property="hasWine">
 		<available file="${wine.prefix}" />
 	</condition>
 
 	<property name="twist.driver.web.browser" value="mozilla" />
 
-	<target name="init">
+	<target name="init-svn.version" unless="svn.version">
+		<exec executable="svn" output="${java.io.tmpdir}/svn.properties" dir="." failifexecutionfails="false">
+			<arg value="info" />
+		</exec>
+
+		<loadproperties srcfile="${java.io.tmpdir}/svn.properties">
+			<filterchain>
+				<prefixlines prefix="svn." />
+				<deletecharacters chars="\ " />
+			</filterchain>
+		</loadproperties>
+
+		<property name="svn.version" value="${svn.LastChangedRev}" />
+	</target>
+	
+	<target name="init" depends="init-svn.version">
 		<mkdir dir="${dist.dir}" />
 	</target>
 
@@ -87,7 +98,7 @@
 				<isset property="plugin.operatingsystem" />
 			</and>
 			<then>
-				<exec executable="ant" failonerror="true">
+				<exec executable="${ant.script}" failonerror="true">
 					<env key="ANT_OPTS" value="-Dosgi.ws=${plugin.windowingsystem} -Dosgi.os=${plugin.operatingsystem}" />
 					<arg value="-Dplugin.id=${plugin.id}" />
 					<arg value="build-bundle" />
@@ -118,6 +129,9 @@
 	</target>
 
 	<target name="dist" depends="clean-dist, build-feature">
+		<property name="dist.jar.name" value="${outer.project}-full-${svn.version}.jar" />
+		<property name="dist.jar" value="${dist.dir}/${dist.jar.name}" />
+
 		<delete dir="${dist.archive.dir}" />
 		<delete dir="${java.io.tmpdir}/${dist.jar.name}" />
 		<mkdir dir="${dist.archive.dir}" />
@@ -154,13 +168,13 @@
 
 	<target name="run">
 		<property name="twist.driver.web.browser" value="mozilla" />
-		<java jar="${dist.dir}/${outer.project}-full-${revision}.jar" fork="true">
+		<java jar="${dist.dir}/${outer.project}-full-${svn.version}.jar" fork="true">
 			<jvmarg value="-Dtwist.driver.web.browser=${twist.driver.web.browser}" />
 			<jvmarg value="${extra.jvm.arg}" />
 		</java>
 	</target>
 
-	<target name="all-tests">
+	<target name="all-tests" depends="build-feature">
 		<delete dir="${junit.output.dir}" />
 		<parallel>
 			<antcall target="ie-wine" />
@@ -202,7 +216,7 @@
 					<pathelement path="${selenium.tests.classpath}" />
 					<pathelement location="${workspace.dir}/build/lib/junit.jar" />
 				</classpath>
-				
+
 				<jvmarg value="${extra.jvm.arg}" />
 				<jvmarg value="-Dtwist.driver.web.browser=@{browser}" />
 
@@ -238,7 +252,7 @@
 				<arg value="java" />
 				<arg value="-cp" />
 				<arg value="${wine.ant.home}\lib\ant.jar;${wine.ant.home}\lib\ant-launcher.jar;${wine.ant.home}\lib\ant-junit.jar " />
-				<arg value="-Drevision=${revision}" />
+				<arg value="-Dsvn.version=${svn.version}" />
 				<arg value="org.apache.tools.ant.launch.Launcher" />
 				<arg value="@{target}" />
 			</exec>
