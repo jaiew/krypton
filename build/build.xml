@@ -72,7 +72,7 @@
 
 		<property name="svn.version" value="${svn.LastChangedRev}" />
 	</target>
-	
+
 	<target name="init" depends="init-svn.version">
 		<mkdir dir="${dist.dir}" />
 	</target>
@@ -183,6 +183,7 @@
 			<antcall target="safari" />
 		</parallel>
 		<antcall target="junitreport" />
+		<antcall target="detect-failure" />
 	</target>
 
 	<target name="safari" if="isMac">
@@ -231,12 +232,23 @@
 		</sequential>
 	</macrodef>
 
+	<target name="detect-failure">
+		<loadfile property="failure" srcFile="${junit.output.dir}/TESTS-TestSuites.xml">
+			<filterchain>
+				<linecontainsregexp>
+					<regexp pattern="&lt;(failure|error)" />
+				</linecontainsregexp>
+			</filterchain>
+		</loadfile>
+		<fail if="failure" message="Tests FAILED"/>
+	</target>
+
 	<target name="junitreport">
 		<junitreport todir="${junit.output.dir}">
 			<fileset dir="${junit.output.dir}">
 				<include name="**/TEST-*.xml" />
 			</fileset>
-			<report format="frames" todir="${junit.output.dir}" />
+			<report format="frames" todir="${junit.output.dir}/html" />
 		</junitreport>
 	</target>
 
