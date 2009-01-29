@@ -26,8 +26,8 @@ public class VerizonTest extends SeleneseTestCase {
     private static final String TIMEOUT = "120000";
 
     public void testSignUp() {
-        selenium.addLocationURLExclusionPattern(".*/vzTracker.aspx.*");
-        selenium.addLocationURLExclusionPattern(".*doubleclick.net/.*");
+//        selenium.addLocationURLExclusionPattern(".*/vzTracker.aspx.*");
+//        selenium.addLocationURLExclusionPattern(".*doubleclick.net/.*");
         selenium.setTimeout(TIMEOUT);
         selenium.open("http://www22.verizon.com/");
         selenium.click("link=Set Up New Phone Service");

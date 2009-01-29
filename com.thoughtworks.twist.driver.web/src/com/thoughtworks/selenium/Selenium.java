@@ -61,7 +61,9 @@ Select the link (anchor) element which contains text matching the
 specified <em>pattern</em>.
 <ul class="first last simple"><li>link=The link text</li></ul></li><li><strong>css</strong>=<em>cssSelectorSyntax</em>:
 Select the element using css selectors. Please refer to <a href="http://www.w3.org/TR/REC-CSS2/selector.html">CSS2 selectors</a>, <a href="http://www.w3.org/TR/2001/CR-css3-selectors-20011113/">CSS3 selectors</a> for more information. You can also check the TestCssLocators test in the selenium test suite for an example of usage, which is included in the downloaded selenium core package.
-<ul class="first last simple"><li>css=a[href="#id3"]</li><li>css=span#firstChild + span</li></ul><p>Currently the css selector locator supports all css1, css2 and css3 selectors except namespace in css3, some pseudo classes(:nth-of-type, :nth-last-of-type, :first-of-type, :last-of-type, :only-of-type, :visited, :hover, :active, :focus, :indeterminate) and pseudo elements(::first-line, ::first-letter, ::selection, ::before, ::after). </p></li></ul><p>
+<ul class="first last simple"><li>css=a[href="#id3"]</li><li>css=span#firstChild + span</li></ul><p>Currently the css selector locator supports all css1, css2 and css3 selectors except namespace in css3, some pseudo classes(:nth-of-type, :nth-last-of-type, :first-of-type, :last-of-type, :only-of-type, :visited, :hover, :active, :focus, :indeterminate) and pseudo elements(::first-line, ::first-letter, ::selection, ::before, ::after). </p></li><li><strong>ui</strong>=<em>uiSpecifierString</em>:
+Locate an element by resolving the UI specifier string to another locator, and evaluating it. See the <a href="http://svn.openqa.org/fisheye/browse/~raw,r=trunk/selenium/trunk/src/main/resources/core/scripts/ui-doc.html">Selenium UI-Element Reference</a> for more details.
+<ul class="first last simple"><li>ui=loginPages::loginButton()</li><li>ui=settingsPages::toggle(label=Hide Email)</li><li>ui=forumPages::postBody(index=2)//a[2]</li></ul></li></ul><p>
 Without an explicit locator prefix, Selenium uses the following default
 strategies:
 </p><ul class="simple"><li><strong>dom</strong>, for locators starting with "document."</li><li><strong>xpath</strong>, for locators starting with "//"</li><li><strong>identifier</strong>, otherwise</li></ul><h3><a name="element-filters">Element Filters</a></h3><blockquote><p>Element filters can be used with a locator to refine a list of candidate elements.  They are currently used only in the 'name' element-locator.</p><p>Filters look much like locators, ie.</p><blockquote><em>filterType</em><strong>=</strong><em>argument</em></blockquote><p>Supported element-filters are:</p><p><strong>value=</strong><em>valuePattern</em></p><blockquote>
@@ -92,11 +94,33 @@ pattern.
 </p>*/
 public interface Selenium {
 
+    /** Sets the per-session extension Javascript */
+    void setExtensionJs(String extensionJs);
+
 	/** Launches the browser with a new Selenium session */
     void start();
-
+    
+    /** Starts a new Selenium testing session with a String, representing a configuration */
+    public void start(String optionsString);
+    
+    /** Starts a new Selenium testing session with a configuration options object */
+    public void start(Object optionsObject);
+    
     /** Ends the test session, killing the browser */
     void stop();
+
+    /** Shows in the RemoteRunner a banner for the current test 
+      * The banner is 'classname : methodname' where those two are derived from the caller
+      * The method name will be unCamelCased with the insertion of spaces at word boundaries
+      */
+    void showContextualBanner();
+
+    /** Shows in the RemoteRunner a banner for the current test 
+      * The banner is 'classname : methodname'
+      * The method name will be unCamelCased with the insertion of spaces at word boundaries
+      */
+    void showContextualBanner(String className, String methodName);
+
 /** Clicks on a link, button, checkbox or radio button. If the click action
 causes a new page to load (like a link usually does), call
 waitForPageToLoad.
@@ -210,18 +234,31 @@ void mouseOver(String locator);
 */
 void mouseOut(String locator);
 
-/** Simulates a user pressing the mouse button (without releasing it yet) on
+/** Simulates a user pressing the left mouse button (without releasing it yet) on
 the specified element.
 @param locator an <a href="#locators">element locator</a>
 */
 void mouseDown(String locator);
 
-/** Simulates a user pressing the mouse button (without releasing it yet) at
+/** Simulates a user pressing the right mouse button (without releasing it yet) on
+the specified element.
+@param locator an <a href="#locators">element locator</a>
+*/
+void mouseDownRight(String locator);
+
+/** Simulates a user pressing the left mouse button (without releasing it yet) at
 the specified location.
 @param locator an <a href="#locators">element locator</a>
 @param coordString specifies the x,y position (i.e. - 10,20) of the mouse      event relative to the element returned by the locator.
 */
 void mouseDownAt(String locator,String coordString);
+
+/** Simulates a user pressing the right mouse button (without releasing it yet) at
+the specified location.
+@param locator an <a href="#locators">element locator</a>
+@param coordString specifies the x,y position (i.e. - 10,20) of the mouse      event relative to the element returned by the locator.
+*/
+void mouseDownRightAt(String locator,String coordString);
 
 /** Simulates the event that occurs when the user releases the mouse button (i.e., stops
 holding the button down) on the specified element.
@@ -229,12 +266,25 @@ holding the button down) on the specified element.
 */
 void mouseUp(String locator);
 
+/** Simulates the event that occurs when the user releases the right mouse button (i.e., stops
+holding the button down) on the specified element.
+@param locator an <a href="#locators">element locator</a>
+*/
+void mouseUpRight(String locator);
+
 /** Simulates the event that occurs when the user releases the mouse button (i.e., stops
 holding the button down) at the specified location.
 @param locator an <a href="#locators">element locator</a>
 @param coordString specifies the x,y position (i.e. - 10,20) of the mouse      event relative to the element returned by the locator.
 */
 void mouseUpAt(String locator,String coordString);
+
+/** Simulates the event that occurs when the user releases the right mouse button (i.e., stops
+holding the button down) at the specified location.
+@param locator an <a href="#locators">element locator</a>
+@param coordString specifies the x,y position (i.e. - 10,20) of the mouse      event relative to the element returned by the locator.
+*/
+void mouseUpRightAt(String locator,String coordString);
 
 /** Simulates a user pressing the mouse button (without releasing it yet) on
 the specified element.
@@ -449,17 +499,24 @@ boolean getWhetherThisWindowMatchWindowExpression(String currentWindowString,Str
 */
 void waitForPopUp(String windowID,String timeout);
 
-/** By default, Selenium's overridden window.confirm() function will
+/** <p>
+By default, Selenium's overridden window.confirm() function will
 return true, as if the user had manually clicked OK; after running
 this command, the next call to confirm() will return false, as if
 the user had clicked Cancel.  Selenium will then resume using the
 default behavior for future confirmations, automatically returning 
 true (OK) unless/until you explicitly call this command for each
 confirmation.
+</p><p>
+Take note - every time a confirmation comes up, you must
+consume it with a corresponding getConfirmation, or else
+the next selenium operation will fail.
+</p>
 */
 void chooseCancelOnNextConfirmation();
 
-/** Undo the effect of calling chooseCancelOnNextConfirmation.  Note
+/** <p>
+Undo the effect of calling chooseCancelOnNextConfirmation.  Note
 that Selenium's overridden window.confirm() function will normally automatically
 return true, as if the user had manually clicked OK, so you shouldn't
 need to use this command unless for some reason you need to change
@@ -467,6 +524,11 @@ your mind prior to the next confirmation.  After any confirmation, Selenium will
 default behavior for future confirmations, automatically returning 
 true (OK) unless/until you explicitly call chooseCancelOnNextConfirmation for each
 confirmation.
+</p><p>
+Take note - every time a confirmation comes up, you must
+consume it with a corresponding getConfirmation, or else
+the next selenium operation will fail.
+</p>
 */
 void chooseOkOnNextConfirmation();
 
@@ -519,9 +581,9 @@ boolean isConfirmationPresent();
 /** Retrieves the message of a JavaScript alert generated during the previous action, or fail if there were no alerts.
 
 <p>Getting an alert has the same effect as manually clicking OK. If an
-alert is generated but you do not get/verify it, the next Selenium action
-will fail.</p><p>NOTE: under Selenium, JavaScript alerts will NOT pop up a visible alert
-dialog.</p><p>NOTE: Selenium does NOT support JavaScript alerts that are generated in a
+alert is generated but you do not consume it with getAlert, the next Selenium action
+will fail.</p><p>Under Selenium, JavaScript alerts will NOT pop up a visible alert
+dialog.</p><p>Selenium does NOT support JavaScript alerts that are generated in a
 page's onload() event handler. In this case a visible dialog WILL be
 generated and Selenium will hang until someone manually clicks OK.</p>
 @return The message of the most recent JavaScript alert
@@ -534,8 +596,10 @@ the previous action.
 <p>
 By default, the confirm function will return true, having the same effect
 as manually clicking OK. This can be changed by prior execution of the
-chooseCancelOnNextConfirmation command. If an confirmation is generated
-but you do not get/verify it, the next Selenium action will fail.
+chooseCancelOnNextConfirmation command. 
+</p><p>
+If an confirmation is generated but you do not consume it with getConfirmation,
+the next Selenium action will fail.
 </p><p>
 NOTE: under Selenium, JavaScript confirmations will NOT pop up a visible
 dialog.
@@ -1036,15 +1100,54 @@ The function must return null if the element can't be found.
 void addLocationStrategy(String strategyName,String functionDefinition);
 
 /** Saves the entire contents of the current window canvas to a PNG file.
-Currently this only works in Mozilla and when running in chrome mode.
 Contrast this with the captureScreenshot command, which captures the
 contents of the OS viewport (i.e. whatever is currently being displayed
-on the monitor), and is implemented in the RC only. Implementation
-mostly borrowed from the Screengrab! Firefox extension. Please see
-http://www.screengrab.org for details.
+on the monitor), and is implemented in the RC only. Currently this only
+works in Firefox when running in chrome mode, and in IE non-HTA using
+the EXPERIMENTAL "Snapsie" utility. The Firefox implementation is mostly
+borrowed from the Screengrab! Firefox extension. Please see
+http://www.screengrab.org and http://snapsie.sourceforge.net/ for
+details.
 @param filename the path to the file to persist the screenshot as. No                  filename extension will be appended by default.                  Directories will not be created if they do not exist,                    and an exception will be thrown, possibly by native                  code.
+@param kwargs a kwargs string that modifies the way the screenshot                  is captured. Example: "background=#CCFFDD" .                  Currently valid options:                  <dl><dt>background</dt><dd>the background CSS for the HTML document. This                     may be useful to set for capturing screenshots of                     less-than-ideal layouts, for example where absolute                     positioning causes the calculation of the canvas                     dimension to fail and a black background is exposed                     (possibly obscuring black text).</dd></dl>
 */
-void captureEntirePageScreenshot(String filename);
+void captureEntirePageScreenshot(String filename,String kwargs);
+
+/** Executes a command rollup, which is a series of commands with a unique
+name, and optionally arguments that control the generation of the set of
+commands. If any one of the rolled-up commands fails, the rollup is
+considered to have failed. Rollups may also contain nested rollups.
+@param rollupName the name of the rollup command
+@param kwargs keyword arguments string that influences how the                    rollup expands into commands
+*/
+void rollup(String rollupName,String kwargs);
+
+/** Loads script content into a new script tag in the Selenium document. This
+differs from the runScript command in that runScript adds the script tag
+to the document of the AUT, not the Selenium document. The following
+entities in the script content are replaced by the characters they
+represent:
+
+    &lt;
+    &gt;
+    &amp;
+
+The corresponding remove command is removeScript.
+@param scriptContent the Javascript content of the script to add
+@param scriptTagId (optional) the id of the new script tag. If                       specified, and an element with this id already                       exists, this operation will fail.
+*/
+void addScript(String scriptContent,String scriptTagId);
+
+/** Removes a script tag from the Selenium document identified by the given
+id. Does nothing if the referenced tag doesn't exist.
+@param scriptTagId the id of the script element to remove.
+*/
+void removeScript(String scriptTagId);
+
+/** Allows choice of one of the available libraries.
+@param libraryName name of the desired library Only the following three can be chosen:   ajaxslt - Google's library   javascript - Cybozu Labs' faster library   default - The default library.  Currently the default library is ajaxslt. If libraryName isn't one of these three, then  no change will be made.
+*/
+void useXpathLibrary(String libraryName);
 
 /** Writes a message to the status bar and adds a note to the browser-side
 log.
@@ -1063,12 +1166,34 @@ void attachFile(String fieldLocator,String fileLocator);
 */
 void captureScreenshot(String filename);
 
+/** Capture a PNG screenshot.  It then returns the file as a base 64 encoded string.
+@return The base 64 encoded string of the screen shot (PNG file)
+*/
+String captureScreenshotToString();
+
+/** Downloads a screenshot of the browser current window canvas to a 
+based 64 encoded PNG file. The <em>entire</em> windows canvas is captured,
+including parts rendered outside of the current view port.
+
+Currently this only works in Mozilla and when running in chrome mode.
+@param kwargs A kwargs string that modifies the way the screenshot is captured. Example: "background=#CCFFDD". This may be useful to set for capturing screenshots of less-than-ideal layouts, for example where absolute positioning causes the calculation of the canvas dimension to fail and a black background is exposed  (possibly obscuring black text).
+@return The base 64 encoded string of the page screenshot (PNG file)
+*/
+String captureEntirePageScreenshotToString(String kwargs);
+
 /** Kills the running Selenium Server and all browser sessions.  After you run this command, you will no longer be able to send
 commands to the server; you can't remotely start the server once it has been stopped.  Normally
 you should prefer to run the "stop" command, which terminates the current browser session, rather than 
 shutting down the entire server.
 */
 void shutDownSeleniumServer();
+
+/** Retrieve the last messages logged on a specific remote control. Useful for error reports, especially
+when running multiple remote controls in a distributed environment. The maximum number of log messages
+that can be retrieve is configured on remote control startup.
+@return The last N log messages as a multi-line string.
+*/
+String retrieveLastRemoteControlLogs();
 
 /** Simulates a user pressing a key (without releasing it yet) by sending a native operating system keystroke.
 This function uses the java.awt.Robot class to send a keystroke; this more accurately simulates typing

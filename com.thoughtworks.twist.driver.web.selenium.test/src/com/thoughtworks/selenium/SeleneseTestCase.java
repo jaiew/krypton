@@ -73,12 +73,9 @@ public class SeleneseTestCase extends TestCase {
     private boolean captureScreetShotOnFailure = false;
 
     /** Use this object to run all of your selenium tests */
-    protected static TwistSelenium selenium;
+    protected static TwistSelenium twistSelenium;
+    protected Selenium selenium;
     private static int port = WEBSERVER_PORT;
-    
-    public static void main(String[] args) {
-        
-    }
     
     static {
         try {
@@ -223,15 +220,16 @@ public class SeleneseTestCase extends TestCase {
             url = "http://localhost:" + port;
         }
 
-        if (selenium == null) {
+        if (twistSelenium == null) {
             session = BrowserSession.create();
-            selenium = new TwistSelenium(url, session);
-            selenium.start();
-            selenium.setContext(this.getClass().getSimpleName() + "." + getName());
+            twistSelenium = new TwistSelenium(url, session);
+            twistSelenium.start();
+            twistSelenium.setContext(this.getClass().getSimpleName() + "." + getName());
         } else {
-            selenium.setBrowserUrl(url);
+            twistSelenium.setBrowserUrl(url);
         }
-        selenium.selectFrame("relative=top");
+        twistSelenium.selectFrame("relative=top");
+        selenium = twistSelenium;
     }
 
     private String getBrowser() {
@@ -491,7 +489,7 @@ public class SeleneseTestCase extends TestCase {
         try {
             checkForVerificationErrors();
         } finally {
-            selenium.closeAllDialogs();
+            twistSelenium.closeAllDialogs();
             // selenium.stop();
         }
     }
@@ -511,7 +509,7 @@ public class SeleneseTestCase extends TestCase {
         // selenium.getBrowserSession().waitForActivity();
         // } else {
         Thread.sleep(2000);
-        selenium.getBrowserSession().waitForIdle();
+        twistSelenium.getBrowserSession().waitForIdle();
         // }
     }
 }

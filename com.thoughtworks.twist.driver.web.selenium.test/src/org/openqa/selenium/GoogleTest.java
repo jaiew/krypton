@@ -225,7 +225,7 @@ public class GoogleTest extends SeleneseTestCase {
 //    }
 
     public void testFinance() throws InterruptedException {
-        selenium.addAjaxURLExclusionPattern(".*/channel.*");
+//        selenium.addAjaxURLExclusionPattern(".*/channel.*");
         selenium.open("http://finance.google.com");
         selenium.typeKeys("searchbox", "Cis");
         Thread.sleep(2000);

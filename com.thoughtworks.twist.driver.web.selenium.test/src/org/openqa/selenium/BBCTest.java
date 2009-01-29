@@ -24,7 +24,7 @@ import com.thoughtworks.selenium.SeleneseTestCase;
 
 public class BBCTest extends SeleneseTestCase {
     public void testHaveYourSaySignup() {
-        selenium.addLocationURLExclusionPattern(".*/front_page/ticker.stm");
+//        selenium.addLocationURLExclusionPattern(".*/front_page/ticker.stm");
         selenium.open("http://www.bbc.co.uk/?ok");
         selenium.type("searchfield", "iraq");
         selenium.click("Search");

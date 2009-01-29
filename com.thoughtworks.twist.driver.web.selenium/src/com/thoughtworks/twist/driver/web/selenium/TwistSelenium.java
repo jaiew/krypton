@@ -247,7 +247,7 @@ public class TwistSelenium implements Selenium {
 		fireEvent(locate(locator), eventName);
 	}
 
-	public void fireEvent(Element element, String eventName) {
+	private void fireEvent(Element element, String eventName) {
 		session.fireEvent(element, eventName);
 		waitForIdle();
 	}
@@ -1110,5 +1110,73 @@ public class TwistSelenium implements Selenium {
 	private DialogHandler[] getDialogHandlers() {
 		return new DialogHandler[]{alertHandler, confirmationHandler,
 				promptHandler};
+	}
+
+	public void addScript(String scriptContent, String scriptTagId) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void captureEntirePageScreenshot(String filename, String kwargs) {
+		throw new UnsupportedOperationException();
+	}
+
+	public String captureEntirePageScreenshotToString(String kwargs) {
+		throw new UnsupportedOperationException();
+	}
+
+	public String captureScreenshotToString() {
+		throw new UnsupportedOperationException();
+	}
+
+	public void mouseDownRight(String locator) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void mouseDownRightAt(String locator, String coordString) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void mouseUpRight(String locator) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void mouseUpRightAt(String locator, String coordString) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void removeScript(String scriptTagId) {
+		throw new UnsupportedOperationException();
+	}
+
+	public String retrieveLastRemoteControlLogs() {
+		throw new UnsupportedOperationException();
+	}
+
+	public void rollup(String rollupName, String kwargs) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setExtensionJs(String extensionJs) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void showContextualBanner() {
+		throw new UnsupportedOperationException();
+	}
+
+	public void showContextualBanner(String className, String methodName) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void start(String optionsString) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void start(Object optionsObject) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void useXpathLibrary(String libraryName) {
+		throw new UnsupportedOperationException();
 	}
 }
