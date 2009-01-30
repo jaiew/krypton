@@ -84,10 +84,12 @@ public class DefaultSelenium implements Selenium {
 	}
 
 	private Selenium createSeleniumInstance(String browserURL) {
-		try {
-			return createSeleniumUsingReflection(browserURL);
-		} catch (Exception tryCreatingUsingOSGi) {
-		}
+			try {
+				return createSeleniumUsingReflection(browserURL);
+			} catch (ClassNotFoundException tryCreatingUsingOsgi) {
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
 		try {
 			return new SeleniumOSGiFactory().create(browserURL);
 		} catch (Exception e) {

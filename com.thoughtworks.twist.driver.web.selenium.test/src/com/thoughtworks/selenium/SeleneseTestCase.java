@@ -222,9 +222,8 @@ public class SeleneseTestCase extends TestCase {
             twistSelenium = new DefaultSelenium("", getWebServerPort(), "", url);
             twistSelenium.start();
             twistSelenium.setContext(this.getClass().getSimpleName() + "." + getName());
-        } else {
-            ((TwistSelenium) twistSelenium.getUnderyingSelenium()).setBrowserUrl(url);
         }
+        ((TwistSelenium) twistSelenium.getUnderyingSelenium()).setBrowserUrl(url);
         twistSelenium.selectFrame("relative=top");
         selenium = twistSelenium;
     }

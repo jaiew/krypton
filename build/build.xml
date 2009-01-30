@@ -164,6 +164,8 @@
 
 		<echo message="" />
 		<echo message="${dist.jar}" />
+		
+		<antcall target="smoke" />
 	</target>
 
 	<target name="run" depends="init-svn.version">
@@ -232,7 +234,7 @@
 		</sequential>
 	</macrodef>
 
-	<target name="smoke" depends="dist">
+	<target name="smoke">
 		<property name="project.id" value="com.thoughtworks.twist.driver.web.selenium.test" />
 
 		<getSourcepath property="src.path" workspace="${workspace.dir}" projectName="${project.id}" />

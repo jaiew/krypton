@@ -41,7 +41,6 @@ public class SeleniumOSGiFactory {
 			
 			return launcher.create(Selenium.class);
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw e;
 		}
 	}
