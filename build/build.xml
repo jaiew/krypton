@@ -166,7 +166,7 @@
 		<echo message="${dist.jar}" />
 	</target>
 
-	<target name="run">
+	<target name="run" depends="init-svn.version">
 		<property name="twist.driver.web.browser" value="mozilla" />
 		<java jar="${dist.dir}/${outer.project}-full-${svn.version}.jar" fork="true">
 			<jvmarg value="-Dtwist.driver.web.browser=${twist.driver.web.browser}" />

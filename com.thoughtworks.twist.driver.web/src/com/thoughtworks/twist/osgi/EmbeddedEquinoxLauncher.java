@@ -61,15 +61,11 @@ public class EmbeddedEquinoxLauncher {
 		classpath.addAll(Arrays.asList(optionalClasspath));
 		classpath.add(findFrameworkJar(eclipseUrl));
 
-		ClassLoader frameworkLoader = new URLClassLoader(classpath
-				.toArray(new URL[0]), getClass().getClassLoader());
+		ClassLoader frameworkLoader = new URLClassLoader(classpath.toArray(new URL[0]), getClass().getClassLoader());
 
-		eclipseStarterClass = frameworkLoader
-				.loadClass("org.eclipse.core.runtime.adaptor.EclipseStarter");
-		bundleContextClass = frameworkLoader
-				.loadClass("org.osgi.framework.BundleContext");
-		serviceReferenceClass = frameworkLoader
-				.loadClass("org.osgi.framework.ServiceReference");
+		eclipseStarterClass = frameworkLoader.loadClass("org.eclipse.core.runtime.adaptor.EclipseStarter");
+		bundleContextClass = frameworkLoader.loadClass("org.osgi.framework.BundleContext");
+		serviceReferenceClass = frameworkLoader.loadClass("org.osgi.framework.ServiceReference");
 
 		configuration = configureInstallArea(eclipseUrl);
 	}
@@ -78,27 +74,21 @@ public class EmbeddedEquinoxLauncher {
 		configuration.put(key, value);
 	}
 
-	public void startup(String... args) throws IllegalAccessException,
-			InvocationTargetException, NoSuchMethodException {
-		eclipseStarterClass.getMethod("setInitialProperties", Map.class)
-				.invoke(null, configuration);
-		bundleContext = eclipseStarterClass.getMethod("startup",
-				String[].class, Runnable.class).invoke(null, args, null);
+	public void startup(String... args) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		eclipseStarterClass.getMethod("setInitialProperties", Map.class).invoke(null, configuration);
+		bundleContext = eclipseStarterClass.getMethod("startup", String[].class, Runnable.class).invoke(null, args, null);
 	}
 
-	public void shutdown() throws IllegalAccessException,
-			InvocationTargetException, NoSuchMethodException {
+	public void shutdown() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		eclipseStarterClass.getMethod("shutdown").invoke(null);
 	}
 
 	@SuppressWarnings("unchecked")
 	public <T> T create(Class<T> service) throws Exception {
-		Object serviceReference = bundleContextClass.getMethod(
-				"getServiceReference", String.class).invoke(bundleContext,
-				service.getName());
+		Object serviceReference = bundleContextClass.getMethod("getServiceReference", String.class)
+				.invoke(bundleContext, service.getName());
 		System.out.println("Resolving ServiceReference " + serviceReference);
-		Object serviceImplementation = bundleContextClass.getMethod(
-				"getService", serviceReferenceClass).invoke(bundleContext,
+		Object serviceImplementation = bundleContextClass.getMethod("getService", serviceReferenceClass).invoke(bundleContext,
 				serviceReference);
 		System.out.println("Returning " + serviceImplementation);
 		System.out.println();
@@ -112,11 +102,9 @@ public class EmbeddedEquinoxLauncher {
 		return configuration;
 	}
 
-	private URL findFrameworkJar(URL eclipseUrl) throws URISyntaxException,
-			MalformedURLException {
+	private URL findFrameworkJar(URL eclipseUrl) throws URISyntaxException, MalformedURLException {
 		URL osgiUrl = null;
-		for (File file : new File(new File(eclipseUrl.toURI()), "plugins")
-				.listFiles()) {
+		for (File file : new File(new File(eclipseUrl.toURI()), "plugins").listFiles()) {
 			if (file.getName().startsWith("org.eclipse.osgi_")) {
 				osgiUrl = file.toURL();
 				break;
@@ -125,20 +113,16 @@ public class EmbeddedEquinoxLauncher {
 		return osgiUrl;
 	}
 
-	private URL extractEclipseFromJar(URL eclipseUrl) throws IOException,
-			UnsupportedEncodingException, FileNotFoundException,
+	private URL extractEclipseFromJar(URL eclipseUrl) throws IOException, UnsupportedEncodingException, FileNotFoundException,
 			MalformedURLException {
 		String[] jarAndPath = eclipseUrl.toExternalForm().split("!/");
 
-		System.out
-				.println("Jar containing plugins directory: " + jarAndPath[0]);
+		System.out.println("Jar containing plugins directory: " + jarAndPath[0]);
 		System.out.println("Jar plugins directory path: " + jarAndPath[1]);
 
-		File jarFile = new File(URLDecoder.decode(jarAndPath[0]
-				.substring("jar:file:".length()), "UTF-8"));
+		File jarFile = new File(URLDecoder.decode(jarAndPath[0].substring("jar:file:".length()), "UTF-8"));
 
-		File driverRoot = new File(System.getProperty("java.io.tmpdir"),
-				jarFile.getName());
+		File driverRoot = new File(System.getProperty("java.io.tmpdir"), jarFile.getName());
 		File eclipseDir = new File(driverRoot, "eclipse");
 		if (driverRoot.isDirectory()) {
 			System.out.println("Already extracted to " + driverRoot);
@@ -149,32 +133,27 @@ public class EmbeddedEquinoxLauncher {
 
 		long currentTimeMillis = System.currentTimeMillis();
 		extractJar(jarFile, driverRoot);
-		System.out.println("Extraction time: "
-				+ (System.currentTimeMillis() - currentTimeMillis));
+		System.out.println("Extraction time: " + (System.currentTimeMillis() - currentTimeMillis));
 
 		return eclipseDir.toURL();
 	}
 
-	private void extractJar(File jarFile, File driverRoot) throws IOException,
-			FileNotFoundException {
+	private void extractJar(File jarFile, File driverRoot) throws IOException, FileNotFoundException {
 		JarFile jar = new JarFile(jarFile);
-		for (Enumeration<JarEntry> entries = jar.entries(); entries
-				.hasMoreElements();) {
+		for (Enumeration<JarEntry> entries = jar.entries(); entries.hasMoreElements();) {
 			JarEntry nextElement = entries.nextElement();
 			if (nextElement.getName().startsWith("eclipse/")) {
 				File file = new File(driverRoot, nextElement.getName());
 				if (nextElement.isDirectory()) {
 					file.mkdirs();
 				} else {
-					extractAndClose(jar.getInputStream(nextElement),
-							new FileOutputStream(file), nextElement.getSize());
+					extractAndClose(jar.getInputStream(nextElement), new FileOutputStream(file), nextElement.getSize());
 				}
 			}
 		}
 	}
 
-	private void extractAndClose(InputStream in, FileOutputStream out, long size)
-			throws IOException, FileNotFoundException {
+	private void extractAndClose(InputStream in, FileOutputStream out, long size) throws IOException, FileNotFoundException {
 		FileChannel outChannel = null;
 		ReadableByteChannel inChannel = null;
 		try {

@@ -38,11 +38,33 @@
 // This file has been automatically generated via XSL
 package com.thoughtworks.selenium;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
+import com.thoughtworks.twist.osgi.SeleniumOSGiFactory;
 
-/** The default implementation of the Selenium interface; <i>end users will primarily interact with this object.</i> */
+/**
+ * The default implementation of the Selenium interface; <i>end users will
+ * primarily interact with this object.</i>
+ */
 public class DefaultSelenium implements Selenium {
-	
+	private static Map<String, String> SELENIUM_BROWSER_LAUNCHES_TO_SWT_BROWSERS = new HashMap<String, String>() {
+		{
+			put("*firefox", "mozilla");
+			put("*pifirefox", "mozilla");
+			put("*firefoxproxy", "mozilla");
+			put("*chrome", "mozilla");
+
+			put("*iexplore", "ie");
+			put("*piiexplore", "ie");
+			put("*iexploreproxy", "ie");
+			put("*iehta", "ie");
+
+			put("*safari", "safari");
+		}
+	};
+
 	private Selenium selenium;
 
 	public Selenium getUnderyingSelenium() {
@@ -50,99 +72,107 @@ public class DefaultSelenium implements Selenium {
 	}
 
 	public DefaultSelenium(String serverHost, int serverPort, String browserStartCommand, String browserURL) {
-    	selenium = createSeleniumInstance(serverHost, serverPort, browserStartCommand, browserURL);
-    }
+		selenium = createSeleniumInstance(serverHost, serverPort, browserStartCommand, browserURL);
+	}
 
 	private Selenium createSeleniumInstance(String serverHost, int serverPort, String browserStartCommand, String browserURL) {
 		try {
-			Class<?> twistSelenium = Class.forName("com.thoughtworks.twist.driver.web.selenium.TwistSelenium");
-			return (Selenium) twistSelenium.getConstructor(String.class).newInstance(browserURL);
+			System.setProperty("twist.driver.web.browser", SELENIUM_BROWSER_LAUNCHES_TO_SWT_BROWSERS.get(browserStartCommand));
+			return createSeleniumUsingReflection(browserURL);
+		} catch (Exception tryCreatingUsingOSGi) {
+		}
+		try {
+			return new SeleniumOSGiFactory().create(browserURL);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
-    
-    /** Uses an arbitrary CommandProcessor */
-    public DefaultSelenium(Object processor) {
-    	throw new UnsupportedOperationException();
-    }
-    
-    /**
-     * Allows javascript to be specified for the test on a per-browser session
-     * basis. The javascript will be in-play the next time a session is created;
-     * that is, typically the next time <code>start()</code> is invoked (and
-     * <code>getNewBrowserSession</code> is sent to the RC under the sheets).
-     *
-     * @param extensionJs  a string representing the extra extension javascript
-     *                     to include in the browser session. This is in
-     *                     addition to any specified via the -userExtensions
-     *                     switch when starting the RC.
-     */
-    public void setExtensionJs(String extensionJs) {
-    	selenium.setExtensionJs(extensionJs);
-    }
-    
-    public void start() {
-    	selenium.start();
-    }
-    
-    public void start(String optionsString) {
-    	selenium.start(optionsString);
-    }
 
-    public void start(Object optionsObject) {
-    	selenium.start(optionsObject);
-    }
-    
-    public void stop() {
-    	selenium.stop();
-    }
+	private Selenium createSeleniumUsingReflection(String browserURL) throws ClassNotFoundException, InstantiationException,
+			IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		Class<?> twistSelenium = Class.forName("com.thoughtworks.twist.driver.web.selenium.TwistSelenium");
+		return (Selenium) twistSelenium.getConstructor(String.class).newInstance(browserURL);
+	}
 
-    public void showContextualBanner() {
-        try {
-            StackTraceElement[] e =Thread.currentThread().getStackTrace();
+	/** Uses an arbitrary CommandProcessor */
+	public DefaultSelenium(Object processor) {
+		throw new UnsupportedOperationException();
+	}
 
-            String className = null;
-            String methodName = null;
+	/**
+	 * Allows javascript to be specified for the test on a per-browser session
+	 * basis. The javascript will be in-play the next time a session is created;
+	 * that is, typically the next time <code>start()</code> is invoked (and
+	 * <code>getNewBrowserSession</code> is sent to the RC under the sheets).
+	 * 
+	 * @param extensionJs
+	 *            a string representing the extra extension javascript to
+	 *            include in the browser session. This is in addition to any
+	 *            specified via the -userExtensions switch when starting the RC.
+	 */
+	public void setExtensionJs(String extensionJs) {
+		selenium.setExtensionJs(extensionJs);
+	}
 
-            for (int i = 0; i < e.length; i++) {
-                if(e[i].getClassName().equals("java.lang.Thread") 
-                  || e[i].getMethodName().equals("showContextualBanner") ) {
-                    continue;
-                }
-                className = e[i].getClassName();
-                methodName = e[i].getMethodName();
-                break;
-            }
-            showContextualBanner(className, methodName);
-        } catch (Exception e) {
-           this.setContext("<unknown context>");
-        }       
+	public void start() {
+		selenium.start();
+	}
 
-    }
+	public void start(String optionsString) {
+		selenium.start(optionsString);
+	}
 
-    public void showContextualBanner(String className, String methodName) {
-            StringBuilder context = new StringBuilder().append(className).append(": ");
-        
-            boolean lastOneWasUpperCase = false;
-            boolean nextOneIsUpperCase = false;
-            int len = methodName.length();
-            for (int i = 0; i < len; i++) {
-                char ch = methodName.charAt(i);
-                nextOneIsUpperCase = i < len-1 ? Character.isUpperCase(methodName.charAt(i+1)) : true;
+	public void start(Object optionsObject) {
+		selenium.start(optionsObject);
+	}
 
-                if ((Character.isUpperCase(ch) && (!lastOneWasUpperCase || !nextOneIsUpperCase))) {
-                    context.append(" ");
-                    lastOneWasUpperCase = true;
-                }
-                if (!Character.isUpperCase(ch)) {
-                    lastOneWasUpperCase = false;
-                }
-                context.append(ch);
-            }
-           this.setContext(context.toString());
-    }
+	public void stop() {
+		selenium.stop();
+	}
 
+	public void showContextualBanner() {
+		try {
+			StackTraceElement[] e = Thread.currentThread().getStackTrace();
+
+			String className = null;
+			String methodName = null;
+
+			for (int i = 0; i < e.length; i++) {
+				if (e[i].getClassName().equals("java.lang.Thread") || e[i].getMethodName().equals("showContextualBanner")) {
+					continue;
+				}
+				className = e[i].getClassName();
+				methodName = e[i].getMethodName();
+				break;
+			}
+			showContextualBanner(className, methodName);
+		} catch (Exception e) {
+			this.setContext("<unknown context>");
+		}
+
+	}
+
+	public void showContextualBanner(String className, String methodName) {
+		StringBuilder context = new StringBuilder().append(className).append(": ");
+
+		boolean lastOneWasUpperCase = false;
+		boolean nextOneIsUpperCase = false;
+		int len = methodName.length();
+		for (int i = 0; i < len; i++) {
+			char ch = methodName.charAt(i);
+			nextOneIsUpperCase = i < len - 1 ? Character.isUpperCase(methodName.charAt(i + 1)) : true;
+
+			if ((Character.isUpperCase(ch) && (!lastOneWasUpperCase || !nextOneIsUpperCase))) {
+				context.append(" ");
+				lastOneWasUpperCase = true;
+			}
+			if (!Character.isUpperCase(ch)) {
+				lastOneWasUpperCase = false;
+			}
+			context.append(ch);
+		}
+		this.setContext(context.toString());
+	}
 
 	// From here on, everything in this file has been auto-generated
 
@@ -158,28 +188,28 @@ public class DefaultSelenium implements Selenium {
 		selenium.contextMenu(locator);
 	}
 
-	public void clickAt(String locator,String coordString) {
-		selenium.clickAt(locator,coordString);
+	public void clickAt(String locator, String coordString) {
+		selenium.clickAt(locator, coordString);
 	}
 
-	public void doubleClickAt(String locator,String coordString) {
-		selenium.doubleClickAt(locator,coordString);
+	public void doubleClickAt(String locator, String coordString) {
+		selenium.doubleClickAt(locator, coordString);
 	}
 
-	public void contextMenuAt(String locator,String coordString) {
-		selenium.contextMenuAt(locator,coordString);
+	public void contextMenuAt(String locator, String coordString) {
+		selenium.contextMenuAt(locator, coordString);
 	}
 
-	public void fireEvent(String locator,String eventName) {
-		selenium.fireEvent(locator,eventName);
+	public void fireEvent(String locator, String eventName) {
+		selenium.fireEvent(locator, eventName);
 	}
 
 	public void focus(String locator) {
 		selenium.focus(locator);
 	}
 
-	public void keyPress(String locator,String keySequence) {
-		selenium.keyPress(locator,keySequence);
+	public void keyPress(String locator, String keySequence) {
+		selenium.keyPress(locator, keySequence);
 	}
 
 	public void shiftKeyDown() {
@@ -214,12 +244,12 @@ public class DefaultSelenium implements Selenium {
 		selenium.controlKeyUp();
 	}
 
-	public void keyDown(String locator,String keySequence) {
-		selenium.keyDown(locator,keySequence);
+	public void keyDown(String locator, String keySequence) {
+		selenium.keyDown(locator, keySequence);
 	}
 
-	public void keyUp(String locator,String keySequence) {
-		selenium.keyUp(locator,keySequence);
+	public void keyUp(String locator, String keySequence) {
+		selenium.keyUp(locator, keySequence);
 	}
 
 	public void mouseOver(String locator) {
@@ -238,12 +268,12 @@ public class DefaultSelenium implements Selenium {
 		selenium.mouseDownRight(locator);
 	}
 
-	public void mouseDownAt(String locator,String coordString) {
-		selenium.mouseDownAt(locator,coordString);
+	public void mouseDownAt(String locator, String coordString) {
+		selenium.mouseDownAt(locator, coordString);
 	}
 
-	public void mouseDownRightAt(String locator,String coordString) {
-		selenium.mouseDownRightAt(locator,coordString);
+	public void mouseDownRightAt(String locator, String coordString) {
+		selenium.mouseDownRightAt(locator, coordString);
 	}
 
 	public void mouseUp(String locator) {
@@ -254,28 +284,28 @@ public class DefaultSelenium implements Selenium {
 		selenium.mouseUpRight(locator);
 	}
 
-	public void mouseUpAt(String locator,String coordString) {
-		selenium.mouseUpAt(locator,coordString);
+	public void mouseUpAt(String locator, String coordString) {
+		selenium.mouseUpAt(locator, coordString);
 	}
 
-	public void mouseUpRightAt(String locator,String coordString) {
-		selenium.mouseUpRightAt(locator,coordString);
+	public void mouseUpRightAt(String locator, String coordString) {
+		selenium.mouseUpRightAt(locator, coordString);
 	}
 
 	public void mouseMove(String locator) {
 		selenium.mouseMove(locator);
 	}
 
-	public void mouseMoveAt(String locator,String coordString) {
-		selenium.mouseMoveAt(locator,coordString);
+	public void mouseMoveAt(String locator, String coordString) {
+		selenium.mouseMoveAt(locator, coordString);
 	}
 
-	public void type(String locator,String value) {
-		selenium.type(locator,value);
+	public void type(String locator, String value) {
+		selenium.type(locator, value);
 	}
 
-	public void typeKeys(String locator,String value) {
-		selenium.typeKeys(locator,value);
+	public void typeKeys(String locator, String value) {
+		selenium.typeKeys(locator, value);
 	}
 
 	public void setSpeed(String value) {
@@ -294,16 +324,16 @@ public class DefaultSelenium implements Selenium {
 		selenium.uncheck(locator);
 	}
 
-	public void select(String selectLocator,String optionLocator) {
-		selenium.select(selectLocator,optionLocator);
+	public void select(String selectLocator, String optionLocator) {
+		selenium.select(selectLocator, optionLocator);
 	}
 
-	public void addSelection(String locator,String optionLocator) {
-		selenium.addSelection(locator,optionLocator);
+	public void addSelection(String locator, String optionLocator) {
+		selenium.addSelection(locator, optionLocator);
 	}
 
-	public void removeSelection(String locator,String optionLocator) {
-		selenium.removeSelection(locator,optionLocator);
+	public void removeSelection(String locator, String optionLocator) {
+		selenium.removeSelection(locator, optionLocator);
 	}
 
 	public void removeAllSelections(String locator) {
@@ -318,8 +348,8 @@ public class DefaultSelenium implements Selenium {
 		selenium.open(url);
 	}
 
-	public void openWindow(String url,String windowID) {
-		selenium.openWindow(url,windowID);
+	public void openWindow(String url, String windowID) {
+		selenium.openWindow(url, windowID);
 	}
 
 	public void selectWindow(String windowID) {
@@ -330,16 +360,16 @@ public class DefaultSelenium implements Selenium {
 		selenium.selectFrame(locator);
 	}
 
-	public boolean getWhetherThisFrameMatchFrameExpression(String currentFrameString,String target) {
-		return selenium.getWhetherThisFrameMatchFrameExpression(currentFrameString,target);
+	public boolean getWhetherThisFrameMatchFrameExpression(String currentFrameString, String target) {
+		return selenium.getWhetherThisFrameMatchFrameExpression(currentFrameString, target);
 	}
 
-	public boolean getWhetherThisWindowMatchWindowExpression(String currentWindowString,String target) {
-		return selenium.getWhetherThisWindowMatchWindowExpression(currentWindowString,target);
+	public boolean getWhetherThisWindowMatchWindowExpression(String currentWindowString, String target) {
+		return selenium.getWhetherThisWindowMatchWindowExpression(currentWindowString, target);
 	}
 
-	public void waitForPopUp(String windowID,String timeout) {
-		selenium.waitForPopUp(windowID,timeout);
+	public void waitForPopUp(String windowID, String timeout) {
+		selenium.waitForPopUp(windowID, timeout);
 	}
 
 	public void chooseCancelOnNextConfirmation() {
@@ -502,8 +532,8 @@ public class DefaultSelenium implements Selenium {
 		return selenium.getAttributeFromAllWindows(attributeName);
 	}
 
-	public void dragdrop(String locator,String movementsString) {
-		selenium.dragdrop(locator,movementsString);
+	public void dragdrop(String locator, String movementsString) {
+		selenium.dragdrop(locator, movementsString);
 	}
 
 	public void setMouseSpeed(String pixels) {
@@ -514,12 +544,12 @@ public class DefaultSelenium implements Selenium {
 		return selenium.getMouseSpeed();
 	}
 
-	public void dragAndDrop(String locator,String movementsString) {
-		selenium.dragAndDrop(locator,movementsString);
+	public void dragAndDrop(String locator, String movementsString) {
+		selenium.dragAndDrop(locator, movementsString);
 	}
 
-	public void dragAndDropToObject(String locatorOfObjectToBeDragged,String locatorOfDragDestinationObject) {
-		selenium.dragAndDropToObject(locatorOfObjectToBeDragged,locatorOfDragDestinationObject);
+	public void dragAndDropToObject(String locatorOfObjectToBeDragged, String locatorOfDragDestinationObject) {
+		selenium.dragAndDropToObject(locatorOfObjectToBeDragged, locatorOfDragDestinationObject);
 	}
 
 	public void windowFocus() {
@@ -546,16 +576,16 @@ public class DefaultSelenium implements Selenium {
 		return selenium.getHtmlSource();
 	}
 
-	public void setCursorPosition(String locator,String position) {
-		selenium.setCursorPosition(locator,position);
+	public void setCursorPosition(String locator, String position) {
+		selenium.setCursorPosition(locator, position);
 	}
 
 	public Number getElementIndex(String locator) {
 		return selenium.getElementIndex(locator);
 	}
 
-	public boolean isOrdered(String locator1,String locator2) {
-		return selenium.isOrdered(locator1,locator2);
+	public boolean isOrdered(String locator1, String locator2) {
+		return selenium.isOrdered(locator1, locator2);
 	}
 
 	public Number getElementPositionLeft(String locator) {
@@ -586,8 +616,8 @@ public class DefaultSelenium implements Selenium {
 		return selenium.getXpathCount(xpath);
 	}
 
-	public void assignId(String locator,String identifier) {
-		selenium.assignId(locator,identifier);
+	public void assignId(String locator, String identifier) {
+		selenium.assignId(locator, identifier);
 	}
 
 	public void allowNativeXpath(String allow) {
@@ -598,8 +628,8 @@ public class DefaultSelenium implements Selenium {
 		selenium.ignoreAttributesWithoutValue(ignore);
 	}
 
-	public void waitForCondition(String script,String timeout) {
-		selenium.waitForCondition(script,timeout);
+	public void waitForCondition(String script, String timeout) {
+		selenium.waitForCondition(script, timeout);
 	}
 
 	public void setTimeout(String timeout) {
@@ -610,8 +640,8 @@ public class DefaultSelenium implements Selenium {
 		selenium.waitForPageToLoad(timeout);
 	}
 
-	public void waitForFrameToLoad(String frameAddress,String timeout) {
-		selenium.waitForFrameToLoad(frameAddress,timeout);
+	public void waitForFrameToLoad(String frameAddress, String timeout) {
+		selenium.waitForFrameToLoad(frameAddress, timeout);
 	}
 
 	public String getCookie() {
@@ -626,12 +656,12 @@ public class DefaultSelenium implements Selenium {
 		return selenium.isCookiePresent(name);
 	}
 
-	public void createCookie(String nameValuePair,String optionsString) {
-		selenium.createCookie(nameValuePair,optionsString);
+	public void createCookie(String nameValuePair, String optionsString) {
+		selenium.createCookie(nameValuePair, optionsString);
 	}
 
-	public void deleteCookie(String name,String optionsString) {
-		selenium.deleteCookie(name,optionsString);
+	public void deleteCookie(String name, String optionsString) {
+		selenium.deleteCookie(name, optionsString);
 	}
 
 	public void deleteAllVisibleCookies() {
@@ -646,20 +676,20 @@ public class DefaultSelenium implements Selenium {
 		selenium.runScript(script);
 	}
 
-	public void addLocationStrategy(String strategyName,String functionDefinition) {
-		selenium.addLocationStrategy(strategyName,functionDefinition);
+	public void addLocationStrategy(String strategyName, String functionDefinition) {
+		selenium.addLocationStrategy(strategyName, functionDefinition);
 	}
 
-	public void captureEntirePageScreenshot(String filename,String kwargs) {
-		selenium.captureEntirePageScreenshot(filename,kwargs);
+	public void captureEntirePageScreenshot(String filename, String kwargs) {
+		selenium.captureEntirePageScreenshot(filename, kwargs);
 	}
 
-	public void rollup(String rollupName,String kwargs) {
-		selenium.rollup(rollupName,kwargs);
+	public void rollup(String rollupName, String kwargs) {
+		selenium.rollup(rollupName, kwargs);
 	}
 
-	public void addScript(String scriptContent,String scriptTagId) {
-		selenium.addScript(scriptContent,scriptTagId);
+	public void addScript(String scriptContent, String scriptTagId) {
+		selenium.addScript(scriptContent, scriptTagId);
 	}
 
 	public void removeScript(String scriptTagId) {
@@ -674,8 +704,8 @@ public class DefaultSelenium implements Selenium {
 		selenium.setContext(context);
 	}
 
-	public void attachFile(String fieldLocator,String fileLocator) {
-		selenium.attachFile(fieldLocator,fileLocator);
+	public void attachFile(String fieldLocator, String fileLocator) {
+		selenium.attachFile(fieldLocator, fileLocator);
 	}
 
 	public void captureScreenshot(String filename) {

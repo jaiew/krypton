@@ -20,56 +20,19 @@
  ***************************************************************************/
 package com.thoughtworks.twist.osgi;
 
-import java.io.File;
-
+import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
 
 
 public class Main {
 	public static void main(String[] args) throws Exception {
 		try {
-			EmbeddedEquinoxLauncher launcher;
-
-			if (isMac()) {
-				verifyOnFirstThread();
-				launcher = new EmbeddedEquinoxLauncher(getAndVerifyCocoaClasspath().toURL());
-			} else {
-				launcher = new EmbeddedEquinoxLauncher();
-			}
-
-			launcher.startup();
-			
-			Selenium web = launcher.create(Selenium.class);
+			Selenium web = new DefaultSelenium("", -1, "", "http://www.google.com");
 
 			web.start();
 			web.open("http://www.google.com");
-
-			launcher.shutdown();
 		} catch (Exception e) {
 			throw e;
 		}
-	}
-
-	private static File getAndVerifyCocoaClasspath() {
-		File cocoaClasspath = new File("/System/Library/Java");
-		if (!new File(cocoaClasspath, "/com/apple").isDirectory()) {
-			throw new IllegalStateException("You need to have the cocoa Java bindings installed at /System/Library/Java (comes with XCode).");
-		}
-		return cocoaClasspath;
-	}
-
-	private static void verifyOnFirstThread() {
-		if (!isRunningOnFirstThread()) {
-			throw new IllegalArgumentException(
-					"You need to start the JVM with -XstartOnFirstThread on Mac.");
-		}
-	}
-
-	private static boolean isRunningOnFirstThread() {
-		return "Thread-0".equals(Thread.currentThread().getName());
-	}
-
-	private static boolean isMac() {
-		return System.getProperty("os.name").toLowerCase().contains("mac");
 	}
 }
