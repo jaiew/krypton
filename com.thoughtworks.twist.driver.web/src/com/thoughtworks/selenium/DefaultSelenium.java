@@ -38,7 +38,6 @@
 // This file has been automatically generated via XSL
 package com.thoughtworks.selenium;
 
-import java.lang.reflect.Constructor;
 
 
 /** The default implementation of the Selenium interface; <i>end users will primarily interact with this object.</i> */
@@ -57,8 +56,7 @@ public class DefaultSelenium implements Selenium {
 	private Selenium createSeleniumInstance(String serverHost, int serverPort, String browserStartCommand, String browserURL) {
 		try {
 			Class<?> twistSelenium = Class.forName("com.thoughtworks.twist.driver.web.selenium.TwistSelenium");
-			Constructor<?> constructor = twistSelenium.getConstructor(String.class);
-			return (Selenium) constructor.newInstance(browserURL);
+			return (Selenium) twistSelenium.getConstructor(String.class).newInstance(browserURL);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
