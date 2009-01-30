@@ -38,7 +38,6 @@
 // This file has been automatically generated via XSL
 package com.thoughtworks.selenium;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -81,6 +80,9 @@ public class DefaultSelenium implements Selenium {
 	}
 
 	private void updateTwistBrowserPropertyIfNeeded(String browserStartCommand) {
+		if (System.getProperty("twist.driver.web.browser") != null) {
+			return;
+		}
 		if (browserStartCommand != null && browserStartCommand.length() != 0) {
 			System.setProperty("twist.driver.web.browser", SELENIUM_BROWSER_LAUNCHES_TO_SWT_BROWSERS.get(browserStartCommand));
 		}

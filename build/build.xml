@@ -242,6 +242,8 @@
 			</classpath>
 
 			<jvmarg value="${extra.jvm.arg}" />
+			<jvmarg value="-Dtwist.driver.web.browser=${twist.driver.web.browser}" />
+
 			<formatter type="xml" />
 
 			<batchtest todir="${junit.output.dir}/smoke/">
