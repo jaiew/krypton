@@ -168,14 +168,6 @@
 		<antcall target="smoke" />
 	</target>
 
-	<target name="run" depends="init-svn.version">
-		<property name="twist.driver.web.browser" value="mozilla" />
-		<java jar="${dist.dir}/${outer.project}-full-${svn.version}.jar" fork="true">
-			<jvmarg value="-Dtwist.driver.web.browser=${twist.driver.web.browser}" />
-			<jvmarg value="${extra.jvm.arg}" />
-		</java>
-	</target>
-
 	<target name="all-tests" depends="build-feature">
 		<delete dir="${junit.output.dir}" />
 		<parallel>
