@@ -31,9 +31,10 @@ public class GoogleTest extends TestCase {
         browser.start();
     }
 
-    public void testGoogle() {
+    public void testGoogle() throws InterruptedException {
         browser.open("http://www.google.com/webhp?hl=en");
         browser.type("q", "hello world\n");
+        assertTrue(browser.isTextPresent("helloworld.com"));
         assertEquals("hello world - Google Search", browser.getTitle());
     }
 
