@@ -50,7 +50,6 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.webapp.WebAppContext;
 
-import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 import com.thoughtworks.twist.driver.web.selenium.TwistSelenium;
 
 /**
@@ -73,7 +72,7 @@ public class SeleneseTestCase extends TestCase {
     private boolean captureScreetShotOnFailure = false;
 
     /** Use this object to run all of your selenium tests */
-    protected static TwistSelenium twistSelenium;
+    protected static DefaultSelenium twistSelenium;
     protected Selenium selenium;
     private static int port = WEBSERVER_PORT;
     
@@ -86,7 +85,6 @@ public class SeleneseTestCase extends TestCase {
     }
 
     private static Server server;
-    private BrowserSession session;
 
     public SeleneseTestCase() {
         super();
@@ -221,12 +219,11 @@ public class SeleneseTestCase extends TestCase {
         }
 
         if (twistSelenium == null) {
-            session = BrowserSession.create();
-            twistSelenium = new TwistSelenium(url, session);
+            twistSelenium = new DefaultSelenium("", getWebServerPort(), "", url);
             twistSelenium.start();
             twistSelenium.setContext(this.getClass().getSimpleName() + "." + getName());
         } else {
-            twistSelenium.setBrowserUrl(url);
+            ((TwistSelenium) twistSelenium.getUnderyingSelenium()).setBrowserUrl(url);
         }
         twistSelenium.selectFrame("relative=top");
         selenium = twistSelenium;
@@ -489,7 +486,7 @@ public class SeleneseTestCase extends TestCase {
         try {
             checkForVerificationErrors();
         } finally {
-            twistSelenium.closeAllDialogs();
+            ((TwistSelenium) twistSelenium.getUnderyingSelenium()).closeAllDialogs();
             // selenium.stop();
         }
     }
@@ -509,7 +506,7 @@ public class SeleneseTestCase extends TestCase {
         // selenium.getBrowserSession().waitForActivity();
         // } else {
         Thread.sleep(2000);
-        twistSelenium.getBrowserSession().waitForIdle();
+        ((TwistSelenium) twistSelenium.getUnderyingSelenium()).getBrowserSession().waitForIdle();
         // }
     }
 }

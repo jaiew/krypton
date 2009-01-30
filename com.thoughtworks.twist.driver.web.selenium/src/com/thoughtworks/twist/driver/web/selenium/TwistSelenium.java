@@ -85,6 +85,10 @@ public class TwistSelenium implements Selenium {
 	private AjaxWaitStrategy ajaxWaitStrategy;
 	private LocationChangedWaitStrategy locationChangedWaitStrategy;
 
+    public TwistSelenium(String browserURL) {
+    	this(browserURL, BrowserSession.create());
+	}
+
 	public TwistSelenium(String browserUrl, BrowserSession session) {
 		this.browserUrl = browserUrl;
 		this.session = session;
