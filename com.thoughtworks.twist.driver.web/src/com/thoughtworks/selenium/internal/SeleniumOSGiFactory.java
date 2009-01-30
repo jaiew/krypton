@@ -18,17 +18,21 @@
  *   Manish Chakravarty
  *   Pavan K S
  ***************************************************************************/
-package com.thoughtworks.twist.osgi;
+package com.thoughtworks.selenium.internal;
 
 import java.io.File;
 
 import com.thoughtworks.selenium.Selenium;
+import com.thoughtworks.selenium.SeleniumFactory;
+import com.thoughtworks.twist.osgi.EmbeddedEquinoxLauncher;
 
 
-public class SeleniumOSGiFactory {
-	public Selenium create(String browserURL) throws Exception {
+public class SeleniumOSGiFactory implements SeleniumFactory {
+	private EmbeddedEquinoxLauncher launcher;
+	private SeleniumFactory factory;
+
+	public SeleniumOSGiFactory() {
 		try {
-			EmbeddedEquinoxLauncher launcher;
 
 			if (isMac()) {
 				verifyOnFirstThread();
@@ -38,11 +42,14 @@ public class SeleniumOSGiFactory {
 			}
 
 			launcher.startup();
-			
-			return launcher.create(Selenium.class);
+			factory = launcher.create(SeleniumFactory.class);
 		} catch (Exception e) {
-			throw e;
+			throw new RuntimeException(e);
 		}
+	}
+	
+	public Selenium create(String browserURL) {
+		return factory.create(browserURL);
 	}
 
 	private File getAndVerifyCocoaClasspath() {

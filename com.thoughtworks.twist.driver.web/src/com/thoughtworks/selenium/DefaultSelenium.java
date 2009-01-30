@@ -39,10 +39,12 @@
 package com.thoughtworks.selenium;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.thoughtworks.twist.osgi.SeleniumOSGiFactory;
+import com.thoughtworks.selenium.internal.SeleniumOSGiFactory;
+import com.thoughtworks.selenium.internal.SeleniumReflectionFactory;
 
 /**
  * The default implementation of the Selenium interface; <i>end users will
@@ -50,21 +52,22 @@ import com.thoughtworks.twist.osgi.SeleniumOSGiFactory;
  */
 @SuppressWarnings("serial")
 public class DefaultSelenium implements Selenium {
-	private static Map<String, String> SELENIUM_BROWSER_LAUNCHES_TO_SWT_BROWSERS = new HashMap<String, String>() {
-		{
-			put("*firefox", "mozilla");
-			put("*pifirefox", "mozilla");
-			put("*firefoxproxy", "mozilla");
-			put("*chrome", "mozilla");
+	private static Map<String, String> SELENIUM_BROWSER_LAUNCHES_TO_SWT_BROWSERS = Collections
+			.unmodifiableMap(new HashMap<String, String>() {
+				{
+					put("*firefox", "mozilla");
+					put("*pifirefox", "mozilla");
+					put("*firefoxproxy", "mozilla");
+					put("*chrome", "mozilla");
 
-			put("*iexplore", "ie");
-			put("*piiexplore", "ie");
-			put("*iexploreproxy", "ie");
-			put("*iehta", "ie");
+					put("*iexplore", "ie");
+					put("*piiexplore", "ie");
+					put("*iexploreproxy", "ie");
+					put("*iehta", "ie");
 
-			put("*safari", "safari");
-		}
-	};
+					put("*safari", "safari");
+				}
+			});
 
 	private Selenium selenium;
 
@@ -78,29 +81,19 @@ public class DefaultSelenium implements Selenium {
 	}
 
 	private void updateTwistBrowserPropertyIfNeeded(String browserStartCommand) {
-		if (browserStartCommand != null && browserStartCommand.length() != 0) {			
+		if (browserStartCommand != null && browserStartCommand.length() != 0) {
 			System.setProperty("twist.driver.web.browser", SELENIUM_BROWSER_LAUNCHES_TO_SWT_BROWSERS.get(browserStartCommand));
 		}
 	}
 
 	private Selenium createSeleniumInstance(String browserURL) {
-			try {
-				return createSeleniumUsingReflection(browserURL);
-			} catch (ClassNotFoundException tryCreatingUsingOsgi) {
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
 		try {
 			return new SeleniumOSGiFactory().create(browserURL);
+		} catch (RuntimeException e) {
+			return new SeleniumReflectionFactory().create(browserURL);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	private Selenium createSeleniumUsingReflection(String browserURL) throws ClassNotFoundException, InstantiationException,
-			IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		Class<?> twistSelenium = Class.forName("com.thoughtworks.twist.driver.web.selenium.TwistSelenium");
-		return (Selenium) twistSelenium.getConstructor(String.class).newInstance(browserURL);
 	}
 
 	/** Uses an arbitrary CommandProcessor */

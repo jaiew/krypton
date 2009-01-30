@@ -27,25 +27,28 @@ import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 
 import com.thoughtworks.selenium.Selenium;
-import com.thoughtworks.twist.driver.web.browser.BrowserSession;
+import com.thoughtworks.selenium.SeleniumFactory;
 
 public class SeleniumActivator implements BundleActivator {
+	private final class InternalSeleniumFactory implements SeleniumFactory {
+		public Selenium create(String browserURL) {
+			return new TwistSelenium(browserURL);
+		}
+	}
+
 	private final class SeleniumServiceFactory implements ServiceFactory {
 		public Object getService(Bundle bundle, ServiceRegistration registration) {
-			return new TwistSelenium("", BrowserSession.create());
+			return new InternalSeleniumFactory();
 		}
 
-		public void ungetService(Bundle bundle,
-				ServiceRegistration registration, Object service) {
+		public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {
 		}
 	}
 
 	public void start(BundleContext context) throws Exception {
-		context.registerService(Selenium.class.getName(),
-				new SeleniumServiceFactory(), null);
+		context.registerService(SeleniumFactory.class.getName(), new SeleniumServiceFactory(), null);
 	}
 
 	public void stop(BundleContext context) throws Exception {
-		System.out.println("Selenium stopped");
 	}
 }

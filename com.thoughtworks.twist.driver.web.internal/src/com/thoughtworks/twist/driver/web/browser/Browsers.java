@@ -165,7 +165,7 @@ public enum Browsers {
         layoutBrowser(browser);
 
         UserFactory userFactory = new UserFactory();
-        log.debug("Creating user: " + userFactory.getUserForPlatform());
+//        log.debug("Creating user: " + userFactory.getUserForPlatform());
         User user = userFactory.createUser(shell);
         BrowserSession session = new BrowserSession(browser, user);
         init(session);
