@@ -48,6 +48,7 @@ import com.thoughtworks.twist.osgi.SeleniumOSGiFactory;
  * The default implementation of the Selenium interface; <i>end users will
  * primarily interact with this object.</i>
  */
+@SuppressWarnings("serial")
 public class DefaultSelenium implements Selenium {
 	private static Map<String, String> SELENIUM_BROWSER_LAUNCHES_TO_SWT_BROWSERS = new HashMap<String, String>() {
 		{
@@ -72,12 +73,18 @@ public class DefaultSelenium implements Selenium {
 	}
 
 	public DefaultSelenium(String serverHost, int serverPort, String browserStartCommand, String browserURL) {
-		selenium = createSeleniumInstance(serverHost, serverPort, browserStartCommand, browserURL);
+		updateTwistBrowserPropertyIfNeeded(browserStartCommand);
+		selenium = createSeleniumInstance(browserURL);
 	}
 
-	private Selenium createSeleniumInstance(String serverHost, int serverPort, String browserStartCommand, String browserURL) {
-		try {
+	private void updateTwistBrowserPropertyIfNeeded(String browserStartCommand) {
+		if (browserStartCommand != null && browserStartCommand.length() != 0) {			
 			System.setProperty("twist.driver.web.browser", SELENIUM_BROWSER_LAUNCHES_TO_SWT_BROWSERS.get(browserStartCommand));
+		}
+	}
+
+	private Selenium createSeleniumInstance(String browserURL) {
+		try {
 			return createSeleniumUsingReflection(browserURL);
 		} catch (Exception tryCreatingUsingOSGi) {
 		}

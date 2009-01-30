@@ -232,6 +232,32 @@
 		</sequential>
 	</macrodef>
 
+	<target name="smoke" depends="dist">
+		<property name="project.id" value="com.thoughtworks.twist.driver.web.selenium.test" />
+
+		<getSourcepath property="src.path" workspace="${workspace.dir}" projectName="${project.id}" />
+		<getOutputpath property="bin.path" workspace="${workspace.dir}" projectName="${project.id}" />
+
+		<mkdir dir="${junit.output.dir}/smoke" />
+
+		<junit printsummary="yes" haltonfailure="true" fork="true" forkmode="once">
+			<classpath>
+				<pathelement location="${bin.path}" />
+				<pathelement location="${dist.jar}" />
+				<pathelement location="${workspace.dir}/build/lib/junit.jar" />
+			</classpath>
+
+			<jvmarg value="${extra.jvm.arg}" />
+			<formatter type="xml" />
+
+			<batchtest todir="${junit.output.dir}/smoke/">
+				<fileset dir="${src.path}">
+					<include name="**/smoke/*Test*.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
 	<target name="detect-failure">
 		<loadfile property="failure" srcFile="${junit.output.dir}/TESTS-TestSuites.xml">
 			<filterchain>
@@ -240,7 +266,7 @@
 				</linecontainsregexp>
 			</filterchain>
 		</loadfile>
-		<fail if="failure" message="Tests FAILED"/>
+		<fail if="failure" message="Tests FAILED" />
 	</target>
 
 	<target name="junitreport">
