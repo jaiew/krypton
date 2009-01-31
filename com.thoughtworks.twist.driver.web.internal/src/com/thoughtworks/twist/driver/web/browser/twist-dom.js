@@ -93,6 +93,8 @@ if (!Twist.dom) {
             }
         }
         
+        xml += attributeString("Twist.domIndex", Twist.domIndex(element));
+        
         if (element.hasChildNodes() || tagName === "script" || tagName === "link") {
             xml += ">";
             var needsCData = tagName === "script" || tagName === "noscript" || tagName === "style";
@@ -128,5 +130,15 @@ if (!Twist.dom) {
         outer.appendChild(element.cloneNode(true));
         
         return outer.innerHTML;
+    };
+    
+    Twist.domIndex = function(element){
+        var parent = element.parentNode;
+        for (var i = 0; i < parent.childNodes.length; i++) {
+            if (parent.childNodes[i] === element) {
+                return i;
+            }
+        }
+        return -1;
     };
 }

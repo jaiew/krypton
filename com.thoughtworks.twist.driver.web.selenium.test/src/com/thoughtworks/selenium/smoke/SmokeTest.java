@@ -20,25 +20,44 @@
  ***************************************************************************/
 package com.thoughtworks.selenium.smoke;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import com.thoughtworks.selenium.*;
-import junit.framework.*;
 
-public class GoogleTest extends TestCase {
-    private Selenium browser;
+import static junit.framework.Assert.*;
 
-    public void setUp() {
+public class SmokeTest {
+    private static Selenium browser;
+
+    @BeforeClass
+    public static void startBrowser() {
         browser = new DefaultSelenium("localhost", 4444, "*firefox", "http://www.google.com");
         browser.start();
     }
 
+    @Test
     public void testGoogle() throws InterruptedException {
         browser.open("http://www.google.com/webhp?hl=en");
         browser.type("q", "hello world\n");
+        
         assertTrue(browser.isTextPresent("helloworld.com"));
         assertEquals("hello world - Google Search", browser.getTitle());
     }
+    
+    @Test
+    public void testDigg() throws Exception {
+        browser.open("http://www.digg.com");
+        browser.click("//div[contains(@class, 'news-summary')][1]//a[@class = 'tool comments']");
+        browser.click("//a[text() = 'digg it']");
 
-    public void tearDown() {
+        assertTrue(browser.isTextPresent("You've got to login or join to Digg that!"));
+        assertTrue(browser.isElementPresent("//div[@class = 'login-digg']//input[@name = 'username']"));
+	}
+
+    @AfterClass
+    public static void stopBrowser() {
         browser.stop();
     }
 }

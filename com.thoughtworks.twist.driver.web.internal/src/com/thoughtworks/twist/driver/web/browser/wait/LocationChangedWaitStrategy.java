@@ -39,9 +39,13 @@ public class LocationChangedWaitStrategy implements LocationListener, WaitStrate
     public void init(BrowserSession session) {
         session.browser.addLocationListener(this);
         
-        exclusionPatterns.add("javascript:.*");
-        exclusionPatterns.add("about:blank");
-        exclusionPatterns.add("about:config");
+        
+        addURLExclusionPattern("javascript:.*");
+        addURLExclusionPattern("about:blank");
+        addURLExclusionPattern("about:config");
+
+        // This obviously needs to be configurable somehow.
+        addURLExclusionPattern(".*analytics.live.com.*");
     }
 
     public synchronized boolean isBusy() {

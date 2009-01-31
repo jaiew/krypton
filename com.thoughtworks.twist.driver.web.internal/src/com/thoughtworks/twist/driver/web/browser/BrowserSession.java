@@ -333,18 +333,12 @@ public class BrowserSession {
         waitStrategies.remove(waitStrategy);
     }
 
-    public String domExpression(Node element) {
+    public String domExpression(Element element) {
         String expression = "";
-        Node original = element;
-        Node parent = null;
-        while ((parent = (Node) element.getParentNode()) != null && !(parent instanceof Document)) {
-            for (int i = 0; i < parent.getChildNodes().getLength(); i++) {
-                if (parent.getChildNodes().item(i) == element) {
-                    expression = ".childNodes[" + i + "]" + expression;
-                    break;
-                }
-            }
-            element = parent;
+        Element original = element;
+        while (!(element.getParentNode() instanceof Document)) {
+            expression = ".childNodes[" + element.getAttribute("Twist.domIndex") + "]" + expression;
+            element = (Element) element.getParentNode();
         }
         String domExpression = getDocumentExpression() + ".documentElement" + expression;
         log.trace("DOM Expression of " + original + " is '" + domExpression + "'");
@@ -513,7 +507,7 @@ public class BrowserSession {
         execute(domExpression(element) + ".scrollIntoView()");
     }
 
-    public boolean isVisible(Node element) {
+    public boolean isVisible(Element element) {
         inject("twist-is-visible.js");
         boolean visible = Boolean.parseBoolean(execute("Twist.isVisible(" + domExpression(element) + ")"));
         log.debug("Is " + element + " visible: " + visible);
