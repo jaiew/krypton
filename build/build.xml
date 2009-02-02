@@ -164,51 +164,101 @@
 
 		<echo message="" />
 		<echo message="${dist.jar}" />
-		
+
 		<antcall target="smoke" />
 	</target>
 
-	<target name="all-tests" depends="build-feature">
+	<target name="all-integration-tests" depends="build-feature">
+		<delete dir="${junit.output.dir}" />
+
+		<antcall target="integration-ie-wine" />
+		<antcall target="integration-ie" />
+		<antcall target="integration-mozilla" />
+		<antcall target="integration-safari" />
+
+		<antcall target="junitreport" />
+		<antcall target="detect-failure" />
+	</target>
+
+	<target name="integration-safari" if="isMac">
+		<integration-tests browser="safari" />
+	</target>
+
+	<target name="integration-mozilla">
+		<integration-tests browser="mozilla" />
+	</target>
+
+	<target name="integration-ie" if="isWindows">
+		<integration-tests browser="ie" />
+	</target>
+
+	<target name="integration-ie-wine" if="hasWine" unless="isWindows">
+		<wine-ant target="integration-ie" timeout="60000" />
+	</target>
+
+	<target name="all-selenium-tests" depends="all-integration-tests">
 		<delete dir="${junit.output.dir}" />
 		<parallel>
-			<antcall target="ie-wine" />
-			<antcall target="ie" />
-			<antcall target="mozilla" />
-			<antcall target="safari" />
+			<antcall target="selenium-ie-wine" />
+			<antcall target="selenium-ie" />
+			<antcall target="selenium-mozilla" />
+			<antcall target="selenium-safari" />
 		</parallel>
 		<antcall target="junitreport" />
 		<antcall target="detect-failure" />
 	</target>
 
-	<target name="safari" if="isMac">
+	<target name="selenium-safari" if="isMac">
 		<selenium-tests browser="safari" />
 	</target>
 
-	<target name="mozilla">
+	<target name="selenium-mozilla">
 		<selenium-tests browser="mozilla" />
 	</target>
 
-	<target name="ie" if="isWindows">
+	<target name="selenium-ie" if="isWindows">
 		<selenium-tests browser="ie" />
 	</target>
 
-	<target name="ie-wine" if="hasWine" unless="isWindows">
-		<wine-ant target="ie" />
+	<target name="selenium-ie-wine" if="hasWine" unless="isWindows">
+		<wine-ant target="selenium-ie" timeout="120000" />
 	</target>
 
 	<macrodef name="selenium-tests">
 		<attribute name="browser" />
 		<sequential>
-			<property name="project.id" value="com.thoughtworks.twist.driver.web.selenium.test" />
+			<run-tests browser="@{browser}" project.id="com.thoughtworks.twist.driver.web.selenium.test">
+				<tests>
+					<include name="**/corebased/*Test*.java" />
+				</tests>
+			</run-tests>
+		</sequential>
+	</macrodef>
 
-			<getEclipseClasspath property="selenium.tests.classpath" workspace="${workspace.dir}" projectName="${project.id}" targetPlatformLocation="${target.eclipse.dir}/eclipse" runtime="true" />
-			<getSourcepath property="src.path" workspace="${workspace.dir}" projectName="${project.id}" />
+	<macrodef name="integration-tests">
+		<attribute name="browser" />
+		<sequential>
+			<run-tests browser="@{browser}" project.id="com.thoughtworks.twist.driver.web.internal.test">
+				<tests>
+					<include name="**/*Test*.java" />
+				</tests>
+			</run-tests>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="run-tests">
+		<attribute name="browser" />
+		<attribute name="project.id" />
+		<element name="tests" />
+		<sequential>
+			<getEclipseClasspath property="tests.classpath" workspace="${workspace.dir}" projectName="@{project.id}" targetPlatformLocation="${target.eclipse.dir}/eclipse" runtime="true" />
+			<getSourcepath property="src.path" workspace="${workspace.dir}" projectName="@{project.id}" />
 
 			<mkdir dir="${junit.output.dir}/@{browser}" />
 
 			<junit printsummary="yes" failureproperty="failure" fork="true" forkmode="once">
 				<classpath>
-					<pathelement path="${selenium.tests.classpath}" />
+					<pathelement path="${tests.classpath}" />
 					<pathelement location="${workspace.dir}/build/lib/junit.jar" />
 				</classpath>
 
@@ -219,7 +269,7 @@
 
 				<batchtest todir="${junit.output.dir}/@{browser}">
 					<fileset dir="${src.path}">
-						<include name="**/corebased/*Test*.java" />
+						<tests />
 					</fileset>
 				</batchtest>
 			</junit>
@@ -276,12 +326,13 @@
 
 	<macrodef name="wine-ant">
 		<attribute name="target" />
+		<attribute name="timeout" />
 		<sequential>
 			<pathconvert property="wine.ant.home" targetos="windows">
 				<path location="${ant.home}" />
 				<map from="" to="${wine.rootdrive}" />
 			</pathconvert>
-			<exec executable="wine" timeout="120000" error="/tmp/wine.stderr.ie" errorproperty="wine.failed">
+			<exec executable="wine" timeout="@{timeout}" error="/tmp/wine.stderr.ie" errorproperty="wine.failed">
 				<env key="WINEPREFIX" value="${wine.prefix}" />
 				<arg value="java" />
 				<arg value="-cp" />
