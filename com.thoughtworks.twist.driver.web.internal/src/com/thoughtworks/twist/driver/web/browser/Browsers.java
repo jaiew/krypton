@@ -251,4 +251,8 @@ public enum Browsers {
     abstract Browser create(Composite composite);
     
     public abstract String referenceError(String reference);
+    
+    public static Browsers fromSystemProperty() {
+    	return Browsers.valueOf(System.getProperty("twist.driver.web.browser", "mozilla").toUpperCase());
+    }
 }

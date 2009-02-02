@@ -37,7 +37,7 @@ import org.junit.Test;
 
 import com.thoughtworks.twist.driver.web.browser.AbstractBaseBrowserSessionWithWebServer;
 
-public abstract class AbstractWaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer {
+public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer {
 
     private static final int REFRESHES = 3;
 

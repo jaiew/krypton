@@ -30,7 +30,7 @@ import com.thoughtworks.twist.driver.web.browser.AbstractBaseBrowserSession;
 import com.thoughtworks.twist.driver.web.browser.locator.ElementNotFoundException;
 import com.thoughtworks.twist.driver.web.browser.locator.XPathLocatorStrategy;
 
-public abstract class AbstractSeleniumLocatorStrategiesTest extends AbstractBaseBrowserSession {
+public class SeleniumLocatorStrategiesTest extends AbstractBaseBrowserSession {
     @Test
     public void shouldReturnElementForIdStartingWithIdEqualsUsingIdLocatorStrategy() throws Exception {
         session.addLocatorStrategy(new IdLocatorStrategy());

@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 import com.thoughtworks.twist.driver.web.browser.AbstractBaseBrowserSession;
 import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 
-public abstract class AbstractLocatorStrategiesTest extends AbstractBaseBrowserSession {
+public class LocatorStrategiesTest extends AbstractBaseBrowserSession {
     @Test
     public void shouldThrowElementNotFoundExceptionWithoutStrategies() throws Exception {
         String locator = "locator";

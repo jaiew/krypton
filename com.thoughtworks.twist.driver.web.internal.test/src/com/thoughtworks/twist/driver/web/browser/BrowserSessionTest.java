@@ -21,18 +21,13 @@
 package com.thoughtworks.twist.driver.web.browser;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.junit.Test;
 import org.w3c.dom.Element;
 
-public abstract class AbstractBrowserSessionTest extends AbstractBaseBrowserSession {
+public class BrowserSessionTest extends AbstractBaseBrowserSession {
     @Test
     public void shouldExecuteJavascriptAndReturnResult() throws Exception {
         render("<html/>");

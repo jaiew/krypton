@@ -134,9 +134,13 @@ public abstract class AbstractBaseBrowserSession {
         session.waitForIdle();
 	}
 
-    protected abstract BrowserSession createBrowserSession();
+    protected BrowserSession createBrowserSession() {
+    	return BrowserSession.create();
+    }
 
-    protected abstract String referenceErrorMessage(String reference);
+    protected String referenceErrorMessage(String reference) {
+    	return Browsers.fromSystemProperty().referenceError(reference);
+    }
 
     private static class LocationChangedListener implements LocationListener {
         boolean changed;

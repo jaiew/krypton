@@ -37,7 +37,7 @@ import org.junit.Test;
 
 import com.thoughtworks.twist.driver.web.browser.AbstractBaseBrowserSessionWithWebServer;
 
-public abstract class AbstractBrowserOperationsTest extends AbstractBaseBrowserSessionWithWebServer {
+public class BrowserOperationsTest extends AbstractBaseBrowserSessionWithWebServer {
     private TwistSelenium selenium = new TwistSelenium("http://localhost:" + WEBSERVER_PORT, session);
     private String path;
 

@@ -96,7 +96,7 @@ public class BrowserSession {
     Log log = LogFactory.getLog(getClass());
 
     public static BrowserSession create() {
-        return Browsers.valueOf(System.getProperty("twist.driver.web.browser", "MOZILLA").toUpperCase()).create();
+        return Browsers.fromSystemProperty().create();
     }
 
     public BrowserSession(Browser browser, User user) {
