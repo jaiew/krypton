@@ -40,6 +40,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,7 +58,6 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import com.sun.org.apache.xpath.internal.jaxp.XPathFactoryImpl;
 import com.thoughtworks.twist.driver.web.browser.locator.ElementNotFoundException;
 import com.thoughtworks.twist.driver.web.browser.locator.LocatorStrategy;
 import com.thoughtworks.twist.driver.web.browser.wait.WaitStrategy;
@@ -110,7 +110,7 @@ public class BrowserSession {
             documentBuilder = factory.newDocumentBuilder();
             documentBuilder.setEntityResolver(new LocalEntityResolver());
 
-            xpath = new XPathFactoryImpl().newXPath();
+            xpath = XPathFactory.newInstance().newXPath();
 
             log.info("Created BrowserSession using browser " + getBrowserName() + " and user " + user.getClass().getSimpleName());
         } catch (Exception e) {

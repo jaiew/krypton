@@ -990,7 +990,6 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void waitForFrameToLoad(String frameAddress, String timeout) {
-		throw new UnsupportedOperationException();
 	}
 
 	public void waitForPageToLoad(String timeout) {
