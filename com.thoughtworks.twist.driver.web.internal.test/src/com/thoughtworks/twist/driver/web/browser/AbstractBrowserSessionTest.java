@@ -20,6 +20,7 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.browser;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -81,15 +82,6 @@ public abstract class AbstractBrowserSessionTest extends AbstractBaseBrowserSess
         assertEquals("html", session.dom().getDocumentElement().getTagName());
     }
 
-//    @Test
-//    public void shouldReadDomAsXml() throws Exception {
-//        String html = readResource("test-dom.html");
-//
-//        render(html);
-//
-//        assertXmlEquals(parse(html), session.dom());
-//    }
-
     @Test
     public void shouldReturnBoundingRectangleForElement() throws Exception {
         render(readResource("test-bounding-rectangle.html"));
@@ -127,12 +119,11 @@ public abstract class AbstractBrowserSessionTest extends AbstractBaseBrowserSess
     }
 
     @Test
-    public void shouldUseCheckedPropertyAfterChangeForCheckboxButLoadedHtmlShouldBeSame() throws Exception {
+    public void shouldUseCheckedPropertyAfterChangeForCheckbox() throws Exception {
         render("<html><head/><body><input id=\"1\" type=\"checkbox\" checked=\"true\"/></body></html>");
-        session.execute(session.domExpression(session.dom().getElementById("1")) + ".checked = false");
+        executeAndWaitForIdle(session.domExpression(session.dom().getElementById("1")) + ".checked = false");
         Element checkbox = session.dom().getElementById("1");
         assertEquals(Boolean.FALSE.toString(), checkbox.getAttribute("checked"));
-//        assertFalse(session.domAsString().contains("false"));
     }
 
     @Test
@@ -151,12 +142,11 @@ public abstract class AbstractBrowserSessionTest extends AbstractBaseBrowserSess
     }
 
     @Test
-    public void shouldUseValuePropertyAfterChangeForTextFieldButLoadedHtmlShouldBeSame() throws Exception {
+    public void shouldUseValuePropertyAfterChangeForTextField() throws Exception {
         render("<html><head/><body><input id=\"1\" type=\"text\" value=\"hello\"/></body></html>");
-        session.execute(session.domExpression(session.dom().getElementById("1")) + ".value = 'world'");
+        executeAndWaitForIdle(session.domExpression(session.dom().getElementById("1")) + ".value = 'world'");
         Element textfield = session.dom().getElementById("1");
         assertEquals("world", textfield.getAttribute("value"));
-//        assertFalse(session.domAsString().contains("world"));
     }
 
     @Test
@@ -176,13 +166,12 @@ public abstract class AbstractBrowserSessionTest extends AbstractBaseBrowserSess
     }
 
     @Test
-    public void shouldUseValuePropertyAfterChangeForTextAreaButLoadedHtmlShouldBeSame() throws Exception {
+    public void shouldUseValuePropertyAfterChangeForTextArea() throws Exception {
         render("<html><head/><body><textarea id=\"1\">hello</textarea></body></html>");
-        session.execute(session.domExpression(session.dom().getElementById("1")) + ".value = 'world'");
+        executeAndWaitForIdle(session.domExpression(session.dom().getElementById("1")) + ".value = 'world'");
         Element textarea = session.dom().getElementById("1");
         assertEquals("world", textarea.getAttribute("value"));
         assertEquals("world", textarea.getTextContent());
-//        assertFalse(session.domAsString().contains("world"));
     }
 
     @Test
@@ -207,12 +196,11 @@ public abstract class AbstractBrowserSessionTest extends AbstractBaseBrowserSess
     }
 
     @Test
-    public void shouldUseSelectedPropertyAfterChangeForOptionButLoadedHtmlShouldBeSame() throws Exception {
+    public void shouldUseSelectedPropertyAfterChangeForOption() throws Exception {
         render("<html><head/><body><select><option id=\"0\"/><option id=\"1\" selected=\"true\"/></select></body></html>");
-        session.execute(session.domExpression(session.dom().getElementById("0")) + ".selected = true");
+        executeAndWaitForIdle(session.domExpression(session.dom().getElementById("0")) + ".selected = true");
         Element option = session.dom().getElementById("1");
         assertEquals(Boolean.FALSE.toString(), option.getAttribute("selected"));
-//        assertFalse(session.domAsString().contains("false"));
     }
 
     @Test
@@ -230,12 +218,11 @@ public abstract class AbstractBrowserSessionTest extends AbstractBaseBrowserSess
     }
 
     @Test
-    public void shouldUseDisabledPropertyAfterChangeForTextFieldButLoadedHtmlShouldBeSame() throws Exception {
+    public void shouldUseDisabledPropertyAfterChangeForTextField() throws Exception {
         render("<html><head/><body><input id=\"1\" type=\"text\" disabled=\"true\"/></body></html>");
-        session.execute(session.domExpression(session.dom().getElementById("1")) + ".disabled = false");
+        executeAndWaitForIdle(session.domExpression(session.dom().getElementById("1")) + ".disabled = false");
         Element textfield = session.dom().getElementById("1");
         assertEquals(Boolean.FALSE.toString(), textfield.getAttribute("disabled"));
-//        assertFalse(session.domAsString().contains("false"));
     }
 
     @Test
@@ -253,12 +240,11 @@ public abstract class AbstractBrowserSessionTest extends AbstractBaseBrowserSess
     }
 
     @Test
-    public void shouldUseReadonlyPropertyAfterChangeForTextFieldButLoadedHtmlShouldBeSame() throws Exception {
+    public void shouldUseReadonlyPropertyAfterChangeForTextField() throws Exception {
         render("<html><head/><body><input id=\"1\" type=\"text\" readonly=\"true\"/></body></html>");
-        session.execute(session.domExpression(session.dom().getElementById("1")) + ".readOnly = false");
+        executeAndWaitForIdle(session.domExpression(session.dom().getElementById("1")) + ".readOnly = false");
         Element textfield = session.dom().getElementById("1");
         assertEquals(Boolean.FALSE.toString(), textfield.getAttribute("readonly"));
-//        assertFalse(session.domAsString().contains("false"));
     }
 
     @Test
@@ -324,21 +310,10 @@ public abstract class AbstractBrowserSessionTest extends AbstractBaseBrowserSess
         }
     }
 
-    // These are invalid for now, may be resurrected.    
-    
-//    @Test
-//    public void shouldTryToFixIllegalAttributes() throws Exception {
-//        render("<html><head/><body id=\"1\" -illegal=\"\" another=very=\"strange\"></body></html>");
-//        Element body = session.dom().getElementById("1");
-//        assertFalse(body.hasAttribute("-illegal"));
-//        assertEquals("very=\"strange\"", body.getAttribute("another"));
-//    }
-//    
-//    @Test
-//    public void shouldHandleEntitiesInAttributes() throws Exception {
-//        render("<html><head/><body id=\"1\" onClick=\"return newprefs('promo_id=rec&amp;promo_action=hide')\" onmouseup=\"return newprefs_geo('promo_id=local&amp;promo_action=accept',this,2);\" /><html>");
-//        Element body = session.dom().getElementById("1");
-//        assertEquals("return newprefs('promo_id=rec&promo_action=hide')", body.getAttribute("onclick"));
-//        assertEquals("return newprefs_geo('promo_id=local&promo_action=accept',this,2);", body.getAttribute("onmouseup"));
-//    }
+    @Test
+    public void shouldRemoveIllegalAttributes() throws Exception {
+        render("<html><head/><body id=\"1\" -illegal=\"\"></body></html>");
+        Element body = session.dom().getElementById("1");
+        assertFalse(body.hasAttribute("-illegal"));
+    }
 }

@@ -71,7 +71,7 @@ public class BrowserSession {
             + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n";
 
     private static final int DEFAULT_EVENTLOOP_TIMEOUT = 10 * 1000;
-    private static final int PATIENT_LOCATOR_TIMEOUT = (int) (0.5 * 1000);
+    private static final int DEFAULT_PATIENT_LOCATOR_TIMEOUT = (int) (0.5 * 1000);
 
     private Map<String, String> resourcesByName = new HashMap<String, String>();
 
@@ -85,7 +85,7 @@ public class BrowserSession {
     private List<WaitStrategy> waitStrategies = new ArrayList<WaitStrategy>();
 
     private int eventLoopTimeout = DEFAULT_EVENTLOOP_TIMEOUT;
-    private long patientLocatorTimeout = PATIENT_LOCATOR_TIMEOUT;
+    private long patientLocatorTimeout = DEFAULT_PATIENT_LOCATOR_TIMEOUT;
 
     private XPath xpath;
 
@@ -293,7 +293,7 @@ public class BrowserSession {
             }
         }
         pumpEvents();
-        document = null;
+        emptyDocumentCache();
     }
 
     public void pumpEvents() {
@@ -517,10 +517,14 @@ public class BrowserSession {
     public void setWindowExpression(String domExpression) {
         log.debug("Changing target window to: '" + domExpression + "'");
         inject("twist-normalize-frame.js");
-        document = null;
+        emptyDocumentCache();
         windowExpression = execute("Twist.normalizeFrame(" + domExpression + ")");
         log.debug("Target window normalized as: '" + windowExpression + "'");
     }
+
+	private void emptyDocumentCache() {
+		document = null;
+	}
 
     public String getWindowExpression() {
         return windowExpression;

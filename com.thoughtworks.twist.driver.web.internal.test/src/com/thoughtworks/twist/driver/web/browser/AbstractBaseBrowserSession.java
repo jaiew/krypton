@@ -128,6 +128,11 @@ public abstract class AbstractBaseBrowserSession {
     protected String readResource(String resource) {
         return session.readResource(resource, getClass());
     }
+    
+	protected void executeAndWaitForIdle(String script) {
+		session.execute(script);
+        session.waitForIdle();
+	}
 
     protected abstract BrowserSession createBrowserSession();
 
