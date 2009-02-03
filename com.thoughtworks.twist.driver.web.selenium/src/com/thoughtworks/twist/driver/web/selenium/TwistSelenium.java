@@ -91,16 +91,15 @@ public class TwistSelenium implements Selenium {
 	private User user;
 
 	public TwistSelenium(String browserURL) {
-		this(browserURL, BrowserSessionFactory.create());
+		this(browserURL, new BrowserSessionFactory().create());
 	}
 
-	public TwistSelenium(String browserUrl, BrowserSession session) {
+	public TwistSelenium(String browserUrl, final BrowserSession session) {
 		this.browserUrl = browserUrl;
 		this.session = session;
 
 		User plainUser = new UserFactory().createUser(session.getBrowser().getShell());
-		User logginUser = Decorators.wrapWithLogging(User.class, plainUser);
-		this.user = Decorators.wrapWithSWTThreading(User.class, logginUser);
+		user = Decorators.wrapWithLogging(User.class, plainUser);
 
 		addWaitStrategies(session);
 		addLocatorStrategies(session);
@@ -1012,7 +1011,7 @@ public class TwistSelenium implements Selenium {
 	private Element locate(String locator) {
 		waitForIdle();
 		Element locate = session.locate(locator);
-        session.execute(session.domExpression(locate) + ".scrollIntoView()");
+		session.execute(session.domExpression(locate) + ".scrollIntoView()");
 		return locate;
 	}
 

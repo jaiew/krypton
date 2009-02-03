@@ -147,7 +147,9 @@ public enum BrowserFamily {
         }
     };
 
-    static {
+    public static final String SYSTEM_PROPERTY = "twist.driver.web.browser";
+
+	static {
         Logger.getLogger("").setLevel(Level.FINEST);
         Logger.getLogger("").getHandlers()[0].setLevel(Level.FINEST);
     }
@@ -252,7 +254,7 @@ public enum BrowserFamily {
     public abstract String referenceError(String reference);
     
     public static BrowserFamily fromSystemProperty() {
-    	return BrowserFamily.valueOf(System.getProperty("twist.driver.web.browser", "mozilla").toUpperCase());
+    	return BrowserFamily.valueOf(System.getProperty(SYSTEM_PROPERTY, "mozilla").toUpperCase());
     }
 
 	public String newXmlHttpRequestCode() {

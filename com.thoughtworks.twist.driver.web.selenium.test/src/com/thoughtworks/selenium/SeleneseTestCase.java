@@ -38,6 +38,7 @@
 package com.thoughtworks.selenium;
 
 import java.io.File;
+import java.lang.reflect.Proxy;
 import java.net.BindException;
 import java.net.ServerSocket;
 import java.util.regex.Pattern;
@@ -50,6 +51,8 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.webapp.WebAppContext;
 
+import com.thoughtworks.twist.driver.web.browser.BrowserFamily;
+import com.thoughtworks.twist.driver.web.browser.Decorators.SWTThreadingDecorator;
 import com.thoughtworks.twist.driver.web.selenium.TwistSelenium;
 
 /**
@@ -105,7 +108,7 @@ public class SeleneseTestCase extends TestCase {
     }
 
     public String getName() {
-        return super.getName() + " " + getBrowser() + " " + System.getProperty("os.name");
+        return super.getName() + " " + BrowserFamily.fromSystemProperty() + " " + System.getProperty("os.name");
     }
 
     /**
@@ -223,14 +226,20 @@ public class SeleneseTestCase extends TestCase {
             twistSelenium.start();
             twistSelenium.setContext(this.getClass().getSimpleName() + "." + getName());
         }
-        ((TwistSelenium) twistSelenium.getUnderyingSelenium()).setBrowserUrl(url);
+        getTwistSelenium().setBrowserUrl(url);
         twistSelenium.selectFrame("relative=top");
         selenium = twistSelenium;
     }
 
-    private String getBrowser() {
-        return System.getProperty("twist.driver.web.browser", "MOZILLA");
-    }
+	@SuppressWarnings("unchecked")
+	private TwistSelenium getTwistSelenium() {
+		Selenium underlyingSelenium = twistSelenium.getUnderyingSelenium();
+		if (underlyingSelenium instanceof TwistSelenium) {
+			return (TwistSelenium) underlyingSelenium;
+		}
+		SWTThreadingDecorator<Selenium> handler = (SWTThreadingDecorator<Selenium>) Proxy.getInvocationHandler(underlyingSelenium);
+		return ((TwistSelenium) handler.getInstance());
+	}
 
     protected int getWebServerPort() {
         return port;
@@ -485,7 +494,7 @@ public class SeleneseTestCase extends TestCase {
         try {
             checkForVerificationErrors();
         } finally {
-            ((TwistSelenium) twistSelenium.getUnderyingSelenium()).closeAllDialogs();
+            getTwistSelenium().closeAllDialogs();
             // selenium.stop();
         }
     }
@@ -505,7 +514,7 @@ public class SeleneseTestCase extends TestCase {
         // selenium.getBrowserSession().waitForActivity();
         // } else {
         Thread.sleep(2000);
-        ((TwistSelenium) twistSelenium.getUnderyingSelenium()).getBrowserSession().waitForIdle();
+        getTwistSelenium().getBrowserSession().waitForIdle();
         // }
     }
 }

@@ -21,7 +21,7 @@
 package com.thoughtworks.twist.driver.web.browser;
 
 public class BrowserSessionFactory {
-	public static BrowserSession create() {
+	public BrowserSession create() {
 		return BrowserFamily.fromSystemProperty().create();
 	}
 }

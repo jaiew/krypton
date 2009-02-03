@@ -31,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.eclipse.swt.widgets.Display;
 
 public class Decorators {
-	private static final class SWTThreadingDecorator<T> implements InvocationHandler {
+	public static final class SWTThreadingDecorator<T> implements InvocationHandler {
 		private T anInstance;
 
 		private SWTThreadingDecorator(T anInstance) {
@@ -56,6 +56,10 @@ public class Decorators {
 			} catch (RuntimeException e) {
 				throw e.getCause();
 			}
+		}
+		
+		public T getInstance() {
+			return anInstance;
 		}
 	}
 

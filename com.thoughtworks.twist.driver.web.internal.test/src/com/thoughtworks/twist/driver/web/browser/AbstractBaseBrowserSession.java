@@ -42,7 +42,7 @@ import com.thoughtworks.twist.driver.web.browser.wait.LocationChangedWaitStrateg
 import static org.junit.Assert.*;
 
 public abstract class AbstractBaseBrowserSession {
-    protected BrowserSession session = BrowserSessionFactory.create();
+    protected BrowserSession session = new BrowserSessionFactory().create();
 
     @After
     public void closeBrowser() {

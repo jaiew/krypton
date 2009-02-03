@@ -50,7 +50,7 @@ public interface BrowserSession {
 
 	void inject(String script);
 
-	void inject(final String script, final Class<?> baseClass);
+	void inject(String script, Class<?> baseClass);
 
 	String readResource(String resource, Class<?> aClass);
 
