@@ -95,7 +95,7 @@ public class TwistSelenium implements Selenium {
 	public TwistSelenium(String browserUrl, BrowserSession session) {
 		this.browserUrl = browserUrl;
 		this.session = session;
-		this.user = new UserFactory().createUser(session.browser.getShell());
+		this.user = new UserFactory().createUser(session.getBrowser().getShell());
 
 		addWaitStrategies(session);
 		addLocatorStrategies(session);
@@ -182,7 +182,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void close() {
-		session.browser.getShell().setVisible(false);
+		session.getBrowser().getShell().setVisible(false);
 	}
 
 	public void contextMenu(String locator) {
@@ -540,7 +540,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void goBack() {
-		session.browser.back();
+		session.getBrowser().back();
 		waitForIdle();
 	}
 
@@ -772,7 +772,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void refresh() {
-		session.browser.refresh();
+		session.getBrowser().refresh();
 		waitForIdle();
 	}
 
@@ -1004,11 +1004,11 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void windowFocus() {
-		session.browser.forceFocus();
+		session.getBrowser().forceFocus();
 	}
 
 	public void windowMaximize() {
-		session.browser.getShell().setMaximized(true);
+		session.getBrowser().getShell().setMaximized(true);
 	}
 
 	public BrowserSession getBrowserSession() {
@@ -1083,7 +1083,7 @@ public class TwistSelenium implements Selenium {
 
 	private void addTitleListenerToTrackCurrentTitle(
 			final BrowserSession session) {
-		session.browser.addTitleListener(new TitleListener() {
+		session.getBrowser().addTitleListener(new TitleListener() {
 			public void changed(TitleEvent event) {
 				title = event.title;
 			}
@@ -1092,7 +1092,7 @@ public class TwistSelenium implements Selenium {
 
 	private void addLocationListenerToTrackCurrentUrl(
 			final BrowserSession session) {
-		session.browser.addLocationListener(new LocationListener() {
+		session.getBrowser().addLocationListener(new LocationListener() {
 			public void changed(LocationEvent event) {
 				browserUrl = event.location;
 			}

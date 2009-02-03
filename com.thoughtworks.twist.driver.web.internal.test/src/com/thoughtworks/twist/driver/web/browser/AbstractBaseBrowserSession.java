@@ -52,7 +52,7 @@ public abstract class AbstractBaseBrowserSession {
     protected void render(String html) throws InterruptedException {
         session.openBrowser();
         LocationChangedWaitStrategy listener = addLocationChangedListener();
-        session.browser.setText(html);
+        session.getBrowser().setText(html);
         waitForLocationToChange(listener);
     }
 
@@ -60,13 +60,13 @@ public abstract class AbstractBaseBrowserSession {
         session.openBrowser();
         LocationChangedWaitStrategy listener = addLocationChangedListener();
 //		session.execute(session.getDocumentExpression() + ".location = '" + url + "'");
-        session.browser.setUrl(url);
+        session.getBrowser().setUrl(url);
         waitForLocationToChange(listener);
     }
 
     private LocationChangedWaitStrategy addLocationChangedListener() {
         LocationChangedWaitStrategy listener = new LocationChangedWaitStrategy();
-        session.browser.addLocationListener(listener);
+        session.getBrowser().addLocationListener(listener);
         return listener;
     }
 
@@ -82,7 +82,7 @@ public abstract class AbstractBaseBrowserSession {
             }
         }
         session.pumpEvents();
-        session.browser.removeLocationListener(listener);
+        session.getBrowser().removeLocationListener(listener);
     }
 
     private String xmlAsString(Document document) throws IOException {
@@ -130,7 +130,7 @@ public abstract class AbstractBaseBrowserSession {
     }
 
     protected void inject(String script) {
-        session.browser.execute(readResource(script));
+        session.getBrowser().execute(readResource(script));
     }
 
     protected String readResource(String resource) {

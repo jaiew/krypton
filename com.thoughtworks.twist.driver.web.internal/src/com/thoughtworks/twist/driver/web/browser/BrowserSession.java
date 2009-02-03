@@ -76,7 +76,7 @@ public class BrowserSession {
     private Shell shell;
     private DocumentBuilder documentBuilder;
 
-    public final Browser browser;
+    private final Browser browser;
 
     private List<LocatorStrategy> locatorStrategies = new ArrayList<LocatorStrategy>();
     private List<WaitStrategy> waitStrategies = new ArrayList<WaitStrategy>();
@@ -420,16 +420,16 @@ public class BrowserSession {
         }
 
         public synchronized String execute(final String expression) {
-            browser.getDisplay().syncExec(new Runnable() {
+            getBrowser().getDisplay().syncExec(new Runnable() {
                 public void run() {
                     log.debug("Executing JavaScript: " + expression);
-                    browser.addStatusTextListener(StatusTransport.this);
+                    getBrowser().addStatusTextListener(StatusTransport.this);
                     String script = "try { window.status = '" + RETURN_VALUE + "' + (" + expression + ");} catch (e) { window.status = '"
                             + EXCEPTION + "' + e; }";
                     pumpEvents();
-                    browser.execute(script);
+                    getBrowser().execute(script);
                     pumpEvents();
-                    browser.removeStatusTextListener(StatusTransport.this);
+                    getBrowser().removeStatusTextListener(StatusTransport.this);
                 }
             });
             if (exception != null) {
@@ -531,4 +531,8 @@ public class BrowserSession {
     public String getDocumentExpression() {
         return windowExpression + ".document";
     }
+
+	public Browser getBrowser() {
+		return browser;
+	}
 }

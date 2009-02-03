@@ -31,13 +31,13 @@ public class OnBeforeUnloadWaitStrategy implements ProgressListener, WaitStrateg
 
     public void init(BrowserSession session) {
         this.session = session;
-        this.session.browser.addProgressListener(this);
+        this.session.getBrowser().addProgressListener(this);
         completed(null);
     }
 
     public boolean isBusy() {
         try {
-            if (session.browser.isDisposed()) {
+            if (session.getBrowser().isDisposed()) {
                 return false;
             }
             String unloading = session.execute("typeof(Twist) !== 'undefined' ? Twist.unloading : undefined");
@@ -52,7 +52,7 @@ public class OnBeforeUnloadWaitStrategy implements ProgressListener, WaitStrateg
     }
 
     public void completed(ProgressEvent event) {
-        session.browser
+        session.getBrowser()
                 .execute("if (!Twist) { var Twist = {}; } var unload = function() { Twist.unloading = true; }; Twist.unloading = false; window.addEventListener ? window.addEventListener('beforeunload', unload, true) : window.attachEvent('onbeforeunload', unload);");
     }
 }

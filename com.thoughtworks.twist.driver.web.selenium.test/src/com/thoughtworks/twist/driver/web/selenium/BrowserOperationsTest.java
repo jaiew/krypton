@@ -90,7 +90,7 @@ public class BrowserOperationsTest extends AbstractBaseBrowserSessionWithWebServ
     public void shouldCloseBrowser() throws Exception {
         selenium.open(localUrl(path));
         selenium.close();
-        assertFalse(session.browser.getShell().isVisible());
+        assertFalse(session.getBrowser().getShell().isVisible());
     }
 
     // Selenium.getHtmlSource is supposed to return the loaded version of the page - we have no way to do that right now.
@@ -124,7 +124,7 @@ public class BrowserOperationsTest extends AbstractBaseBrowserSessionWithWebServ
     public void shouldEndSessionOnStop() throws Exception {
         selenium.open(localUrl(path));
         selenium.stop();
-        assertTrue(session.browser.isDisposed());
+        assertTrue(session.getBrowser().isDisposed());
     }
 
     @Test
@@ -137,7 +137,7 @@ public class BrowserOperationsTest extends AbstractBaseBrowserSessionWithWebServ
             otherWindow.forceFocus();
             assertTrue(otherWindow.isFocusControl());
             selenium.windowFocus();
-            assertTrue(session.browser.isFocusControl());
+            assertTrue(session.getBrowser().isFocusControl());
         } finally {
             if (otherWindow != null) {
                 otherWindow.dispose();
@@ -149,7 +149,7 @@ public class BrowserOperationsTest extends AbstractBaseBrowserSessionWithWebServ
     public void shouldMaximizeWindow() throws Exception {
         selenium.open(localUrl(path));
         selenium.windowMaximize();
-        assertTrue(session.browser.getShell().getMaximized());
+        assertTrue(session.getBrowser().getShell().getMaximized());
     }
     
     @Test

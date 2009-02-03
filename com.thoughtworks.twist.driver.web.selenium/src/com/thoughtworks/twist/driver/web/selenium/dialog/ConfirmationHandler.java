@@ -44,8 +44,8 @@ public class ConfirmationHandler
 
 	public ConfirmationHandler(BrowserSession session) {
 		this.session = session;
-		session.browser.addProgressListener(this);
-		session.browser.addStatusTextListener(this);
+		session.getBrowser().addProgressListener(this);
+		session.getBrowser().addStatusTextListener(this);
 		completed(null);
 	}
 
@@ -53,7 +53,7 @@ public class ConfirmationHandler
 	}
 
 	public void completed(ProgressEvent event) {
-		session.browser.
+		session.getBrowser().
 				execute("if (!Twist) { var Twist = {}; } if (Twist.confirmationAnswer === undefined) { Twist.confirmationAnswer = true; } window.confirm = function(message) { window.status = '"
 						+ JAVASCRIPT_CONFIRM
 						+ "' + message; window.status = ''; var answer = Twist.confirmationAnswer; Twist.confirmationAnswer = true; return answer; }");
@@ -78,12 +78,12 @@ public class ConfirmationHandler
 	}
 
 	public void chooseCancelOnNextConfirmation() {
-		session.browser.execute("if (!Twist) { var Twist = {}; } Twist.confirmationAnswer = false");
+		session.getBrowser().execute("if (!Twist) { var Twist = {}; } Twist.confirmationAnswer = false");
 		session.pumpEvents();
 	}
 
 	public void chooseOkOnNextConfirmation() {
-		session.browser.execute("if (!Twist) { var Twist = {}; } Twist.confirmationAnswer = true");
+		session.getBrowser().execute("if (!Twist) { var Twist = {}; } Twist.confirmationAnswer = true");
 		session.pumpEvents();
 	}
 }

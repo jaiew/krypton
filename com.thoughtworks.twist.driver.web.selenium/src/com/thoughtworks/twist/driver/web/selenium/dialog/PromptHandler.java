@@ -44,8 +44,8 @@ public class PromptHandler
 
 	public PromptHandler(BrowserSession session) {
 		this.session = session;
-		session.browser.addProgressListener(this);
-		session.browser.addStatusTextListener(this);
+		session.getBrowser().addProgressListener(this);
+		session.getBrowser().addStatusTextListener(this);
 		completed(null);
 	}
 
@@ -53,7 +53,7 @@ public class PromptHandler
 	}
 
 	public void completed(ProgressEvent event) {
-		session.browser
+		session.getBrowser()
 				.execute("if (!Twist) { var Twist = {}; } if (Twist.promptAnswer === undefined) { Twist.promptAnswer = ''; } window.prompt = function(message, value) { window.status = '"
 						+ JAVASCRIPT_PROMPT
 						+ "' + message; window.status =''; var answer = Twist.promptAnswer; if (value) answer = value; Twist.promptAnswer = ''; return answer; }");
@@ -78,7 +78,7 @@ public class PromptHandler
 	}
 
 	public void answerOnNextPrompt(String answer) {
-		session.browser.execute("if (!Twist) { var Twist = {}; } Twist.promptAnswer = '" + answer + "';");
+		session.getBrowser().execute("if (!Twist) { var Twist = {}; } Twist.promptAnswer = '" + answer + "';");
 		session.pumpEvents();
 	}
 }

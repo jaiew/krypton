@@ -170,7 +170,7 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
     }
 
     private void assertReloadHelloWorld(String path, int timeout) throws MalformedURLException {
-        session.browser.setUrl(localUrl(path));
+        session.getBrowser().setUrl(localUrl(path));
         timedWaitForIdle();
         assertTrue(idleTime < timeout);
         assertTrue(idleTime >= BlockingHelloWorldServlet.BLOCKING_TIME);
@@ -204,7 +204,7 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
         handler.addServletWithMapping(BlockingHelloWorldServlet.class, path);
 
         session.openBrowser();
-        session.browser.setUrl(localUrl(path));
+        session.getBrowser().setUrl(localUrl(path));
 
         timedWaitForIdle();
 

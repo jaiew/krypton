@@ -35,13 +35,13 @@ public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
 
 	public void init(BrowserSession session) {
 		this.session = session;
-		this.session.browser.addLocationListener(this);
+		this.session.getBrowser().addLocationListener(this);
 	}
 
 	public void changed(LocationEvent event) {
 		session.inject("twist-ajax-wait-strategy.js", getClass());
 		for (String pattern : exclusionPatterns) {
-			session.browser.execute("Twist.ajaxExclusionPatterns.push(new RegExp('" + pattern + "'))");
+			session.getBrowser().execute("Twist.ajaxExclusionPatterns.push(new RegExp('" + pattern + "'))");
 		}
 	}
 
@@ -50,7 +50,7 @@ public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
 
 	public boolean isBusy() {
 		try {
-			if (session.browser.isDisposed()) {
+			if (session.getBrowser().isDisposed()) {
 				return false;
 			}
 			String requests = session.execute("Twist.numberOfActiveAjaxRequests");

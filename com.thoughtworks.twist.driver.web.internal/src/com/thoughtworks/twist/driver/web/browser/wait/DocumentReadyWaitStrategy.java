@@ -31,12 +31,12 @@ public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener
 
     public void init(final BrowserSession session) {
         this.session = session;
-        session.browser.addLocationListener(this);
+        session.getBrowser().addLocationListener(this);
     }
 
     public void changed(LocationEvent event) {
         if ("Mozilla".equals(session.getBrowserName())) {
-            session.browser.execute("if (!Twist) { var Twist = {}; }" +
+            session.getBrowser().execute("if (!Twist) { var Twist = {}; }" +
                     "if (!Twist.hasContentLoadListener) { document.addEventListener('DOMContentLoaded', function() { " +
             "Twist.contentLoaded = true; }, false); Twist.hasContentLoadListener = true; }");
             hasListener = true;

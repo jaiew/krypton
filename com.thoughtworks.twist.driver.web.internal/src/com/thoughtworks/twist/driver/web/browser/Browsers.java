@@ -68,7 +68,7 @@ public enum Browsers {
 //        }
 
         private void loadAboutBlank(BrowserSession session) {
-            session.browser.setUrl("about:blank");
+            session.getBrowser().setUrl("about:blank");
             session.pumpEvents();
         }
 
@@ -239,7 +239,7 @@ public enum Browsers {
     private void initEmptyDocument(BrowserSession session) {
         LocationChangedWaitStrategy waitStrategy = new LocationChangedWaitStrategy();
         session.addWaitStrategy(waitStrategy);
-        session.browser.setUrl("about:blank");
+        session.getBrowser().setUrl("about:blank");
         session.waitForIdle();
         session.removeWaitStrategy(waitStrategy);
     }

@@ -37,7 +37,7 @@ public class LocationChangedWaitStrategy implements LocationListener, WaitStrate
     Log log = LogFactory.getLog(getClass());
 
     public void init(BrowserSession session) {
-        session.browser.addLocationListener(this);
+        session.getBrowser().addLocationListener(this);
         
         
         addURLExclusionPattern("javascript:.*");
