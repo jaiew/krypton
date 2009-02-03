@@ -25,6 +25,8 @@ import org.eclipse.swt.browser.LocationListener;
 
 import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 
+import static com.thoughtworks.twist.driver.web.browser.BrowserFamily.*;
+
 public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener {
     private BrowserSession session;
     private boolean hasListener;
@@ -35,7 +37,7 @@ public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener
     }
 
     public void changed(LocationEvent event) {
-        if ("Mozilla".equals(session.getBrowserName())) {
+        if (MOZILLA == session.getBrowserFamily()) {
             session.getBrowser().execute("if (!Twist) { var Twist = {}; }" +
                     "if (!Twist.hasContentLoadListener) { document.addEventListener('DOMContentLoaded', function() { " +
             "Twist.contentLoaded = true; }, false); Twist.hasContentLoadListener = true; }");
@@ -48,10 +50,10 @@ public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener
     }
 
     public boolean isBusy() {
-        if ("Safari".equals(session.getBrowserName()) || "IE".equals(session.getBrowserName())) {
+        if (SAFARI == session.getBrowserFamily() || IE == session.getBrowserFamily()) {
             String readyState = session.execute("document.readyState");
             return !"complete".equals(readyState);
-        } else if ("Mozilla".equals(session.getBrowserName())) {
+        } else if (MOZILLA == session.getBrowserFamily()) {
             boolean isLoading = Boolean.parseBoolean(session
                     .execute("typeof document.getElementsByTagName == 'undefined' " +
                             (hasListener ? "|| typeof Twist.contentLoaded == 'undefined' " : "") +

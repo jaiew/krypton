@@ -84,7 +84,7 @@ public abstract class AbstractBaseBrowserSessionWithWebServer extends AbstractBa
     }
 
     protected String createXMLHttpRequest() {
-    	return Browsers.fromSystemProperty().newXmlHttpRequestCode();
+    	return BrowserFamily.fromSystemProperty().newXmlHttpRequestCode();
     }
 
     protected void timedWaitForIdle() {

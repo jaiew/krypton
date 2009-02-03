@@ -20,10 +20,6 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.browser.wait;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -36,7 +32,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.Test;
 
 import com.thoughtworks.twist.driver.web.browser.AbstractBaseBrowserSessionWithWebServer;
-import com.thoughtworks.twist.driver.web.browser.Browsers;
+import com.thoughtworks.twist.driver.web.browser.BrowserFamily;
+
+import static org.junit.Assert.*;
+
+import static com.thoughtworks.twist.driver.web.browser.BrowserFamily.*;
 
 public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer {
 
@@ -83,7 +83,7 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
     // Safari lacks the onbeforeunload event.
     @Test
     public void shouldWaitForPageToLoadUsingOnBeforeUnloadWaitStrategy() throws Exception {
-    	if (Browsers.fromSystemProperty() == Browsers.SAFARI) {
+    	if (BrowserFamily.fromSystemProperty() == BrowserFamily.SAFARI) {
     		return;
     	}
         String path = "/blocking-servlet";
@@ -115,7 +115,7 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
             }
         };
         
-        if (!"IE".equals(session.getBrowserName())) {            
+        if (IE != session.getBrowserFamily()) { 
             session.addWaitStrategy(new LocationChangedWaitStrategy());
         }
         session.addWaitStrategy(waitStrategy);

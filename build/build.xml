@@ -193,10 +193,10 @@
 	</target>
 
 	<target name="integration-ie-wine" if="hasWine" unless="isWindows">
-		<wine-ant target="integration-ie" timeout="90000" />
+		<wine-ant target="integration-ie" timeout="60000" />
 	</target>
 
-	<target name="all-selenium-tests" depends="all-integration-tests">
+	<target name="all-selenium-tests" depends="build-feature">
 		<delete dir="${junit.output.dir}" />
 		<parallel>
 			<antcall target="selenium-ie-wine" />
@@ -223,6 +223,8 @@
 	<target name="selenium-ie-wine" if="hasWine" unless="isWindows">
 		<wine-ant target="selenium-ie" timeout="120000" />
 	</target>
+
+	<target name="all-tests" depends="all-integration-tests, all-selenium-tests" />
 
 	<macrodef name="selenium-tests">
 		<attribute name="browser" />
@@ -298,7 +300,7 @@
 
 			<batchtest todir="${junit.output.dir}/smoke/">
 				<fileset dir="${src.path}">
-					<include name="**/smoke/*Test*.java" />
+					<include name="**/smoke/*Test.java" />
 				</fileset>
 			</batchtest>
 		</junit>

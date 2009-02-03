@@ -34,6 +34,6 @@ public class JavascriptException extends RuntimeException {
     }
 
     public boolean isReferenceError() {
-        return getMessage().startsWith(REFERENCE_ERROR) || getMessage().equals(Browsers.IE.referenceError(""));
+        return getMessage().startsWith(REFERENCE_ERROR) || getMessage().equals(BrowserFamily.IE.referenceError(""));
     }
 }

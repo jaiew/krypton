@@ -18,25 +18,10 @@
  *   Manish Chakravarty
  *   Pavan K S
  ***************************************************************************/
-package com.thoughtworks.twist.driver.web.user;
+package com.thoughtworks.twist.driver.web.browser;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.Arrays;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-public class LoggingUser {
-
-    public static User wrap(final User user) {
-        return (User) Proxy.newProxyInstance(LoggingUser.class.getClassLoader(), new Class[] {User.class}, new InvocationHandler() {
-            Log log = LogFactory.getLog(user.getClass());
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                log.debug(method.getName() + ": " + Arrays.toString(args));
-                return method.invoke(user, args);
-            }
-        });
-    }
+public class BrowserSessionFactory {
+	public static BrowserSession create() {
+		return BrowserFamily.fromSystemProperty().create();
+	}
 }

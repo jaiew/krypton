@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.Text;
 
 import com.thoughtworks.twist.driver.web.browser.wait.LocationChangedWaitStrategy;
 
-public enum Browsers {
+public enum BrowserFamily {
     MOZILLA {
         public Browser create(Composite composite) {
             return new Browser(composite, SWT.MOZILLA);
@@ -166,7 +166,7 @@ public enum Browsers {
         
         layoutBrowser(browser);
 
-        BrowserSession session = new BrowserSession(browser);
+        BrowserSession session = new SWTBrowserSession(browser, this);
         init(session);
         
         initEmptyDocument(session);
@@ -251,8 +251,8 @@ public enum Browsers {
     
     public abstract String referenceError(String reference);
     
-    public static Browsers fromSystemProperty() {
-    	return Browsers.valueOf(System.getProperty("twist.driver.web.browser", "mozilla").toUpperCase());
+    public static BrowserFamily fromSystemProperty() {
+    	return BrowserFamily.valueOf(System.getProperty("twist.driver.web.browser", "mozilla").toUpperCase());
     }
 
 	public String newXmlHttpRequestCode() {

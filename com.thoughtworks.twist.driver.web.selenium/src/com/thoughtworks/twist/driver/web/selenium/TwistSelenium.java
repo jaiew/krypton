@@ -42,6 +42,8 @@ import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.twist.driver.web.browser.BrowserSession;
+import com.thoughtworks.twist.driver.web.browser.BrowserSessionFactory;
+import com.thoughtworks.twist.driver.web.browser.Decorators;
 import com.thoughtworks.twist.driver.web.browser.locator.DomLocatorStrategy;
 import com.thoughtworks.twist.driver.web.browser.locator.ElementNotFoundException;
 import com.thoughtworks.twist.driver.web.browser.locator.XPathLocatorStrategy;
@@ -88,14 +90,16 @@ public class TwistSelenium implements Selenium {
 	private LocationChangedWaitStrategy locationChangedWaitStrategy;
 	private User user;
 
-    public TwistSelenium(String browserURL) {
-    	this(browserURL, BrowserSession.create());
+	public TwistSelenium(String browserURL) {
+		this(browserURL, BrowserSessionFactory.create());
 	}
 
 	public TwistSelenium(String browserUrl, BrowserSession session) {
 		this.browserUrl = browserUrl;
 		this.session = session;
-		this.user = new UserFactory().createUser(session.getBrowser().getShell());
+		User plainUser = new UserFactory().createUser(session.getBrowser().getShell());
+		User logginUser = Decorators.wrapWithLogging(User.class, plainUser);
+		this.user = Decorators.wrapWithSWTThreading(User.class, logginUser);
 
 		addWaitStrategies(session);
 		addLocatorStrategies(session);
@@ -114,8 +118,7 @@ public class TwistSelenium implements Selenium {
 		promptHandler = new PromptHandler(session);
 	}
 
-	public void addLocationStrategy(String strategyName,
-			String functionDefinition) {
+	public void addLocationStrategy(String strategyName, String functionDefinition) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -139,8 +142,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void assignId(String locator, String identifier) {
-		session.execute(session.domExpression(locate(locator))
-				+ ".setAttribute('id', '" + identifier + "')");
+		session.execute(session.domExpression(locate(locator)) + ".setAttribute('id', '" + identifier + "')");
 	}
 
 	public void attachFile(String fieldLocator, String fileLocator) {
@@ -176,8 +178,7 @@ public class TwistSelenium implements Selenium {
 	public void clickAt(String locator, String coordString) {
 		Rectangle rectangle = session.boundingRectangle(locate(locator));
 		String[] coordinates = coordString.split(",");
-		user.click(rectangle.x + Integer.parseInt(coordinates[0]),
-				rectangle.y + Integer.parseInt(coordinates[1]));
+		user.click(rectangle.x + Integer.parseInt(coordinates[0]), rectangle.y + Integer.parseInt(coordinates[1]));
 		waitForIdle();
 	}
 
@@ -222,28 +223,21 @@ public class TwistSelenium implements Selenium {
 	public void doubleClickAt(String locator, String coordString) {
 		Rectangle rectangle = session.boundingRectangle(locate(locator));
 		String[] coordinates = coordString.split(",");
-		user.doubleClick(
-				rectangle.x + Integer.parseInt(coordinates[0]), rectangle.y
-						+ Integer.parseInt(coordinates[1]));
+		user.doubleClick(rectangle.x + Integer.parseInt(coordinates[0]), rectangle.y + Integer.parseInt(coordinates[1]));
 		waitForIdle();
 	}
 
 	public void dragAndDrop(String locator, String movementsString) {
 		Point source = session.center(locate(locator));
 		String[] movement = movementsString.split(",");
-		user.dragAndDrop(source.x, source.y, source.x
-				+ Integer.parseInt(movement[0]), source.y
-				+ Integer.parseInt(movement[1]));
+		user.dragAndDrop(source.x, source.y, source.x + Integer.parseInt(movement[0]), source.y + Integer.parseInt(movement[1]));
 		waitForIdle();
 	}
 
-	public void dragAndDropToObject(String locatorOfObjectToBeDragged,
-			String locatorOfDragDestinationObject) {
+	public void dragAndDropToObject(String locatorOfObjectToBeDragged, String locatorOfDragDestinationObject) {
 		Point source = session.center(locate(locatorOfObjectToBeDragged));
-		Point destination = session
-				.center(locate(locatorOfDragDestinationObject));
-		user.dragAndDrop(source.x, source.y, destination.x,
-				destination.y);
+		Point destination = session.center(locate(locatorOfDragDestinationObject));
+		user.dragAndDrop(source.x, source.y, destination.x, destination.y);
 		waitForIdle();
 	}
 
@@ -299,8 +293,7 @@ public class TwistSelenium implements Selenium {
 	public String getAttribute(String attributeLocator) {
 		int indexOfAt = attributeLocator.lastIndexOf("@");
 		String locator = attributeLocator.substring(0, indexOfAt);
-		if (new XPathLocatorStrategy().canLocate(locator)
-				&& locator.endsWith("/")) {
+		if (new XPathLocatorStrategy().canLocate(locator) && locator.endsWith("/")) {
 			locator = locator.substring(0, locator.length() - 1);
 		}
 		String attribute = attributeLocator.substring(indexOfAt + 1);
@@ -493,8 +486,7 @@ public class TwistSelenium implements Selenium {
 
 	public String getTable(String tableCellAddress) {
 		int columnIndex = tableCellAddress.lastIndexOf(".");
-		int column = Integer.parseInt(tableCellAddress
-				.substring(columnIndex + 1));
+		int column = Integer.parseInt(tableCellAddress.substring(columnIndex + 1));
 		tableCellAddress = tableCellAddress.substring(0, columnIndex);
 
 		int rowIndex = tableCellAddress.lastIndexOf(".");
@@ -503,8 +495,7 @@ public class TwistSelenium implements Selenium {
 		tableCellAddress = tableCellAddress.substring(0, rowIndex);
 
 		Element table = locate(tableCellAddress);
-		Element rowElement = (Element) table.getElementsByTagName("tr").item(
-				row);
+		Element rowElement = (Element) table.getElementsByTagName("tr").item(row);
 		NodeList cells = rowElement.getElementsByTagName("td");
 		if (cells.getLength() == 0) {
 			cells = rowElement.getElementsByTagName("th");
@@ -517,7 +508,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public String getTitle() {
-//		waitForIdle();
+		// waitForIdle();
 		return session.execute(session.getDocumentExpression() + ".title").trim();
 	}
 
@@ -525,13 +516,11 @@ public class TwistSelenium implements Selenium {
 		return locate(locator).getAttribute("value");
 	}
 
-	public boolean getWhetherThisFrameMatchFrameExpression(
-			String currentFrameString, String target) {
+	public boolean getWhetherThisFrameMatchFrameExpression(String currentFrameString, String target) {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean getWhetherThisWindowMatchWindowExpression(
-			String currentWindowString, String target) {
+	public boolean getWhetherThisWindowMatchWindowExpression(String currentWindowString, String target) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -572,11 +561,9 @@ public class TwistSelenium implements Selenium {
 	public boolean isEditable(String locator) {
 		Element element = locate(locator);
 		String tagName = element.getTagName().toLowerCase();
-		boolean editable = !(Boolean.parseBoolean(element
-				.getAttribute("disabled")) || Boolean.parseBoolean(element
+		boolean editable = !(Boolean.parseBoolean(element.getAttribute("disabled")) || Boolean.parseBoolean(element
 				.getAttribute("readonly")));
-		editable = editable
-				&& asList("input", "select", "textarea").contains(tagName);
+		editable = editable && asList("input", "select", "textarea").contains(tagName);
 		return editable;
 	}
 
@@ -593,9 +580,7 @@ public class TwistSelenium implements Selenium {
 		Element firstElement = locate(locator1);
 		Element secondElement = locate(locator2);
 
-		if (!firstElement.isEqualNode(secondElement)
-				&& firstElement.getParentNode().isEqualNode(
-						secondElement.getParentNode())) {
+		if (!firstElement.isEqualNode(secondElement) && firstElement.getParentNode().isEqualNode(secondElement.getParentNode())) {
 			return indexOfNode(firstElement) < indexOfNode(secondElement);
 		}
 		return false;
@@ -650,30 +635,30 @@ public class TwistSelenium implements Selenium {
 			int keyCode = (char) Integer.parseInt(keySequence);
 
 			switch (keyCode) {
-				case KeyEvent.VK_DOWN:
-					keyCode = SWT.ARROW_DOWN;
-					break;
-				case KeyEvent.VK_UP:
-					keyCode = SWT.ARROW_UP;
-					break;
-				case KeyEvent.VK_LEFT:
-					keyCode = SWT.ARROW_LEFT;
-					break;
-				case KeyEvent.VK_RIGHT:
-					keyCode = SWT.ARROW_RIGHT;
-					break;
-				case KeyEvent.VK_PAGE_UP:
-					keyCode = SWT.PAGE_UP;
-					break;
-				case KeyEvent.VK_PAGE_DOWN:
-					keyCode = SWT.PAGE_DOWN;
-					break;
-				case KeyEvent.VK_HOME:
-					keyCode = SWT.HOME;
-					break;
-				case KeyEvent.VK_END:
-					keyCode = SWT.END;
-					break;
+			case KeyEvent.VK_DOWN:
+				keyCode = SWT.ARROW_DOWN;
+				break;
+			case KeyEvent.VK_UP:
+				keyCode = SWT.ARROW_UP;
+				break;
+			case KeyEvent.VK_LEFT:
+				keyCode = SWT.ARROW_LEFT;
+				break;
+			case KeyEvent.VK_RIGHT:
+				keyCode = SWT.ARROW_RIGHT;
+				break;
+			case KeyEvent.VK_PAGE_UP:
+				keyCode = SWT.PAGE_UP;
+				break;
+			case KeyEvent.VK_PAGE_DOWN:
+				keyCode = SWT.PAGE_DOWN;
+				break;
+			case KeyEvent.VK_HOME:
+				keyCode = SWT.HOME;
+				break;
+			case KeyEvent.VK_END:
+				keyCode = SWT.END;
+				break;
 			}
 			user.key(keyCode);
 		} else {
@@ -740,8 +725,7 @@ public class TwistSelenium implements Selenium {
 			start();
 			if (url.startsWith("/")) {
 				URL realUrl = new URL(browserUrl);
-				url = new URL(realUrl.getProtocol(), realUrl.getHost(), realUrl
-						.getPort(), url).toExternalForm();
+				url = new URL(realUrl.getProtocol(), realUrl.getHost(), realUrl.getPort(), url).toExternalForm();
 			}
 			boolean isSameURL = url.equals(getLocation());
 			if (isSameURL) {
@@ -792,8 +776,7 @@ public class TwistSelenium implements Selenium {
 		doSelection(selectLocator, optionLocator, false, true);
 	}
 
-	private void doSelection(String selectLocator, String optionLocator,
-			boolean multiselect, boolean shouldSelect) {
+	private void doSelection(String selectLocator, String optionLocator, boolean multiselect, boolean shouldSelect) {
 		Element select = locate(selectLocator);
 
 		String indexPrefix = "index=";
@@ -801,10 +784,8 @@ public class TwistSelenium implements Selenium {
 		String valuePrefix = "value=";
 		String idPrefix = "id=";
 
-		if (!Boolean.parseBoolean(select.getAttribute("multiple"))
-				&& multiselect) {
-			throw new IllegalArgumentException("Not a multi select: "
-					+ selectLocator);
+		if (!Boolean.parseBoolean(select.getAttribute("multiple")) && multiselect) {
+			throw new IllegalArgumentException("Not a multi select: " + selectLocator);
 		}
 
 		fireEvent(select, "focus");
@@ -824,30 +805,26 @@ public class TwistSelenium implements Selenium {
 				setSelected(option, false);
 			}
 			if (optionLocator.startsWith(indexPrefix)) {
-				int index = Integer.parseInt(optionLocator
-						.substring(indexPrefix.length()));
+				int index = Integer.parseInt(optionLocator.substring(indexPrefix.length()));
 				if (currentIndex - 1 == index) {
 					wasSelected = true;
 					setSelected(option, shouldSelect);
 					break;
 				}
 			} else if (optionLocator.startsWith(valuePrefix)) {
-				if (optionLocator.substring(valuePrefix.length()).equals(
-						option.getAttribute("value"))) {
+				if (optionLocator.substring(valuePrefix.length()).equals(option.getAttribute("value"))) {
 					wasSelected = true;
 					setSelected(option, shouldSelect);
 					break;
 				}
 			} else if (optionLocator.startsWith(idPrefix)) {
-				if (optionLocator.substring(idPrefix.length()).equals(
-						option.getAttribute("id"))) {
+				if (optionLocator.substring(idPrefix.length()).equals(option.getAttribute("id"))) {
 					wasSelected = true;
 					setSelected(option, shouldSelect);
 					break;
 				}
 			} else if (optionLocator.startsWith(labelPrefix)) {
-				if (option.getTextContent().matches(
-						optionLocator.substring(labelPrefix.length()))) {
+				if (option.getTextContent().matches(optionLocator.substring(labelPrefix.length()))) {
 					wasSelected = true;
 					setSelected(option, shouldSelect);
 					break;
@@ -863,8 +840,7 @@ public class TwistSelenium implements Selenium {
 		if (wasSelected) {
 			fireEvent(select, "change");
 		} else {
-			throw new IllegalArgumentException("No such option: "
-					+ optionLocator);
+			throw new IllegalArgumentException("No such option: " + optionLocator);
 		}
 	}
 
@@ -873,15 +849,14 @@ public class TwistSelenium implements Selenium {
 	}
 
 	private void setProperty(Element element, String property, String value) {
-		session.execute(session.domExpression(element) + "." + property + " = "
-				+ value);
+		session.execute(session.domExpression(element) + "." + property + " = " + value);
 	}
 
 	public void selectFrame(String locator) {
 		if (locator.startsWith("index=")) {
 			int index = Integer.parseInt(locator.substring(locator.indexOf("=") + 1));
-			session.setWindowExpression(session.getWindowExpression() +  ".frames[" + index + "]");
-		} else  if (locator.startsWith("relative=")) {
+			session.setWindowExpression(session.getWindowExpression() + ".frames[" + index + "]");
+		} else if (locator.startsWith("relative=")) {
 			String relation = locator.substring(locator.indexOf("=") + 1);
 			if ("top".equals(relation)) {
 				session.setWindowExpression("window");
@@ -895,7 +870,7 @@ public class TwistSelenium implements Selenium {
 			}
 			if (!"undefined".equals(session.execute("typeof " + locator + ".tagName"))) {
 				session.setWindowExpression(locator + ".contentWindow");
-			} else {				
+			} else {
 				session.setWindowExpression(locator);
 			}
 		} else {
@@ -918,7 +893,7 @@ public class TwistSelenium implements Selenium {
 
 	public void setCursorPosition(String locator, String position) {
 		Element element = locate(locator);
-//		fireEvent(element, "focus");
+		// fireEvent(element, "focus");
 		session.setCursorPosition(element, Integer.parseInt(position));
 	}
 
@@ -1015,18 +990,18 @@ public class TwistSelenium implements Selenium {
 		return session;
 	}
 
-    public void addAjaxURLExclusionPattern(String pattern) {
-    	ajaxWaitStrategy.addURLExclusionPattern(pattern);
-    }
+	public void addAjaxURLExclusionPattern(String pattern) {
+		ajaxWaitStrategy.addURLExclusionPattern(pattern);
+	}
 
 	public void addLocationURLExclusionPattern(String pattern) {
 		locationChangedWaitStrategy.addURLExclusionPattern(pattern);
 	}
-	
+
 	private void removeLocationURLExclusionPattern(String pattern) {
-		locationChangedWaitStrategy.removeURLExclusionPattern(pattern);		
+		locationChangedWaitStrategy.removeURLExclusionPattern(pattern);
 	}
-	
+
 	public void setExcludedWaitURLs(String urls) {
 		for (String pattern : urls.split(",")) {
 			addLocationURLExclusionPattern(pattern);
@@ -1044,16 +1019,16 @@ public class TwistSelenium implements Selenium {
 		Point center = session.center(element);
 		user.click(center.x, center.y);
 		waitForIdle();
-//		 showPoint(center);
+		// showPoint(center);
 	}
 
-//	 private void showPoint(Point point) {
-//	 session.execute(
-//	 "function() { var div = document.createElement('div'); div.setAttribute('style', 'position: absolute; border: 1px solid red; top: "
-//	 + (point.y - 2) + "; left: " + (point.x - 2) +
-//	 "; width: 5px; height: 5px;'); document.body.appendChild(div); setTimeout(function() {div.parentNode.removeChild(div);}, 2000);}()"
-//	 );
-//	 }
+	// private void showPoint(Point point) {
+	// session.execute(
+	// "function() { var div = document.createElement('div'); div.setAttribute('style', 'position: absolute; border: 1px solid red; top: "
+	// + (point.y - 2) + "; left: " + (point.x - 2) +
+	// "; width: 5px; height: 5px;'); document.body.appendChild(div); setTimeout(function() {div.parentNode.removeChild(div);}, 2000);}()"
+	// );
+	// }
 
 	private void addStringMatchers() {
 		stringMatchers.add(new RegexpMatcher());
@@ -1081,8 +1056,7 @@ public class TwistSelenium implements Selenium {
 		session.addLocatorStrategy(new IdentifierLocatorStrategy());
 	}
 
-	private void addTitleListenerToTrackCurrentTitle(
-			final BrowserSession session) {
+	private void addTitleListenerToTrackCurrentTitle(final BrowserSession session) {
 		session.getBrowser().addTitleListener(new TitleListener() {
 			public void changed(TitleEvent event) {
 				title = event.title;
@@ -1090,8 +1064,7 @@ public class TwistSelenium implements Selenium {
 		});
 	}
 
-	private void addLocationListenerToTrackCurrentUrl(
-			final BrowserSession session) {
+	private void addLocationListenerToTrackCurrentUrl(final BrowserSession session) {
 		session.getBrowser().addLocationListener(new LocationListener() {
 			public void changed(LocationEvent event) {
 				browserUrl = event.location;
@@ -1115,8 +1088,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	private DialogHandler[] getDialogHandlers() {
-		return new DialogHandler[]{alertHandler, confirmationHandler,
-				promptHandler};
+		return new DialogHandler[] { alertHandler, confirmationHandler, promptHandler };
 	}
 
 	public void addScript(String scriptContent, String scriptTagId) {
