@@ -62,8 +62,6 @@ import com.thoughtworks.twist.driver.web.browser.locator.ElementNotFoundExceptio
 import com.thoughtworks.twist.driver.web.browser.locator.LocatorStrategy;
 import com.thoughtworks.twist.driver.web.browser.wait.WaitStrategy;
 import com.thoughtworks.twist.driver.web.browser.wait.WaitTimedOutException;
-import com.thoughtworks.twist.driver.web.user.LoggingUser;
-import com.thoughtworks.twist.driver.web.user.User;
 
 public class BrowserSession {
     
@@ -79,7 +77,6 @@ public class BrowserSession {
     private DocumentBuilder documentBuilder;
 
     public final Browser browser;
-    public final User user;
 
     private List<LocatorStrategy> locatorStrategies = new ArrayList<LocatorStrategy>();
     private List<WaitStrategy> waitStrategies = new ArrayList<WaitStrategy>();
@@ -99,11 +96,10 @@ public class BrowserSession {
         return Browsers.fromSystemProperty().create();
     }
 
-    public BrowserSession(Browser browser, User user) {
+    public BrowserSession(Browser browser) {
         try {
             this.shell = browser.getShell();
             this.browser = browser;
-            this.user = LoggingUser.wrap(user);
 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
@@ -112,7 +108,7 @@ public class BrowserSession {
 
             xpath = XPathFactory.newInstance().newXPath();
 
-            log.info("Created BrowserSession using browser " + getBrowserName() + " and user " + user.getClass().getSimpleName());
+            log.info("Created BrowserSession using browser " + getBrowserName());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

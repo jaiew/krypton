@@ -193,7 +193,7 @@
 	</target>
 
 	<target name="integration-ie-wine" if="hasWine" unless="isWindows">
-		<wine-ant target="integration-ie" timeout="60000" />
+		<wine-ant target="integration-ie" timeout="90000" />
 	</target>
 
 	<target name="all-selenium-tests" depends="all-integration-tests">

@@ -20,8 +20,6 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.browser;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -29,8 +27,6 @@ import java.io.StringWriter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.eclipse.swt.browser.LocationEvent;
-import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.widgets.Display;
 import org.junit.After;
 import org.w3c.dom.CDATASection;
@@ -43,6 +39,8 @@ import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 import com.thoughtworks.twist.driver.web.browser.wait.LocationChangedWaitStrategy;
 
+import static org.junit.Assert.*;
+
 public abstract class AbstractBaseBrowserSession {
     protected BrowserSession session = BrowserSession.create();
 
@@ -50,11 +48,6 @@ public abstract class AbstractBaseBrowserSession {
     public void closeBrowser() {
         session.closeBrowser();
     }
-
-//    @Before
-//    public void createBrowserSession() {
-//    	session = BrowserSession.create();
-//    }
 
     protected void render(String html) throws InterruptedException {
         session.openBrowser();
@@ -151,16 +144,5 @@ public abstract class AbstractBaseBrowserSession {
 
     protected String referenceErrorMessage(String reference) {
     	return Browsers.fromSystemProperty().referenceError(reference);
-    }
-
-    private static class LocationChangedListener implements LocationListener {
-        boolean changed;
-
-        public void changed(LocationEvent event) {
-            this.changed = true;
-        }
-
-        public void changing(LocationEvent event) {
-        }
     }
 }

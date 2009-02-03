@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.Test;
 
 import com.thoughtworks.twist.driver.web.browser.AbstractBaseBrowserSessionWithWebServer;
+import com.thoughtworks.twist.driver.web.browser.Browsers;
 
 public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer {
 
@@ -79,8 +80,12 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
         loadAndRefreshPageThreeTimes(path, timeout);
     }
 
+    // Safari lacks the onbeforeunload event.
     @Test
     public void shouldWaitForPageToLoadUsingOnBeforeUnloadWaitStrategy() throws Exception {
+    	if (Browsers.fromSystemProperty() == Browsers.SAFARI) {
+    		return;
+    	}
         String path = "/blocking-servlet";
         handler.addServletWithMapping(BlockingHelloWorldServlet.class, path);
         int timeout = BlockingHelloWorldServlet.BLOCKING_TIME * 2;

@@ -20,8 +20,6 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.selenium;
 
-import static java.util.Arrays.asList;
-
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -65,6 +63,10 @@ import com.thoughtworks.twist.driver.web.selenium.stringmatch.ExactMatcher;
 import com.thoughtworks.twist.driver.web.selenium.stringmatch.GlobMatcher;
 import com.thoughtworks.twist.driver.web.selenium.stringmatch.RegexpMatcher;
 import com.thoughtworks.twist.driver.web.selenium.stringmatch.StringMatcher;
+import com.thoughtworks.twist.driver.web.user.User;
+import com.thoughtworks.twist.driver.web.user.UserFactory;
+
+import static java.util.Arrays.*;
 
 public class TwistSelenium implements Selenium {
 	private BrowserSession session;
@@ -84,6 +86,7 @@ public class TwistSelenium implements Selenium {
 	private PromptHandler promptHandler;
 	private AjaxWaitStrategy ajaxWaitStrategy;
 	private LocationChangedWaitStrategy locationChangedWaitStrategy;
+	private User user;
 
     public TwistSelenium(String browserURL) {
     	this(browserURL, BrowserSession.create());
@@ -92,6 +95,7 @@ public class TwistSelenium implements Selenium {
 	public TwistSelenium(String browserUrl, BrowserSession session) {
 		this.browserUrl = browserUrl;
 		this.session = session;
+		this.user = new UserFactory().createUser(session.browser.getShell());
 
 		addWaitStrategies(session);
 		addLocatorStrategies(session);
@@ -172,7 +176,7 @@ public class TwistSelenium implements Selenium {
 	public void clickAt(String locator, String coordString) {
 		Rectangle rectangle = session.boundingRectangle(locate(locator));
 		String[] coordinates = coordString.split(",");
-		session.user.click(rectangle.x + Integer.parseInt(coordinates[0]),
+		user.click(rectangle.x + Integer.parseInt(coordinates[0]),
 				rectangle.y + Integer.parseInt(coordinates[1]));
 		waitForIdle();
 	}
@@ -211,14 +215,14 @@ public class TwistSelenium implements Selenium {
 
 	public void doubleClick(String locator) {
 		Point center = session.center(locate(locator));
-		session.user.doubleClick(center.x, center.y);
+		user.doubleClick(center.x, center.y);
 		waitForIdle();
 	}
 
 	public void doubleClickAt(String locator, String coordString) {
 		Rectangle rectangle = session.boundingRectangle(locate(locator));
 		String[] coordinates = coordString.split(",");
-		session.user.doubleClick(
+		user.doubleClick(
 				rectangle.x + Integer.parseInt(coordinates[0]), rectangle.y
 						+ Integer.parseInt(coordinates[1]));
 		waitForIdle();
@@ -227,7 +231,7 @@ public class TwistSelenium implements Selenium {
 	public void dragAndDrop(String locator, String movementsString) {
 		Point source = session.center(locate(locator));
 		String[] movement = movementsString.split(",");
-		session.user.dragAndDrop(source.x, source.y, source.x
+		user.dragAndDrop(source.x, source.y, source.x
 				+ Integer.parseInt(movement[0]), source.y
 				+ Integer.parseInt(movement[1]));
 		waitForIdle();
@@ -238,7 +242,7 @@ public class TwistSelenium implements Selenium {
 		Point source = session.center(locate(locatorOfObjectToBeDragged));
 		Point destination = session
 				.center(locate(locatorOfDragDestinationObject));
-		session.user.dragAndDrop(source.x, source.y, destination.x,
+		user.dragAndDrop(source.x, source.y, destination.x,
 				destination.y);
 		waitForIdle();
 	}
@@ -671,9 +675,9 @@ public class TwistSelenium implements Selenium {
 					keyCode = SWT.END;
 					break;
 			}
-			session.user.key(keyCode);
+			user.key(keyCode);
 		} else {
-			session.user.key(keySequence.charAt(0));
+			user.key(keySequence.charAt(0));
 		}
 		waitForIdle();
 	}
@@ -934,11 +938,11 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void shiftKeyDown() {
-		session.user.shiftDown();
+		user.shiftDown();
 	}
 
 	public void shiftKeyUp() {
-		session.user.shiftUp();
+		user.shiftUp();
 	}
 
 	public void shutDownSeleniumServer() {
@@ -975,7 +979,7 @@ public class TwistSelenium implements Selenium {
 
 		// Don't like this, but it makes it more consistent in IE.
 		focus(locator);
-		session.user.type(value);
+		user.type(value);
 		waitForIdle();
 	}
 
@@ -1038,7 +1042,7 @@ public class TwistSelenium implements Selenium {
 
 	private void click(Element element) {
 		Point center = session.center(element);
-		session.user.click(center.x, center.y);
+		user.click(center.x, center.y);
 		waitForIdle();
 //		 showPoint(center);
 	}
