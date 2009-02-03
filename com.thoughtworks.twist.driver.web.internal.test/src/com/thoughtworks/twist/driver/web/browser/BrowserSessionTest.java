@@ -281,6 +281,7 @@ public class BrowserSessionTest extends AbstractBaseBrowserSession {
     public void shouldChangeBackToTopFrame() throws Exception {
         render(readResource("test-iframe.html"));
         session.setWindowExpression("window.frames[0]");
+        assertEquals("window.frames[0].document", session.getDocumentExpression());
         assertNotNull(session.dom().getElementById("1"));
         session.setWindowExpression("window");
         assertNull(session.dom().getElementById("1"));

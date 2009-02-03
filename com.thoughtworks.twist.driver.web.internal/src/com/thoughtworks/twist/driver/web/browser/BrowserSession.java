@@ -132,6 +132,7 @@ public class BrowserSession {
         if (!shell.isDisposed()) {
             shell.close();
             shell.dispose();
+            browser.dispose();
         }
     }
 
@@ -429,6 +430,7 @@ public class BrowserSession {
                     browser.addStatusTextListener(StatusTransport.this);
                     String script = "try { window.status = '" + RETURN_VALUE + "' + (" + expression + ");} catch (e) { window.status = '"
                             + EXCEPTION + "' + e; }";
+                    pumpEvents();
                     browser.execute(script);
                     pumpEvents();
                     browser.removeStatusTextListener(StatusTransport.this);

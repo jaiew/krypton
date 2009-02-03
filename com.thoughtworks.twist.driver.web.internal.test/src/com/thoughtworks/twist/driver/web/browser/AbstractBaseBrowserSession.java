@@ -41,39 +41,54 @@ import org.w3c.dom.NodeList;
 
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
+import com.thoughtworks.twist.driver.web.browser.wait.LocationChangedWaitStrategy;
 
 public abstract class AbstractBaseBrowserSession {
-    protected BrowserSession session = createBrowserSession();
+    protected BrowserSession session = BrowserSession.create();
 
     @After
     public void closeBrowser() {
         session.closeBrowser();
     }
 
+//    @Before
+//    public void createBrowserSession() {
+//    	session = BrowserSession.create();
+//    }
+
     protected void render(String html) throws InterruptedException {
         session.openBrowser();
-        LocationChangedListener listener = addLocationChangedListener();
+        LocationChangedWaitStrategy listener = addLocationChangedListener();
         session.browser.setText(html);
         waitForLocationToChange(listener);
     }
 
     protected void load(String url) {
         session.openBrowser();
-        LocationChangedListener listener = addLocationChangedListener();
+        LocationChangedWaitStrategy listener = addLocationChangedListener();
+//		session.execute(session.getDocumentExpression() + ".location = '" + url + "'");
         session.browser.setUrl(url);
         waitForLocationToChange(listener);
     }
 
-    private LocationChangedListener addLocationChangedListener() {
-        LocationChangedListener listener = new LocationChangedListener();
+    private LocationChangedWaitStrategy addLocationChangedListener() {
+        LocationChangedWaitStrategy listener = new LocationChangedWaitStrategy();
         session.browser.addLocationListener(listener);
         return listener;
     }
 
-    private void waitForLocationToChange(LocationChangedListener listener) {
-        Display display = Display.getDefault();
-        display.sleep();
-        while (display.readAndDispatch() || !listener.changed);
+    private void waitForLocationToChange(LocationChangedWaitStrategy listener) {
+    	Display display = Display.getDefault();
+    	display.sleep();
+        session.pumpEvents();
+        while (listener.isBusy()) {
+        	session.pumpEvents();
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+            }
+        }
+        session.pumpEvents();
         session.browser.removeLocationListener(listener);
     }
 
@@ -133,10 +148,6 @@ public abstract class AbstractBaseBrowserSession {
 		session.execute(script);
         session.waitForIdle();
 	}
-
-    protected BrowserSession createBrowserSession() {
-    	return BrowserSession.create();
-    }
 
     protected String referenceErrorMessage(String reference) {
     	return Browsers.fromSystemProperty().referenceError(reference);

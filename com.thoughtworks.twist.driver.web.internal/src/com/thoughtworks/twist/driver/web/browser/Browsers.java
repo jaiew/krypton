@@ -49,7 +49,7 @@ public enum Browsers {
         }
         
         void init(BrowserSession session) {
-            configureXULRunnerUsingAboutConfig(session);
+//            configureXULRunnerUsingAboutConfig(session);
             loadAboutBlank(session);
         }
 
@@ -129,6 +129,10 @@ public enum Browsers {
         public String referenceError(String reference) {
             return "[object Error]";
         }
+
+        public String newXmlHttpRequestCode() {
+    		return "new ActiveXObject('Microsoft.XMLHTTP')";
+    	}
     },
 
     SAFARI {
@@ -255,4 +259,8 @@ public enum Browsers {
     public static Browsers fromSystemProperty() {
     	return Browsers.valueOf(System.getProperty("twist.driver.web.browser", "mozilla").toUpperCase());
     }
+
+	public String newXmlHttpRequestCode() {
+		return "new XMLHttpRequest()";
+	}
 }

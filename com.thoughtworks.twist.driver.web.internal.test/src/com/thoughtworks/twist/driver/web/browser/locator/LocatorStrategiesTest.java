@@ -140,7 +140,7 @@ public class LocatorStrategiesTest extends AbstractBaseBrowserSession {
 
     @Test
     public void shouldThrowElementNotFoundExceptionForNonExistingDomExpression() throws Exception {
-        String locator = "document.getElementById('2')";
+        String locator = "document.getElementById('4')";
         try {
             session.addLocatorStrategy(new DomLocatorStrategy());
             render(readResource("test-locators.html"));
