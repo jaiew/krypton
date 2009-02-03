@@ -98,6 +98,14 @@ public class TwistSelenium implements Selenium {
 		this.browserUrl = browserUrl;
 		this.session = session;
 
+		session.getBrowser().getDisplay().syncExec(new Runnable() {
+			public void run() {
+				init(session);
+			}
+		});
+	}
+
+	private void init(final BrowserSession session) {
 		User plainUser = new UserFactory().createUser(session.getBrowser().getShell());
 		user = Decorators.wrapWithLogging(User.class, plainUser);
 

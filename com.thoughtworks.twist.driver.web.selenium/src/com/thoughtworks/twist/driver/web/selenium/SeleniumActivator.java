@@ -28,11 +28,12 @@ import org.osgi.framework.ServiceRegistration;
 
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.SeleniumFactory;
+import com.thoughtworks.twist.driver.web.browser.Decorators;
 
 public class SeleniumActivator implements BundleActivator {
 	private final class InternalSeleniumFactory implements SeleniumFactory {
 		public Selenium create(String browserURL) {
-			return new TwistSelenium(browserURL);
+			return Decorators.wrapWithSWTThreading(Selenium.class, new TwistSelenium(browserURL));
 		}
 	}
 

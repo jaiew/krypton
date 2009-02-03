@@ -40,6 +40,13 @@ public class Decorators {
 
 		public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
 			try {
+				if (Display.getCurrent() == Display.getDefault()) {
+					try {
+						return method.invoke(anInstance, args);
+					} catch (InvocationTargetException e) {
+						throw new RuntimeException(e.getCause());
+					}
+				}
 				final Object[] result = new Object[1];
 				Display.getDefault().syncExec(new Runnable() {
 					public void run() {

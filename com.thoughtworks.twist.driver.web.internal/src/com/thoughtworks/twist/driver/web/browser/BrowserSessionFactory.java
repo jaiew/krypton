@@ -20,8 +20,17 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.browser;
 
+import org.eclipse.swt.widgets.Display;
+
 public class BrowserSessionFactory {
+	private BrowserSession browserSession;
+
 	public BrowserSession create() {
-		return BrowserFamily.fromSystemProperty().create();
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+				browserSession = BrowserFamily.fromSystemProperty().create();
+			}
+		});
+		return browserSession;
 	}
 }
