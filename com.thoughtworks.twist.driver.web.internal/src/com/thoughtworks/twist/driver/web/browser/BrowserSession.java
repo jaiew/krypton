@@ -20,22 +20,31 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.browser;
 
+import java.util.List;
+
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import com.thoughtworks.twist.driver.web.browser.locator.LocatorStrategy;
 import com.thoughtworks.twist.driver.web.browser.wait.WaitStrategy;
 
 public interface BrowserSession {
 
+	// Core Browser
+
 	void openBrowser();
 
 	void closeBrowser();
+
+	BrowserFamily getBrowserFamily();
+
+	Browser getBrowser();
+
+	// JavaScript
 
 	String execute(String expression);
 
@@ -45,11 +54,9 @@ public interface BrowserSession {
 
 	String readResource(String resource, Class<?> aClass);
 
-	BrowserFamily getBrowserFamily();
+	// DOM
 
 	Document dom();
-
-	String domAsString();
 
 	Rectangle boundingRectangle(Element element);
 
@@ -57,7 +64,7 @@ public interface BrowserSession {
 
 	Element locate(String locator);
 
-	NodeList locateAll(String xpathExpression);
+	List<Node> locateAll(String xpathExpression);
 
 	void fireEvent(Element element, String eventName);
 
@@ -65,13 +72,23 @@ public interface BrowserSession {
 
 	int getCursorPosition(Element element);
 
-	String outerHTML(Element element);
+	String domExpression(Element element);
+
+	String getText(Node node);
+
+	boolean isVisible(Element element);
+
+	// Event Thread
 
 	void waitForIdle();
 
 	void pumpEvents();
 
-	boolean areWaitStrategiesIdle();
+	void setEventLoopTimeout(int timeout);
+
+	void setPatientLocatorTimeout(int timeout);
+
+	// Strategies
 
 	void addLocatorStrategy(LocatorStrategy locatorStrategy);
 
@@ -79,29 +96,11 @@ public interface BrowserSession {
 
 	void removeWaitStrategy(WaitStrategy waitStrategy);
 
-	String domExpression(Element element);
-
-	void setEventLoopTimeout(int timeout);
-
-	void setPatientLocatorTimeout(int timeout);
-
-	void waitForActivity();
-
-	String asXml(Node element);
-
-	String getText(Node node);
-
-	String getText(Node node, boolean preformatted);
-
-	void scrollIntoView(Element element);
-
-	boolean isVisible(Element element);
+	// Frames/Windows
 
 	void setWindowExpression(String domExpression);
 
 	String getWindowExpression();
 
 	String getDocumentExpression();
-
-	Browser getBrowser();
 }

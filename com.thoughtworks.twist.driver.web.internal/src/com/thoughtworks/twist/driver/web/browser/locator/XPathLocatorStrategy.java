@@ -20,7 +20,10 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.browser.locator;
 
+import java.util.List;
+
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 
@@ -36,6 +39,10 @@ public class XPathLocatorStrategy implements LocatorStrategy {
         if (locator.startsWith(XPATH_EQUALS_PREFIX)) {
             locator = locator.substring(XPATH_EQUALS_PREFIX.length());
         }
-        return (Element) session.locateAll(locator).item(0);
+        List<Node> locateAll = session.locateAll(locator);
+        if (locateAll.isEmpty()) {
+        	return null;
+        }
+		return (Element) locateAll.get(0);
     }
 }

@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
 
 import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 
@@ -41,7 +41,7 @@ public class NameLocatorStrategy extends AttributeLocatorStrategy {
 	public Element locate(BrowserSession session, String locator) {
 		locator = locator.substring(prefix.length());
 		String[] locatorAndFilter = locator.split(" ");
-		NodeList locateAll = session.locateAll("//*[@" + attribute
+		List<Node> locateAll = session.locateAll("//*[@" + attribute
 				+ "='" + locatorAndFilter[0] + "']");
 
 		if (locatorAndFilter.length > 1) {
@@ -56,7 +56,10 @@ public class NameLocatorStrategy extends AttributeLocatorStrategy {
 			}
 			return null;
 		} else {
-			return (Element) locateAll.item(0);
+			if (locateAll.isEmpty()) {
+				return null;
+			}
+			return (Element) locateAll.get(0);
 		}
 	}
 
@@ -73,13 +76,13 @@ public class NameLocatorStrategy extends AttributeLocatorStrategy {
 			return filter.startsWith(prefix);
 		}
 
-		public List<Element> matches(NodeList list, String filter) {
+		public List<Element> matches(List<Node> list, String filter) {
 			if (filter.startsWith(prefix)) {
 				filter = filter.substring(prefix.length());
 			}
 			List<Element> matching = new ArrayList<Element>();
-			for (int i = 0; i < list.getLength(); i++) {
-				Element element = (Element) list.item(i);
+			for (int i = 0; i < list.size(); i++) {
+				Element element = (Element) list.get(i);
 				if (filter.equals(element.getAttribute(attribute))) {
 					matching.add(element);
 				}
@@ -95,11 +98,11 @@ public class NameLocatorStrategy extends AttributeLocatorStrategy {
 			return filter.startsWith(PREFIX);
 		}
 
-		public List<Element> matches(NodeList list, String filter) {
+		public List<Element> matches(List<Node> list, String filter) {
 			int index = Integer.parseInt(filter.substring(PREFIX.length()));
 			List<Element> matching = new ArrayList<Element>();
-			for (int i = 0; i < list.getLength(); i++) {
-				Element element = (Element) list.item(i);
+			for (int i = 0; i < list.size(); i++) {
+				Element element = (Element) list.get(i);
 				if (i == index) {
 					matching.add(element);
 				}
@@ -127,7 +130,7 @@ public class NameLocatorStrategy extends AttributeLocatorStrategy {
 	private static interface Filter {
 		boolean canFilter(String filter);
 
-		List<Element> matches(NodeList list, String filter);
+		List<Element> matches(List<Node> list, String filter);
 	}
 
 }

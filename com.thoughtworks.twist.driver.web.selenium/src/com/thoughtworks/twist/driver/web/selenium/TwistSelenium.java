@@ -97,6 +97,7 @@ public class TwistSelenium implements Selenium {
 	public TwistSelenium(String browserUrl, BrowserSession session) {
 		this.browserUrl = browserUrl;
 		this.session = session;
+
 		User plainUser = new UserFactory().createUser(session.getBrowser().getShell());
 		User logginUser = Decorators.wrapWithLogging(User.class, plainUser);
 		this.user = Decorators.wrapWithSWTThreading(User.class, logginUser);
@@ -525,7 +526,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public Number getXpathCount(String xpath) {
-		return session.locateAll(xpath).getLength();
+		return session.locateAll(xpath).size();
 	}
 
 	public void goBack() {
@@ -1011,7 +1012,7 @@ public class TwistSelenium implements Selenium {
 	private Element locate(String locator) {
 		waitForIdle();
 		Element locate = session.locate(locator);
-		session.scrollIntoView(locate);
+        session.execute(session.domExpression(locate) + ".scrollIntoView()");
 		return locate;
 	}
 

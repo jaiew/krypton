@@ -24,7 +24,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,10 +31,6 @@ import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -63,7 +58,6 @@ import com.thoughtworks.twist.driver.web.browser.wait.WaitStrategy;
 import com.thoughtworks.twist.driver.web.browser.wait.WaitTimedOutException;
 
 public class SWTBrowserSession implements BrowserSession {
-    
     private static final String XHTML1_STRICT_DOCTYPE = "<!DOCTYPE html\n" + "PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n"
             + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n";
 
@@ -75,7 +69,7 @@ public class SWTBrowserSession implements BrowserSession {
     private Shell shell;
     private DocumentBuilder documentBuilder;
 
-    private final Browser browser;
+    private Browser browser;
 
     private List<LocatorStrategy> locatorStrategies = new ArrayList<LocatorStrategy>();
     private List<WaitStrategy> waitStrategies = new ArrayList<WaitStrategy>();
@@ -91,7 +85,7 @@ public class SWTBrowserSession implements BrowserSession {
 
     private Log log = LogFactory.getLog(getClass());
 
-	private final BrowserFamily browserFamily;
+	private BrowserFamily browserFamily;
 
     public SWTBrowserSession(Browser browser, BrowserFamily browserFamily) {
         this.browserFamily = browserFamily;
@@ -187,7 +181,7 @@ public class SWTBrowserSession implements BrowserSession {
         }
     }
 
-    public String domAsString() {
+    private String domAsString() {
         inject("twist-dom.js");
         return execute("Twist.dom(" + getDocumentExpression() + ".documentElement)");
     }
@@ -230,10 +224,15 @@ public class SWTBrowserSession implements BrowserSession {
         throw new ElementNotFoundException(locator);
     }
 
-    public NodeList locateAll(String xpathExpression) {
+    public List<Node> locateAll(String xpathExpression) {
         try {
             log.debug("Locating all elements using '" + xpathExpression + "'");
-            return (NodeList) xpath.evaluate(xpathExpression, dom(), XPathConstants.NODESET);
+            List<Node> result = new ArrayList<Node>();
+            NodeList nodeList = (NodeList) xpath.evaluate(xpathExpression, dom(), XPathConstants.NODESET);
+            for (int i = 0; i < nodeList.getLength(); i++) {
+            	result.add(nodeList.item(0));
+            }
+            return result;
         } catch (XPathExpressionException e) {
             throw new RuntimeException(e);
         }
@@ -256,13 +255,6 @@ public class SWTBrowserSession implements BrowserSession {
         int position = Integer.parseInt(execute("Twist.getCursorPosition(" + domExpression(element) + ")"));
         log.debug("Cursor positon is " + position + " at " + element);
         return position;
-    }
-
-    public String outerHTML(Element element) {
-        inject("twist-dom.js", getClass());
-        String outerHTML = execute("Twist.outerHTML(" + domExpression(element) + ")");
-        log.debug("Outer HTML of " + element + " is " + outerHTML);
-        return outerHTML;
     }
 
     public void waitForIdle() {
@@ -290,7 +282,7 @@ public class SWTBrowserSession implements BrowserSession {
             ;
     }
 
-    public boolean areWaitStrategiesIdle() {
+    private boolean areWaitStrategiesIdle() {
         for (WaitStrategy strategy : waitStrategies) {
             if (strategy.isBusy()) {
                 return false;
@@ -340,13 +332,6 @@ public class SWTBrowserSession implements BrowserSession {
 
     public void setPatientLocatorTimeout(int timeout) {
         this.patientLocatorTimeout = timeout;
-    }
-
-    public void waitForActivity() {
-        browser.getDisplay().sleep();
-        pumpEvents();
-        browser.getDisplay().sleep();
-        pumpEvents();
     }
 
     public String readResource(String resource, Class<?> baseClass) {
@@ -434,19 +419,6 @@ public class SWTBrowserSession implements BrowserSession {
         }
     }
 
-    public String asXml(Node element) {
-        try {
-            TransformerFactory xformFactory = TransformerFactory.newInstance();
-            Transformer idTransform = xformFactory.newTransformer();
-            StringWriter result = new StringWriter();
-            idTransform.transform(new DOMSource(element), new StreamResult(result));
-            String xml = result.toString();
-            return xml.replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public String getText(Node node) {
         String text = normalizeNewlines(escapeAposForIE(getText(node, false))).trim();
         log.debug("Text of " + node + " is: " + text);
@@ -457,7 +429,7 @@ public class SWTBrowserSession implements BrowserSession {
         return text.replaceAll("&apos;", "'");
     }
 
-    public String getText(Node node, boolean preformatted) {
+    private String getText(Node node, boolean preformatted) {
         if (Node.TEXT_NODE == node.getNodeType()) {
             String text = node.getTextContent();
             if (!preformatted) {
@@ -492,16 +464,9 @@ public class SWTBrowserSession implements BrowserSession {
         return text.replaceAll("\\s+", " ").replace(nonBreakingSpace, ' ');
     }
 
-    public void scrollIntoView(Element element) {
-        log.trace("Scrolling " + element + " into view");
-        execute(domExpression(element) + ".scrollIntoView()");
-    }
-
     public boolean isVisible(Element element) {
         inject("twist-is-visible.js");
-        boolean visible = Boolean.parseBoolean(execute("Twist.isVisible(" + domExpression(element) + ")"));
-        log.debug("Is " + element + " visible: " + visible);
-        return visible;
+        return Boolean.parseBoolean(execute("Twist.isVisible(" + domExpression(element) + ")"));
     }
 
     public void setWindowExpression(String domExpression) {
