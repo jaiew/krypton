@@ -39,32 +39,37 @@ public class Decorators {
 		}
 
 		public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
-			try {
-				if (Display.getCurrent() == Display.getDefault()) {
-					try {
-						return method.invoke(anInstance, args);
-					} catch (InvocationTargetException e) {
-						throw new RuntimeException(e.getCause());
-					}
+			if (Display.getCurrent() == Display.getDefault()) {
+				try {
+					return method.invoke(anInstance, args);
+				} catch (InvocationTargetException e) {
+					throw unwind(e);
 				}
+			}
+			try {
 				final Object[] result = new Object[1];
 				Display.getDefault().syncExec(new Runnable() {
 					public void run() {
 						try {
 							result[0] = method.invoke(anInstance, args);
-						} catch (InvocationTargetException e) {
-							throw new RuntimeException(e.getCause());
 						} catch (Exception e) {
-							throw new RuntimeException(e);
+							throw new RuntimeException(unwind(e));
 						}
 					}
 				});
 				return result[0];
 			} catch (RuntimeException e) {
-				throw e.getCause();
+				throw unwind(e);
 			}
 		}
-		
+
+		private Throwable unwind(Throwable t) {
+			while (t.getCause() != null) {
+				t = t.getCause();
+			}
+			return t;
+		}
+
 		public T getInstance() {
 			return anInstance;
 		}
@@ -91,11 +96,13 @@ public class Decorators {
 
 	@SuppressWarnings("unchecked")
 	public static <T> T wrapWithLogging(final Class<T> anInterface, final T anInstance) {
-		return (T) Proxy.newProxyInstance(Decorators.class.getClassLoader(), new Class[] { anInterface }, new LoggingDecorator<T>(anInstance));
+		return (T) Proxy.newProxyInstance(Decorators.class.getClassLoader(), new Class[] { anInterface }, new LoggingDecorator<T>(
+				anInstance));
 	}
 
 	@SuppressWarnings("unchecked")
 	public static <T> T wrapWithSWTThreading(final Class<T> anInterface, final T anInstance) {
-		return (T) Proxy.newProxyInstance(Decorators.class.getClassLoader(), new Class[] { anInterface }, new SWTThreadingDecorator<T>(anInstance));
+		return (T) Proxy.newProxyInstance(Decorators.class.getClassLoader(), new Class[] { anInterface }, new SWTThreadingDecorator<T>(
+				anInstance));
 	}
 }

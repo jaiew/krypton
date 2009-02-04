@@ -230,7 +230,7 @@ public class SWTBrowserSession implements BrowserSession {
             List<Node> result = new ArrayList<Node>();
             NodeList nodeList = (NodeList) xpath.evaluate(xpathExpression, dom(), XPathConstants.NODESET);
             for (int i = 0; i < nodeList.getLength(); i++) {
-            	result.add(nodeList.item(0));
+            	result.add(nodeList.item(i));
             }
             return result;
         } catch (XPathExpressionException e) {

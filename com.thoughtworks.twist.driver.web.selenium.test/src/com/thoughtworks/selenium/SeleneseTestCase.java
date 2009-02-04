@@ -41,7 +41,6 @@ import java.io.File;
 import java.lang.reflect.Proxy;
 import java.net.BindException;
 import java.net.ServerSocket;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
@@ -56,6 +55,7 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.webapp.WebAppContext;
 
 import com.thoughtworks.twist.driver.web.browser.BrowserFamily;
+import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 import com.thoughtworks.twist.driver.web.browser.Decorators.SWTThreadingDecorator;
 import com.thoughtworks.twist.driver.web.selenium.TwistSelenium;
 
@@ -126,36 +126,36 @@ public class SeleneseTestCase extends TestCase {
 	// @Override
 	public void runBare() throws Throwable {
 		runBareWithSecondThread();
-//		runBareWithOneThread();
+//		 runBareWithOneThread();
 	}
 
 	private void runBareWithSecondThread() throws Throwable {
-		final CountDownLatch latch = new CountDownLatch(1);
+		final boolean[] done = new boolean[1];
+		final Throwable[] throwable = new Throwable[1];
+	
 		final Display display = Display.getDefault();
-		try {
-			executor.execute(new Runnable() {
-				public void run() {
-					try {
-						runBareWithOneThread();
-					} catch (Throwable t) {
-						throw new RuntimeException(t);
-					} finally {
-						latch.countDown();
-						display.wake();
-					}
+		executor.execute(new Runnable() {
+			public void run() {
+				try {
+					runBareWithOneThread();
+				} catch (Throwable t) {
+					throwable[0] = t;
+				} finally {
+					done[0] = true;
 				}
-			});
-		} catch (RuntimeException e) {
-			if (e.getCause() != null) {
-				throw e.getCause();
 			}
-			throw e;
-		}
-		while ((!display.isDisposed() && display.readAndDispatch()) || latch.getCount() > 0) {
-			display.sleep();
-			if (latch.getCount() == 0) {
+		});
+		while ((!display.isDisposed())) {
+			try {
+				display.readAndDispatch();
+			} catch (Exception whoCares) {
+			}
+			if (done[0]) {
 				break;
 			}
+		}
+		if (throwable[0] != null) {
+			throw throwable[0];
 		}
 	}
 
@@ -529,7 +529,12 @@ public class SeleneseTestCase extends TestCase {
 		// selenium.getBrowserSession().waitForActivity();
 		// } else {
 		Thread.sleep(2000);
-		getTwistSelenium().getBrowserSession().waitForIdle();
+		final BrowserSession session = getTwistSelenium().getBrowserSession();
+		session.getBrowser().getDisplay().syncExec(new Runnable() {
+			public void run() {
+				session.waitForIdle();
+			}
+		});
 		// }
 	}
 
