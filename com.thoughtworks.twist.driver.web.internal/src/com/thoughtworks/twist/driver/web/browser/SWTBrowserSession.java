@@ -397,6 +397,17 @@ public class SWTBrowserSession implements BrowserSession {
         }
 
         public synchronized String execute(final String expression) {
+//        	try {
+//        		String script = "return " + expression + ";";
+//        		log.debug("Executing JavaScript: " + script);
+//				Object result = getBrowser().evaluate(script);
+//				if (result == null) {
+//					return null;
+//				}
+//				return result.toString();
+//        	} catch (SWTException e) {
+//        		throw new JavascriptException(e.getMessage());
+//        	}
             getBrowser().getDisplay().syncExec(new Runnable() {
                 public void run() {
                     log.debug("Executing JavaScript: " + expression);
