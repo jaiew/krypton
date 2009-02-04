@@ -23,7 +23,6 @@ package com.thoughtworks.twist.driver.web.user.cocoa;
 import java.util.Enumeration;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.internal.carbon.OS;
 import org.eclipse.swt.widgets.Shell;
 
 import com.apple.cocoa.application.NSApplication;
@@ -33,8 +32,11 @@ import com.apple.cocoa.foundation.NSPoint;
 import com.thoughtworks.twist.driver.web.user.User;
 import com.thoughtworks.twist.driver.web.user.KeyTranslator.TransaltedKey;
 
-@SuppressWarnings({ "deprecation", "restriction" })
+@SuppressWarnings( { "deprecation" })
 public class CocoaUser implements User {
+	private static final int LEFT = 1;
+	private static final int RIGHT = 2;
+
 	private NSWindow window;
 	private CocoaKeyTranslator translator;
 	private int modifiers;
@@ -42,8 +44,7 @@ public class CocoaUser implements User {
 
 	private static NSWindow findCocoaWindowForShell() {
 		NSApplication application = NSApplication.sharedApplication();
-		Enumeration<?> windows = application.windows()
-				.reverseObjectEnumerator();
+		Enumeration<?> windows = application.windows().reverseObjectEnumerator();
 		return (NSWindow) windows.nextElement();
 	}
 
@@ -59,24 +60,21 @@ public class CocoaUser implements User {
 	}
 
 	public void click(int x, int y) {
-		click(x, y, OS.kEventMouseButtonPrimary, NSEvent.LeftMouseDown,
-				NSEvent.LeftMouseUp);
+		click(x, y, LEFT, NSEvent.LeftMouseDown, NSEvent.LeftMouseUp);
 	}
 
 	public void doubleClick(int x, int y) {
 		click(x, y);
-		mouseEvent(NSEvent.LeftMouseDown, x, y, OS.kEventMouseButtonPrimary, 2,
-				1);
-		mouseEvent(NSEvent.LeftMouseUp, x, y, OS.kEventMouseButtonPrimary, 2, 0);
+		mouseEvent(NSEvent.LeftMouseDown, x, y, LEFT, 2, 1);
+		mouseEvent(NSEvent.LeftMouseUp, x, y, LEFT, 2, 0);
 	}
 
 	public void rightClick(int x, int y) {
-		click(x, y, OS.kEventMouseButtonSecondary, NSEvent.RightMouseDown,
-				NSEvent.RightMouseUp);
+		click(x, y, RIGHT, NSEvent.RightMouseDown, NSEvent.RightMouseUp);
 	}
 
 	public void dragAndDrop(int startX, int startY, int endX, int endY) {
-		int button = OS.kEventMouseButtonPrimary;
+		int button = LEFT;
 		mouseEvent(NSEvent.MouseMoved, startX, startY, button, 1, 0);
 		mouseEvent(NSEvent.LeftMouseDown, startX, startY, button, 1, 1);
 		// dragEvents(startX, startY, endX, endY, button, 10);
@@ -196,28 +194,22 @@ public class CocoaUser implements User {
 		keyEvent(NSEvent.KeyUp, (char) c, (short) keyCode, wasTranslated);
 	}
 
-	private void click(int x, int y, int button, int mouseDownEventType,
-			int mouseUpEventType) {
+	private void click(int x, int y, int button, int mouseDownEventType, int mouseUpEventType) {
 		mouseEvent(NSEvent.MouseMoved, x, y, button, 1, 0);
 		mouseEvent(mouseDownEventType, x, y, button, 1, 1);
 		mouseEvent(mouseUpEventType, x, y, button, 1, 0);
 	}
 
-	private void mouseEvent(int type, final int x, final int y, int button,
-			int clickCount, float pressure) {
-		NSEvent mouseEvent = NSEvent.mouseEvent(type, new NSPoint(x, window
-				.contentView().frame().height()
-				- y), NSEvent.MouseEnteredMask, 0.0, window.windowNumber(),
-				NSApplication.sharedApplication().context(), 0, clickCount,
-				pressure);
+	private void mouseEvent(int type, final int x, final int y, int button, int clickCount, float pressure) {
+		NSEvent mouseEvent = NSEvent.mouseEvent(type, new NSPoint(x, window.contentView().frame().height() - y), NSEvent.MouseEnteredMask,
+				0.0, window.windowNumber(), NSApplication.sharedApplication().context(), 0, clickCount, pressure);
 
 		ensureWindowCanAcceptEvents();
 		window.sendEvent(mouseEvent);
 		window.displayIfNeeded();
 	}
 
-	private void keyEvent(int type, final char c, final short keyCode,
-			boolean wasTranslated) {
+	private void keyEvent(int type, final char c, final short keyCode, boolean wasTranslated) {
 		String string = new String(new char[] { c });
 		int mask = modifiers;
 		// int mask = NSEvent.MouseEnteredMask | modifiers;
@@ -226,8 +218,7 @@ public class CocoaUser implements User {
 		// OtherMouseDraggedMask;
 		// }
 
-		NSEvent keyEvent = NSEvent.keyEvent(type, new NSPoint(), mask, 0.0, 0,
-				NSApplication.sharedApplication().context(), string, string,
+		NSEvent keyEvent = NSEvent.keyEvent(type, new NSPoint(), mask, 0.0, 0, NSApplication.sharedApplication().context(), string, string,
 				false, keyCode);
 
 		ensureWindowCanAcceptEvents();
@@ -237,7 +228,7 @@ public class CocoaUser implements User {
 
 	private void ensureWindowCanAcceptEvents() {
 		shell.setFocus();
-		if (window != null) {			
+		if (window != null) {
 			window.becomeKeyWindow();
 		}
 	}
