@@ -21,7 +21,7 @@ Requirements:
  Mac OS X, Linux (with GTK) or Windows
  Java 5
  Ant 1.7
- svn
+ svn 1.5
 
 Mozilla:
  XULRunner 1.8.1.3 or higher for Mozilla - Firefox 2 support.

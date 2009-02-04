@@ -47,15 +47,15 @@ public class SmokeTest {
     }
 
     // Doesn't work on Windows for now.
-//    @Test
-//    public void testDigg() throws Exception {
-//        browser.open("http://www.digg.com");
-//        browser.click("//div[contains(@class, 'news-summary')][1]//a[@class = 'tool comments']");
-//        browser.click("//a[text() = 'digg it']");
-//
-//        assertTrue(browser.isTextPresent("You've got to login or join to Digg that!"));
-//        assertTrue(browser.isElementPresent("//div[@class = 'login-digg']//input[@name = 'username']"));
-//	}
+    @Test
+    public void testDigg() throws Exception {
+        browser.open("http://www.digg.com");
+        browser.click("//div[contains(@class, 'news-summary')][1]//a[@class = 'tool comments']");
+        browser.click("//a[text() = 'digg it']");
+
+        assertTrue(browser.isTextPresent("You've got to login or join to Digg that!"));
+        assertTrue(browser.isElementPresent("//div[@class = 'login-digg']//input[@name = 'username']"));
+	}
 
     @AfterClass
     public static void stopBrowser() {
