@@ -151,8 +151,11 @@ public class SeleneseTestCase extends TestCase {
 			}
 			throw e;
 		}
-		while (!display.isDisposed() && display.readAndDispatch() || latch.getCount() > 0) {
+		while ((!display.isDisposed() && display.readAndDispatch()) || latch.getCount() > 0) {
 			display.sleep();
+			if (latch.getCount() == 0) {
+				break;
+			}
 		}
 	}
 
