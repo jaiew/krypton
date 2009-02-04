@@ -95,13 +95,13 @@ public class Decorators {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T wrapWithLogging(final Class<T> anInterface, final T anInstance) {
+	public static <T> T wrapWithLogging(Class<T> anInterface, T anInstance) {
 		return (T) Proxy.newProxyInstance(Decorators.class.getClassLoader(), new Class[] { anInterface }, new LoggingDecorator<T>(
 				anInstance));
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> T wrapWithSWTThreading(final Class<T> anInterface, final T anInstance) {
+	public static <T> T wrapWithSWTThreading(Class<T> anInterface, T anInstance) {
 		return (T) Proxy.newProxyInstance(Decorators.class.getClassLoader(), new Class[] { anInterface }, new SWTThreadingDecorator<T>(
 				anInstance));
 	}

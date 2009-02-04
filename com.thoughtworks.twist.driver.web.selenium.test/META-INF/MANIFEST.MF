@@ -3,8 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: com.thoughtworks.twist.driver.web.selenium.test
 Bundle-SymbolicName: com.thoughtworks.twist.driver.web.selenium.test
 Bundle-Version: 1.0.0
-Export-Package:  com.thoughtworks.selenium,
- com.thoughtworks.selenium.corebased,
+Export-Package: com.thoughtworks.selenium.corebased,
  com.thoughtworks.selenium.corebasedskip,
  com.thoughtworks.twist.driver.web.selenium,
  com.thoughtworks.twist.driver.web.selenium.locator,
