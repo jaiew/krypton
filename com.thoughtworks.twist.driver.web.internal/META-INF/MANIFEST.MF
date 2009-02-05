@@ -14,4 +14,5 @@ Import-Package: org.osgi.framework;version="1.5.0"
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/commons-logging-1.1.1.jar,
  .,
- resources/
+ resources/,
+ lib/js.jar

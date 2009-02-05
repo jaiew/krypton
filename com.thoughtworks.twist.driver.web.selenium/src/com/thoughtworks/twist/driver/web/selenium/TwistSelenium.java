@@ -265,7 +265,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void focus(String locator) {
-		session.evaluate(session.domExpression(locate(locator)) + ".focus();");
+		session.evaluate(session.domExpression(locate(locator)) + ".focus()");
 	}
 
 	public String getAlert() {

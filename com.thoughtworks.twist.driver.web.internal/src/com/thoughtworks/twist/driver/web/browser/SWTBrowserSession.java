@@ -44,6 +44,12 @@ import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.StatusTextEvent;
 import org.eclipse.swt.browser.StatusTextListener;
 import org.eclipse.swt.widgets.Shell;
+import org.mozilla.javascript.CompilerEnvirons;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
+import org.mozilla.javascript.ErrorReporter;
+import org.mozilla.javascript.Parser;
+import org.mozilla.javascript.ScriptOrFnNode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -125,6 +131,7 @@ public class SWTBrowserSession implements BrowserSession {
 	}
 
 	public synchronized void execute(String statements) {
+		verifyJavaScript(statements);
 		browser.execute(statements);
 		pumpEvents();
 	}
@@ -139,7 +146,9 @@ public class SWTBrowserSession implements BrowserSession {
 
 	public void inject(final String script, final Class<?> baseClass) {
 		log.trace("Injecting " + script + " base class is " + baseClass);
-		browser.execute(readResource(script, baseClass));
+		String code = readResource(script, baseClass);
+		verifyJavaScript(code);
+		browser.execute(code);
 	}
 
 	public BrowserFamily getBrowserFamily() {
@@ -358,6 +367,19 @@ public class SWTBrowserSession implements BrowserSession {
 		}
 	}
 
+	private void verifyJavaScript(String script) {
+		Context ctx = ContextFactory.getGlobal().enterContext();
+		try {
+			CompilerEnvirons compilerEnv = new CompilerEnvirons();
+			compilerEnv.initFromContext(ctx);
+			ErrorReporter compilationErrorReporter = compilerEnv.getErrorReporter();
+			Parser p = new Parser(compilerEnv, compilationErrorReporter);
+			ScriptOrFnNode tree = p.parse(script, "", 1);
+		} finally {
+			Context.exit();
+		}
+	}
+
 	private final class LocalEntityResolver implements EntityResolver {
 		public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
 			if (publicId.equals("-//W3C//DTD XHTML 1.0 Strict//EN")) {
@@ -394,9 +416,11 @@ public class SWTBrowserSession implements BrowserSession {
 
 		public String evaluate(final String expression) {
 			log.debug("Executing JavaScript: " + expression);
-			getBrowser().addStatusTextListener(StatusTransport.this);
 			String script = "try { window.status = '" + RETURN_VALUE + "' + (" + expression + ");} catch (e) { window.status = '"
 					+ EXCEPTION + "' + e; }";
+			verifyJavaScript(script);
+			
+			getBrowser().addStatusTextListener(StatusTransport.this);
 			pumpEvents();
 			getBrowser().execute(script);
 			pumpEvents();
