@@ -30,19 +30,16 @@ import org.w3c.dom.Element;
 public class BrowserSessionTest extends AbstractBaseBrowserSession {
     @Test
     public void shouldExecuteJavascriptAndReturnResult() throws Exception {
-        render("<html/>");
         assertEquals("Hello", session.execute("'Hello'"));
     }
 
     @Test
     public void shouldExecuteJavascriptAndReturnEvaluatedResult() throws Exception {
-        render("<html/>");
         assertEquals("2", session.execute("1 + 1"));
     }
 
     @Test
     public void shouldExecuteJavascriptAndThrowException() throws Exception {
-        render("<html/>");
         String reference = "Hello";
         try {
             session.execute(reference);
@@ -54,7 +51,6 @@ public class BrowserSessionTest extends AbstractBaseBrowserSession {
 
     @Test
     public void shouldThrowExceptionWhenInjectingNonExistingJavascript() throws Exception {
-        render("<html/>");
         try {
             inject("test-does-not-exist.js");
             fail();

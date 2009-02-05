@@ -7,8 +7,7 @@ Export-Package: com.thoughtworks.selenium.corebased,
  com.thoughtworks.selenium.corebasedskip,
  com.thoughtworks.twist.driver.web.selenium,
  com.thoughtworks.twist.driver.web.selenium.locator,
- com.thoughtworks.twist.driver.web.selenium.stringmatch,
- org.openqa.selenium
+ com.thoughtworks.twist.driver.web.selenium.stringmatch
 Require-Bundle: com.thoughtworks.twist.driver.web.selenium;bundle-version="1.0.0",
  com.thoughtworks.twist.driver.web.internal;bundle-version="1.0.0",
  com.thoughtworks.twist.driver.web.internal.test;bundle-version="1.0.0",
