@@ -20,11 +20,11 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.browser;
 
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.List;
 
 import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

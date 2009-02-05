@@ -20,6 +20,8 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.browser;
 
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -41,8 +43,6 @@ import org.apache.commons.logging.LogFactory;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.StatusTextEvent;
 import org.eclipse.swt.browser.StatusTextListener;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

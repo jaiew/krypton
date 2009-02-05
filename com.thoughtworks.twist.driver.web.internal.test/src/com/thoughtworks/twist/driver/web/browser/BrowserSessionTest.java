@@ -22,8 +22,8 @@ package com.thoughtworks.twist.driver.web.browser;
 
 import static org.junit.Assert.*;
 
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
+import java.awt.Point;
+import java.awt.Rectangle;
 import org.junit.Test;
 import org.w3c.dom.Element;
 

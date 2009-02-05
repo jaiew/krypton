@@ -38,8 +38,7 @@ public class LocationChangedWaitStrategy implements LocationListener, WaitStrate
 
     public void init(BrowserSession session) {
         session.getBrowser().addLocationListener(this);
-        
-        
+
         addURLExclusionPattern("javascript:.*");
         addURLExclusionPattern("about:blank");
         addURLExclusionPattern("about:config");
