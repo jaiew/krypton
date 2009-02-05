@@ -47,68 +47,68 @@ public enum BrowserFamily {
         }
         
         void init(BrowserSession session) {
-//            configureXULRunnerUsingAboutConfig(session);
+            configureXULRunnerUsingAboutConfig(session);
             loadAboutBlank(session);
         }
 
-//        private void configureXULRunnerUsingAboutConfig(BrowserSession session) {
-//            session.browser.setUrl("about:config");
-//            session.waitForActivity();
-//            
-//            waitForAboutConfigToInitialize(session);
-//
+        private void configureXULRunnerUsingAboutConfig(BrowserSession session) {
+            session.getBrowser().setUrl("about:config");
+            session.pumpEvents();
+
+            waitForAboutConfigToInitialize(session);
+
 //            setStringPreference(session, "general.useragent.extra.firefox", "Gecko/2008070206 Firefox/3.0.1");
 //            setStringPreference(session, "general.useragent.extra.firefox", "Firefox/2.0.0.13");
-//
-//            setBooleanPreference(session, "security.warn_entering_secure", false);
-//            setBooleanPreference(session, "security.warn_entering_weak", false);
-//            setBooleanPreference(session, "security.warn_leaving_secure", false);
-//            setBooleanPreference(session, "security.warn_submit_insecure", false);
-//            setBooleanPreference(session, "security.warn_viewing_mixed", false);
-//        }
+
+            setBooleanPreference(session, "security.warn_entering_secure", false);
+            setBooleanPreference(session, "security.warn_entering_weak", false);
+            setBooleanPreference(session, "security.warn_leaving_secure", false);
+            setBooleanPreference(session, "security.warn_submit_insecure", false);
+            setBooleanPreference(session, "security.warn_viewing_mixed", false);
+        }
 
         private void loadAboutBlank(BrowserSession session) {
             session.getBrowser().setUrl("about:blank");
             session.pumpEvents();
         }
 
-//        private void waitForAboutConfigToInitialize(BrowserSession session) {
-//            long timeout = System.currentTimeMillis() + 4000;
-//            boolean configLoaded = false;
-//            while (!configLoaded) {
-//                try {
-//                    session.execute("gPrefBranch");
-//                    configLoaded = true;
-//                } catch (JavascriptException e) {
-//                    if (!referenceError("gPrefBranch").equals(e.getMessage())) {
-//                        throw e;
-//                    }
-//                    if (System.currentTimeMillis() >= timeout) {
-//                        throw new IllegalStateException("Could not load about:config properly");                    
-//                    }
-//                    try {
-//                        Thread.sleep(200);
-//                    } catch (InterruptedException ignore) {
-//                    }
-//                }
-//            }
-//        }
+        private void waitForAboutConfigToInitialize(BrowserSession session) {
+            long timeout = System.currentTimeMillis() + 4000;
+            boolean configLoaded = false;
+            while (!configLoaded) {
+                try {
+                    session.execute("gPrefBranch");
+                    configLoaded = true;
+                } catch (JavascriptException e) {
+                    if (!referenceError("gPrefBranch").equals(e.getMessage())) {
+                        throw e;
+                    }
+                    if (System.currentTimeMillis() >= timeout) {
+                        throw new IllegalStateException("Could not load about:config properly");                    
+                    }
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException ignore) {
+                    }
+                }
+            }
+        }
 
-//        private void setPreference(BrowserSession session, String type, String key, Object value) {
-//            Object javaScriptValue = value instanceof String ? "'" + value + "'" : value;
-//            session.execute("gPrefBranch.set" + type + "Pref('" + key + "', " + javaScriptValue + ")");
-//            if (!value.toString().equals(session.execute("gPrefBranch.get" + type + "Pref('" + key + "')"))) {
-//                throw new IllegalStateException("Failed to change preference " + key + " to " + value);
-//            }
-//        }
-//
-//        private void setStringPreference(BrowserSession session, String key, String value) {
-//            setPreference(session, "Char", key, value);
-//        }
-//
-//        private void setBooleanPreference(BrowserSession session, String key, boolean value) {
-//            setPreference(session, "Bool", key, value);
-//        }
+        private void setPreference(BrowserSession session, String type, String key, Object value) {
+            Object javaScriptValue = value instanceof String ? "'" + value + "'" : value;
+            session.execute("gPrefBranch.set" + type + "Pref('" + key + "', " + javaScriptValue + ")");
+            if (!value.toString().equals(session.execute("gPrefBranch.get" + type + "Pref('" + key + "')"))) {
+                throw new IllegalStateException("Failed to change preference " + key + " to " + value);
+            }
+        }
+
+        private void setStringPreference(BrowserSession session, String key, String value) {
+            setPreference(session, "Char", key, value);
+        }
+
+        private void setBooleanPreference(BrowserSession session, String key, boolean value) {
+            setPreference(session, "Bool", key, value);
+        }
 
         public String referenceError(String reference) {
             return "ReferenceError: " + reference + " is not defined";
@@ -239,11 +239,8 @@ public enum BrowserFamily {
     }
 
     private void initEmptyDocument(BrowserSession session) {
-        LocationChangedWaitStrategy waitStrategy = new LocationChangedWaitStrategy();
-        session.addWaitStrategy(waitStrategy);
         session.getBrowser().setUrl("about:blank");
         session.waitForIdle();
-        session.removeWaitStrategy(waitStrategy);
     }
 
     void init(BrowserSession session) {

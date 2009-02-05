@@ -32,15 +32,12 @@ import org.eclipse.swt.browser.StatusTextListener;
 
 import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 
-public class PromptHandler
-		implements
-			ProgressListener,
-			StatusTextListener, DialogHandler {
+public class PromptHandler implements ProgressListener, StatusTextListener, DialogHandler {
 	private static final String JAVASCRIPT_PROMPT = "javascript-prompt: ";
 
 	private final BrowserSession session;
 	private List<String> prompts = new ArrayList<String>();
-    Log log = LogFactory.getLog(getClass());
+	Log log = LogFactory.getLog(getClass());
 
 	public PromptHandler(BrowserSession session) {
 		this.session = session;
@@ -53,19 +50,19 @@ public class PromptHandler
 	}
 
 	public void completed(ProgressEvent event) {
-		session.getBrowser()
-				.execute("if (!Twist) { var Twist = {}; } if (Twist.promptAnswer === undefined) { Twist.promptAnswer = ''; } window.prompt = function(message, value) { window.status = '"
-						+ JAVASCRIPT_PROMPT
-						+ "' + message; window.status =''; var answer = Twist.promptAnswer; if (value) answer = value; Twist.promptAnswer = ''; return answer; }");
+		session
+				.getBrowser()
+				.execute(
+						"if (!Twist) { var Twist = {}; } if (Twist.promptAnswer === undefined) { Twist.promptAnswer = ''; } window.prompt = function(message, value) { window.status = '"
+								+ JAVASCRIPT_PROMPT
+								+ "' + message; window.status =''; var answer = Twist.promptAnswer; if (value) { answer = value; } Twist.promptAnswer = ''; return answer; }");
 		session.pumpEvents();
 	}
 
 	public void changed(StatusTextEvent event) {
 		if (event.text.startsWith(JAVASCRIPT_PROMPT)) {
-			prompts
-					.add(event.text.substring(JAVASCRIPT_PROMPT.length()));
-			log.info("prompt: "
-					+ prompts.get(prompts.size() - 1));
+			prompts.add(event.text.substring(JAVASCRIPT_PROMPT.length()));
+			log.info("prompt: " + prompts.get(prompts.size() - 1));
 		}
 	}
 

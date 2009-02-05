@@ -94,8 +94,6 @@ public interface BrowserSession {
 
 	void addWaitStrategy(WaitStrategy waitStrategy);
 
-	void removeWaitStrategy(WaitStrategy waitStrategy);
-
 	// Frames/Windows
 
 	void setWindowExpression(String domExpression);

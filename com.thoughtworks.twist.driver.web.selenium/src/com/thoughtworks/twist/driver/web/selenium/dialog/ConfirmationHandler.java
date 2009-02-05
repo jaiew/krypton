@@ -32,15 +32,12 @@ import org.eclipse.swt.browser.StatusTextListener;
 
 import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 
-public class ConfirmationHandler
-		implements
-			ProgressListener,
-			StatusTextListener, DialogHandler {
+public class ConfirmationHandler implements ProgressListener, StatusTextListener, DialogHandler {
 	private static final String JAVASCRIPT_CONFIRM = "javascript-confirm: ";
 
 	private final BrowserSession session;
 	private List<String> confirmations = new ArrayList<String>();
-    Log log = LogFactory.getLog(getClass());
+	Log log = LogFactory.getLog(getClass());
 
 	public ConfirmationHandler(BrowserSession session) {
 		this.session = session;
@@ -53,19 +50,19 @@ public class ConfirmationHandler
 	}
 
 	public void completed(ProgressEvent event) {
-		session.getBrowser().
-				execute("if (!Twist) { var Twist = {}; } if (Twist.confirmationAnswer === undefined) { Twist.confirmationAnswer = true; } window.confirm = function(message) { window.status = '"
-						+ JAVASCRIPT_CONFIRM
-						+ "' + message; window.status = ''; var answer = Twist.confirmationAnswer; Twist.confirmationAnswer = true; return answer; }");
+		session
+				.getBrowser()
+				.execute(
+						"if (!Twist) { var Twist = {}; } if (Twist.confirmationAnswer === undefined) { Twist.confirmationAnswer = true; } window.confirm = function(message) { window.status = '"
+								+ JAVASCRIPT_CONFIRM
+								+ "' + message; window.status = ''; var answer = Twist.confirmation	Answer; Twist.confirmationAnswer = true; return answer; }");
 		session.pumpEvents();
 	}
 
 	public void changed(StatusTextEvent event) {
 		if (event.text.startsWith(JAVASCRIPT_CONFIRM)) {
-			confirmations
-					.add(event.text.substring(JAVASCRIPT_CONFIRM.length()));
-			log.info("confirmation: "
-					+ confirmations.get(confirmations.size() - 1));
+			confirmations.add(event.text.substring(JAVASCRIPT_CONFIRM.length()));
+			log.info("confirmation: " + confirmations.get(confirmations.size() - 1));
 		}
 	}
 

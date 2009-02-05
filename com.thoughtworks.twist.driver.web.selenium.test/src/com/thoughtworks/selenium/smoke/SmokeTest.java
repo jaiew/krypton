@@ -26,7 +26,8 @@ import org.junit.Test;
 
 import com.thoughtworks.selenium.*;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
+
 
 public class SmokeTest {
     private static Selenium browser;
@@ -46,19 +47,38 @@ public class SmokeTest {
         assertEquals("hello world - Google Search", browser.getTitle());
     }
 
-    // Doesn't work on Windows for now.
-    @Test
-    public void testDigg() throws Exception {
-        browser.open("http://www.digg.com");
-        browser.click("//div[contains(@class, 'news-summary')][1]//a[@class = 'tool comments']");
-        browser.click("//a[text() = 'digg it']");
+//    @Test
+//	public void testGMail() throws Exception {
+//		browser.open("http://mail.google.com");
+//		browser.type("Email", "hakan.raberg");
+//		browser.type("Passwd", getPW());
+//		browser.click("signIn");
+//		browser.selectFrame("canvas_frame");
+//		System.out.println(browser.getText("//a[contains(text(),'Inbox')]"));
+//		browser.click("//span[text() = 'LinkedIn Updates']");
+//		browser.click("//div[text() = 'Reply']");
+//	}
 
-        assertTrue(browser.isTextPresent("You've got to login or join to Digg that!"));
-        assertTrue(browser.isElementPresent("//div[@class = 'login-digg']//input[@name = 'username']"));
-	}
+	// Doesn't work on Windows for now.
+//    @Test
+//    public void testDigg() throws Exception {
+//        browser.open("http://www.digg.com");
+//        browser.click("//div[contains(@class, 'news-summary')][1]//a[@class = 'tool comments']");
+//        browser.click("//a[text() = 'digg it']");
+//
+//        assertTrue(browser.isTextPresent("You've got to login or join to Digg that!"));
+//        assertTrue(browser.isElementPresent("//div[@class = 'login-digg']//input[@name = 'username']"));
+//	}
 
     @AfterClass
     public static void stopBrowser() {
         browser.stop();
     }
+    
+    
+    
+    
+    private String getPW() {
+		return "xxxxxxxx";
+	}
 }

@@ -310,10 +310,6 @@ public class SWTBrowserSession implements BrowserSession {
         waitStrategies.add(waitStrategy);
     }
 
-    public void removeWaitStrategy(WaitStrategy waitStrategy) {
-        waitStrategies.remove(waitStrategy);
-    }
-
     public String domExpression(Element element) {
         String expression = "";
         Element original = element;
@@ -396,18 +392,7 @@ public class SWTBrowserSession implements BrowserSession {
             }
         }
 
-        public synchronized String execute(final String expression) {
-//        	try {
-//        		String script = "return " + expression + ";";
-//        		log.debug("Executing JavaScript: " + script);
-//				Object result = getBrowser().evaluate(script);
-//				if (result == null) {
-//					return null;
-//				}
-//				return result.toString();
-//        	} catch (SWTException e) {
-//        		throw new JavascriptException(e.getMessage());
-//        	}
+        public String execute(final String expression) {
             getBrowser().getDisplay().syncExec(new Runnable() {
                 public void run() {
                     log.debug("Executing JavaScript: " + expression);
