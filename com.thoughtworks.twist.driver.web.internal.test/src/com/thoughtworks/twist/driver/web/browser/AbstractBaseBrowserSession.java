@@ -138,7 +138,7 @@ public abstract class AbstractBaseBrowserSession {
     }
     
 	protected void executeAndWaitForIdle(String script) {
-		session.execute(script);
+		session.evaluate(script);
         session.waitForIdle();
 	}
 

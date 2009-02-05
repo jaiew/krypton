@@ -50,13 +50,10 @@ public class ConfirmationHandler implements ProgressListener, StatusTextListener
 	}
 
 	public void completed(ProgressEvent event) {
-		session
-				.getBrowser()
-				.execute(
+		session.execute(
 						"if (!Twist) { var Twist = {}; } if (Twist.confirmationAnswer === undefined) { Twist.confirmationAnswer = true; } window.confirm = function(message) { window.status = '"
 								+ JAVASCRIPT_CONFIRM
-								+ "' + message; window.status = ''; var answer = Twist.confirmation	Answer; Twist.confirmationAnswer = true; return answer; }");
-		session.pumpEvents();
+								+ "' + message; window.status = ''; var answer = Twist.confirmationAnswer; Twist.confirmationAnswer = true; return answer; }");
 	}
 
 	public void changed(StatusTextEvent event) {
@@ -75,12 +72,10 @@ public class ConfirmationHandler implements ProgressListener, StatusTextListener
 	}
 
 	public void chooseCancelOnNextConfirmation() {
-		session.getBrowser().execute("if (!Twist) { var Twist = {}; } Twist.confirmationAnswer = false");
-		session.pumpEvents();
+		session.execute("if (!Twist) { var Twist = {}; } Twist.confirmationAnswer = false");
 	}
 
 	public void chooseOkOnNextConfirmation() {
-		session.getBrowser().execute("if (!Twist) { var Twist = {}; } Twist.confirmationAnswer = true");
-		session.pumpEvents();
+		session.execute("if (!Twist) { var Twist = {}; } Twist.confirmationAnswer = true");
 	}
 }

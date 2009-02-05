@@ -38,7 +38,7 @@ public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener
 
     public void changed(LocationEvent event) {
         if (MOZILLA == session.getBrowserFamily()) {
-            session.getBrowser().execute("if (!Twist) { var Twist = {}; }" +
+            session.execute("if (!Twist) { var Twist = {}; }" +
                     "if (!Twist.hasContentLoadListener) { document.addEventListener('DOMContentLoaded', function() { " +
             "Twist.contentLoaded = true; }, false); Twist.hasContentLoadListener = true; }");
             hasListener = true;
@@ -51,11 +51,11 @@ public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener
 
     public boolean isBusy() {
         if (SAFARI == session.getBrowserFamily() || IE == session.getBrowserFamily()) {
-            String readyState = session.execute("document.readyState");
+            String readyState = session.evaluate("document.readyState");
             return !"complete".equals(readyState);
         } else if (MOZILLA == session.getBrowserFamily()) {
             boolean isLoading = Boolean.parseBoolean(session
-                    .execute("typeof document.getElementsByTagName == 'undefined' " +
+                    .evaluate("typeof document.getElementsByTagName == 'undefined' " +
                             (hasListener ? "|| typeof Twist.contentLoaded == 'undefined' " : "") +
                             "|| document.body == null"));
             return isLoading;

@@ -50,9 +50,8 @@ public class AlertHandler implements ProgressListener, StatusTextListener, Dialo
 	}
 
 	public void completed(ProgressEvent event) {
-		session.getBrowser().execute("window.alert = function(message) { window.status = '"
+		session.execute("window.alert = function(message) { window.status = '"
 				+ JAVASCRIPT_ALERT + "' + message; window.status = ''; }");
-		session.pumpEvents();
 	}
 
 	public void changed(StatusTextEvent event) {

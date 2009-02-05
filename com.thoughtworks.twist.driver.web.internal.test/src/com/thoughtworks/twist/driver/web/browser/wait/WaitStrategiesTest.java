@@ -222,12 +222,12 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
         load(localUrl(path));
 
         doLocalAjaxRequest(path);
-        assertEquals(1, Integer.parseInt(session.execute("Twist.numberOfActiveAjaxRequests")));
+        assertEquals(1, Integer.parseInt(session.evaluate("Twist.numberOfActiveAjaxRequests")));
         timedWaitForIdle();
 
         assertTrue(idleTime < timeout);
         assertTrue(idleTime >= BlockingHelloWorldServlet.BLOCKING_TIME);
-        assertEquals(0, Integer.parseInt(session.execute("Twist.numberOfActiveAjaxRequests")));
+        assertEquals(0, Integer.parseInt(session.evaluate("Twist.numberOfActiveAjaxRequests")));
     }
 
     @Test
@@ -242,11 +242,11 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
         load(localUrl(path));
 
         doLocalAjaxRequest(path);
-        assertEquals(0, Integer.parseInt(session.execute("Twist.numberOfActiveAjaxRequests")));
+        assertEquals(0, Integer.parseInt(session.evaluate("Twist.numberOfActiveAjaxRequests")));
         timedWaitForIdle();
 
         assertTrue(idleTime < BlockingHelloWorldServlet.BLOCKING_TIME);
-        assertEquals(0, Integer.parseInt(session.execute("Twist.numberOfActiveAjaxRequests")));
+        assertEquals(0, Integer.parseInt(session.evaluate("Twist.numberOfActiveAjaxRequests")));
     }
 
     @Test

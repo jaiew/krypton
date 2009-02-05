@@ -50,13 +50,10 @@ public class PromptHandler implements ProgressListener, StatusTextListener, Dial
 	}
 
 	public void completed(ProgressEvent event) {
-		session
-				.getBrowser()
-				.execute(
+		session.execute(
 						"if (!Twist) { var Twist = {}; } if (Twist.promptAnswer === undefined) { Twist.promptAnswer = ''; } window.prompt = function(message, value) { window.status = '"
 								+ JAVASCRIPT_PROMPT
 								+ "' + message; window.status =''; var answer = Twist.promptAnswer; if (value) { answer = value; } Twist.promptAnswer = ''; return answer; }");
-		session.pumpEvents();
 	}
 
 	public void changed(StatusTextEvent event) {

@@ -56,6 +56,6 @@ public class DomLocatorStrategy extends XPathLocatorStrategy {
     }
 
     private String domToXPath(BrowserSession session, String locator) {
-        return session.execute("Twist.domToXPath(" + locator + ")");
+        return session.evaluate("Twist.domToXPath(" + locator + ")");
     }
 }

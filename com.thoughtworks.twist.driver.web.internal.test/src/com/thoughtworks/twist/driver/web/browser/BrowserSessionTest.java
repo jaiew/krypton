@@ -30,19 +30,19 @@ import org.w3c.dom.Element;
 public class BrowserSessionTest extends AbstractBaseBrowserSession {
     @Test
     public void shouldExecuteJavascriptAndReturnResult() throws Exception {
-        assertEquals("Hello", session.execute("'Hello'"));
+        assertEquals("Hello", session.evaluate("'Hello'"));
     }
 
     @Test
     public void shouldExecuteJavascriptAndReturnEvaluatedResult() throws Exception {
-        assertEquals("2", session.execute("1 + 1"));
+        assertEquals("2", session.evaluate("1 + 1"));
     }
 
     @Test
     public void shouldExecuteJavascriptAndThrowException() throws Exception {
         String reference = "Hello";
         try {
-            session.execute(reference);
+            session.evaluate(reference);
             fail();
         } catch (JavascriptException e) {
             assertEquals(referenceErrorMessage(reference), e.getMessage());
@@ -63,7 +63,7 @@ public class BrowserSessionTest extends AbstractBaseBrowserSession {
         render("<html/>");
         inject("test-hello-world.js");
 
-        assertEquals("world", session.execute("hello()"));
+        assertEquals("world", session.evaluate("hello()"));
     }
 
     @Test

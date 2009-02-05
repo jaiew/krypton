@@ -77,7 +77,7 @@ public enum BrowserFamily {
             boolean configLoaded = false;
             while (!configLoaded) {
                 try {
-                    session.execute("gPrefBranch");
+                    session.evaluate("gPrefBranch");
                     configLoaded = true;
                 } catch (JavascriptException e) {
                     if (!referenceError("gPrefBranch").equals(e.getMessage())) {
@@ -96,8 +96,8 @@ public enum BrowserFamily {
 
         private void setPreference(BrowserSession session, String type, String key, Object value) {
             Object javaScriptValue = value instanceof String ? "'" + value + "'" : value;
-            session.execute("gPrefBranch.set" + type + "Pref('" + key + "', " + javaScriptValue + ")");
-            if (!value.toString().equals(session.execute("gPrefBranch.get" + type + "Pref('" + key + "')"))) {
+            session.evaluate("gPrefBranch.set" + type + "Pref('" + key + "', " + javaScriptValue + ")");
+            if (!value.toString().equals(session.evaluate("gPrefBranch.get" + type + "Pref('" + key + "')"))) {
                 throw new IllegalStateException("Failed to change preference " + key + " to " + value);
             }
         }
@@ -177,7 +177,7 @@ public enum BrowserFamily {
         Label userAgent = addUserAgentLabel(shell);
 
         addListeners(shell, location, browser);
-        String userAgentString = session.execute("navigator.userAgent");
+        String userAgentString = session.evaluate("navigator.userAgent");
         userAgent.setText(userAgentString);
         log.info("Initialized BrowserSession using " + userAgentString);
 

@@ -38,6 +38,6 @@ public class CssSelectorToXPathLocatorStrategy extends XPathLocatorStrategy {
     }
 
     private String cssToXPath(BrowserSession session, String locator) {
-        return session.execute("Twist.cssToXPath('" + locator.substring(CSS_EQUALS_PREFIX.length()) + "')");
+        return session.evaluate("Twist.cssToXPath('" + locator.substring(CSS_EQUALS_PREFIX.length()) + "')");
     }
 }

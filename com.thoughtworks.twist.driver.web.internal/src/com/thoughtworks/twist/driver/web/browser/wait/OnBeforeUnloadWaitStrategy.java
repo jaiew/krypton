@@ -40,7 +40,7 @@ public class OnBeforeUnloadWaitStrategy implements ProgressListener, WaitStrateg
             if (session.getBrowser().isDisposed()) {
                 return false;
             }
-            String unloading = session.execute("typeof(Twist) !== 'undefined' ? Twist.unloading : undefined");
+            String unloading = session.evaluate("typeof(Twist) !== 'undefined' ? Twist.unloading : undefined");
             return "undefined".equals(unloading) || Boolean.parseBoolean(unloading);
         } catch (JavascriptException e) {
             e.printStackTrace();
@@ -52,7 +52,6 @@ public class OnBeforeUnloadWaitStrategy implements ProgressListener, WaitStrateg
     }
 
     public void completed(ProgressEvent event) {
-        session.getBrowser()
-                .execute("if (!Twist) { var Twist = {}; } var unload = function() { Twist.unloading = true; }; Twist.unloading = false; window.addEventListener ? window.addEventListener('beforeunload', unload, true) : window.attachEvent('onbeforeunload', unload);");
+        session.execute("if (!Twist) { var Twist = {}; } var unload = function() { Twist.unloading = true; }; Twist.unloading = false; window.addEventListener ? window.addEventListener('beforeunload', unload, true) : window.attachEvent('onbeforeunload', unload);");
     }
 }

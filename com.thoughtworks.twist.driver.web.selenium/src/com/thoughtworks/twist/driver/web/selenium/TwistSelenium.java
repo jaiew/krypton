@@ -152,7 +152,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void assignId(String locator, String identifier) {
-		session.execute(session.domExpression(locate(locator)) + ".setAttribute('id', '" + identifier + "')");
+		session.evaluate(session.domExpression(locate(locator)) + ".setAttribute('id', '" + identifier + "')");
 	}
 
 	public void attachFile(String fieldLocator, String fileLocator) {
@@ -265,7 +265,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void focus(String locator) {
-		session.execute(session.domExpression(locate(locator)) + ".focus();");
+		session.evaluate(session.domExpression(locate(locator)) + ".focus();");
 	}
 
 	public String getAlert() {
@@ -377,7 +377,7 @@ public class TwistSelenium implements Selenium {
 
 	public String getExpression(String expression) {
 		try {
-			return session.execute(expression);
+			return session.evaluate(expression);
 		} finally {
 			waitForIdle();
 		}
@@ -396,7 +396,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public String getLocation() {
-		return session.execute(session.getDocumentExpression() + ".location");
+		return session.evaluate(session.getDocumentExpression() + ".location");
 	}
 
 	public Number getMouseSpeed() {
@@ -519,7 +519,7 @@ public class TwistSelenium implements Selenium {
 
 	public String getTitle() {
 		// waitForIdle();
-		return session.execute(session.getDocumentExpression() + ".title").trim();
+		return session.evaluate(session.getDocumentExpression() + ".title").trim();
 	}
 
 	public String getValue(String locator) {
@@ -741,7 +741,7 @@ public class TwistSelenium implements Selenium {
 			if (isSameURL) {
 				addLocationURLExclusionPattern(url);
 			}
-			session.execute(session.getDocumentExpression() + ".location = '" + url + "'");
+			session.evaluate(session.getDocumentExpression() + ".location = '" + url + "'");
 			waitForIdle();
 			if (isSameURL) {
 				removeLocationURLExclusionPattern(url);
@@ -859,7 +859,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	private void setProperty(Element element, String property, String value) {
-		session.execute(session.domExpression(element) + "." + property + " = " + value);
+		session.evaluate(session.domExpression(element) + "." + property + " = " + value);
 	}
 
 	public void selectFrame(String locator) {
@@ -878,7 +878,7 @@ public class TwistSelenium implements Selenium {
 			if (locator.startsWith("dom=")) {
 				locator = locator.substring("dom=".length());
 			}
-			if (!"undefined".equals(session.execute("typeof " + locator + ".tagName"))) {
+			if (!"undefined".equals(session.evaluate("typeof " + locator + ".tagName"))) {
 				session.setWindowExpression(locator + ".contentWindow");
 			} else {
 				session.setWindowExpression(locator);
@@ -955,7 +955,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void type(String locator, String value) {
-		session.execute(session.domExpression(locate(locator)) + ".value = ''");
+		session.evaluate(session.domExpression(locate(locator)) + ".value = ''");
 		typeKeys(locator, value);
 	}
 
@@ -1021,7 +1021,7 @@ public class TwistSelenium implements Selenium {
 	private Element locate(String locator) {
 		waitForIdle();
 		Element locate = session.locate(locator);
-		session.execute(session.domExpression(locate) + ".scrollIntoView()");
+		session.evaluate(session.domExpression(locate) + ".scrollIntoView()");
 		return locate;
 	}
 
