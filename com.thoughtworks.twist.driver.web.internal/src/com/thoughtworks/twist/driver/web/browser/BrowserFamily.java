@@ -46,7 +46,7 @@ public enum BrowserFamily {
         
         void init(BrowserSession session) {
             configureXULRunnerUsingAboutConfig(session);
-            loadAboutBlank(session);
+//            loadAboutBlank(session);
         }
 
         private void configureXULRunnerUsingAboutConfig(BrowserSession session) {
@@ -65,11 +65,6 @@ public enum BrowserFamily {
             setBooleanPreference(session, "security.warn_viewing_mixed", false);
         }
 
-        private void loadAboutBlank(BrowserSession session) {
-            session.getBrowser().setUrl("about:blank");
-            session.pumpEvents();
-        }
-
         private void waitForAboutConfigToInitialize(BrowserSession session) {
             long timeout = System.currentTimeMillis() + 4000;
             boolean configLoaded = false;
@@ -85,7 +80,7 @@ public enum BrowserFamily {
                         throw new IllegalStateException("Could not load about:config properly");                    
                     }
                     try {
-                        Thread.sleep(200);
+                        Thread.sleep(50);
                     } catch (InterruptedException ignore) {
                     }
                 }
@@ -168,8 +163,7 @@ public enum BrowserFamily {
 
         BrowserSession session = new SWTBrowserSession(browser, this);
         init(session);
-        
-        initEmptyDocument(session);
+        browser.setUrl("about:blank");
 
         Text location = addLocationBar(shell);
         Label userAgent = addUserAgentLabel(shell);
@@ -234,11 +228,6 @@ public enum BrowserFamily {
         data.grabExcessHorizontalSpace = true;
         location.setLayoutData(data);
         return location;
-    }
-
-    private void initEmptyDocument(BrowserSession session) {
-        session.getBrowser().setUrl("about:blank");
-        session.waitForIdle();
     }
 
     void init(BrowserSession session) {
