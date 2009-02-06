@@ -38,8 +38,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import com.thoughtworks.twist.driver.web.browser.wait.LocationChangedWaitStrategy;
-
 public enum BrowserFamily {
     MOZILLA {
         public Browser create(Composite composite) {
@@ -102,9 +100,9 @@ public enum BrowserFamily {
             }
         }
 
-        private void setStringPreference(BrowserSession session, String key, String value) {
-            setPreference(session, "Char", key, value);
-        }
+//        private void setStringPreference(BrowserSession session, String key, String value) {
+//            setPreference(session, "Char", key, value);
+//        }
 
         private void setBooleanPreference(BrowserSession session, String key, boolean value) {
             setPreference(session, "Bool", key, value);

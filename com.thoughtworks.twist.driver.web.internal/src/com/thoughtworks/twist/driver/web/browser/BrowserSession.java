@@ -46,6 +46,8 @@ public interface BrowserSession {
 
 	// JavaScript
 
+	void execute(String statments);
+
 	String evaluate(String expression);
 
 	void inject(String script);
@@ -101,6 +103,4 @@ public interface BrowserSession {
 	String getWindowExpression();
 
 	String getDocumentExpression();
-
-	void execute(String statments);
 }

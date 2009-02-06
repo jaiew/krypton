@@ -32,10 +32,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.browser.LocationEvent;
-import org.eclipse.swt.browser.LocationListener;
-import org.eclipse.swt.browser.TitleEvent;
-import org.eclipse.swt.browser.TitleListener;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -117,9 +113,6 @@ public class TwistSelenium implements Selenium {
 		addStringMatchers();
 
 		addDialogHandlers(session);
-
-		addTitleListenerToTrackCurrentTitle(session);
-		addLocationListenerToTrackCurrentUrl(session);
 	}
 
 	private void addDialogHandlers(BrowserSession session) {
@@ -1064,25 +1057,6 @@ public class TwistSelenium implements Selenium {
 		session.addLocatorStrategy(new AltLocatorStrategy());
 		session.addLocatorStrategy(new ClassLocatorStrategy());
 		session.addLocatorStrategy(new IdentifierLocatorStrategy());
-	}
-
-	private void addTitleListenerToTrackCurrentTitle(final BrowserSession session) {
-		session.getBrowser().addTitleListener(new TitleListener() {
-			public void changed(TitleEvent event) {
-				title = event.title;
-			}
-		});
-	}
-
-	private void addLocationListenerToTrackCurrentUrl(final BrowserSession session) {
-		session.getBrowser().addLocationListener(new LocationListener() {
-			public void changed(LocationEvent event) {
-				browserUrl = event.location;
-			}
-
-			public void changing(LocationEvent event) {
-			}
-		});
 	}
 
 	private void waitForIdle() {
