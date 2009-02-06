@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.thoughtworks.twist.driver.web.browser.AbstractBaseBrowserSessionWithWebServer;
@@ -39,8 +40,13 @@ import static org.junit.Assert.*;
 import static com.thoughtworks.twist.driver.web.browser.BrowserFamily.*;
 
 public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer {
-
-    private static final int REFRESHES = 3;
+    private static final int SET_TIMEOUT_PRECISION = 15;
+	private static final int REFRESHES = 3;
+    
+    @Before
+    public void setTimeoutToOneSecond() {
+    	session.setEventLoopTimeout(1000);
+    }
 
     @Test
     public void shouldVerifyWebServerIsResponding() throws Exception {
@@ -83,7 +89,7 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
     // Safari lacks the onbeforeunload event.
     @Test
     public void shouldWaitForPageToLoadUsingOnBeforeUnloadWaitStrategy() throws Exception {
-    	if (BrowserFamily.fromSystemProperty() == BrowserFamily.SAFARI) {
+    	if (BrowserFamily.SAFARI == BrowserFamily.fromSystemProperty()) {
     		return;
     	}
         String path = "/blocking-servlet";
@@ -161,22 +167,6 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
         }
         assertEquals(REFRESHES, i);
     }
-    private void loadAndRefreshPageThreeTimes(String path, int timeout) throws Exception {
-        int i;
-        for (i = 0; i < REFRESHES; i++) {
-            assertReloadHelloWorld(path, timeout);
-        }
-        assertEquals(REFRESHES, i);
-    }
-
-    private void assertReloadHelloWorld(String path, int timeout) throws MalformedURLException {
-        session.getBrowser().setUrl(localUrl(path));
-        timedWaitForIdle();
-        assertTrue(idleTime < timeout);
-        assertTrue(idleTime >= BlockingHelloWorldServlet.BLOCKING_TIME);
-        assertEquals("Hello World", session.dom().getElementById("helloworld").getTextContent());
-    }
-
     // This just doesn't work
 
     // @Test
@@ -261,6 +251,107 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
         timedWaitForIdle();
 
         assertTrue(idleTime < BlockingHelloWorldServlet.BLOCKING_TIME);
+    }
+
+    @Test
+    public void shouldNotWaitForSetTimeouWithoutSetTimeoutWaitStrategy() throws Exception {
+        String path = "/hello-world-servlet";
+        handler.addServletWithMapping(HelloWorldServlet.class, path);
+
+        session.openBrowser();
+        load(localUrl(path));
+
+        doSetTimeoutCall("''", BlockingHelloWorldServlet.BLOCKING_TIME);
+        timedWaitForIdle();
+
+        assertTrue(Integer.parseInt(session.evaluate("slowTimeoutID")) > 0);
+        assertTrue(idleTime < BlockingHelloWorldServlet.BLOCKING_TIME);
+    }
+
+    @Test
+    public void shouldWaitForSetTimeoutUsingSetTimeoutWaitStrategy() throws Exception {
+        String path = "/hello-world-servlet";
+        handler.addServletWithMapping(HelloWorldServlet.class, path);
+        int timeout = BlockingHelloWorldServlet.BLOCKING_TIME * 2;
+        session.addWaitStrategy(new SetTimeoutWaitStrategy());
+
+        session.openBrowser();
+        load(localUrl(path));
+
+        doSetTimeoutCall("'Hello'", BlockingHelloWorldServlet.BLOCKING_TIME);
+        assertEquals(1, Integer.parseInt(session.evaluate("Twist.numberOfActiveSetTimeouts")));
+
+        timedWaitForIdle();
+
+        assertTrue(Integer.parseInt(session.evaluate("slowTimeoutID")) > 0);
+
+        assertTrue(idleTime < timeout);
+        assertTrue(Math.abs(idleTime - BlockingHelloWorldServlet.BLOCKING_TIME) < SET_TIMEOUT_PRECISION);
+        assertEquals("Hello", session.evaluate("Twist.slowSetTimeoutCalledWith"));
+        assertEquals(0, Integer.parseInt(session.evaluate("Twist.numberOfActiveSetTimeouts")));
+    }
+    
+    @Test
+    public void shouldWaitForSetTimeoutAndStopWhenClearingTimeoutUsingSetTimeoutWaitStrategy() throws Exception {
+        String path = "/hello-world-servlet";
+        handler.addServletWithMapping(HelloWorldServlet.class, path);
+        final int timeout = BlockingHelloWorldServlet.BLOCKING_TIME * 2;
+        session.addWaitStrategy(new SetTimeoutWaitStrategy());
+
+        session.openBrowser();
+        load(localUrl(path));
+
+        doSetTimeoutCall("'Hello'", timeout);
+        assertEquals(1, Integer.parseInt(session.evaluate("Twist.numberOfActiveSetTimeouts")));
+
+        int timeoutID = Integer.parseInt(session.evaluate("slowTimeoutID"));
+		assertTrue(timeoutID > 0);
+
+        clearTimeoutInSeparateThread(timeoutID, BlockingHelloWorldServlet.BLOCKING_TIME);
+        timedWaitForIdle();
+
+        assertTrue(idleTime < timeout);
+        assertTrue(idleTime >= BlockingHelloWorldServlet.BLOCKING_TIME);
+
+        assertEquals("undefined", session.evaluate("Twist.slowSetTimeoutCalledWith"));
+        assertEquals(0, Integer.parseInt(session.evaluate("Twist.numberOfActiveSetTimeouts")));
+    }
+
+	private void clearTimeoutInSeparateThread(final int timeoutID, final int delay) {
+		new Thread() {
+        	public void run() {
+        		session.getBrowser().getDisplay().syncExec(new Runnable(){
+					public void run() {
+						try {
+							Thread.sleep(delay);
+							session.execute("window.clearTimeout(" + timeoutID + ")");
+						} catch (InterruptedException e) {
+						}
+					}
+				});
+        	}
+        }.start();
+	}
+
+
+	private void doSetTimeoutCall(String parameter, int delay) {
+		session.execute("slowTimeoutID = window.setTimeout(slowSetTimeout, " + delay + ", " + parameter + "); function slowSetTimeout(message) { Twist.slowSetTimeoutCalledWith = message; }");
+	}
+
+    private void loadAndRefreshPageThreeTimes(String path, int timeout) throws Exception {
+        int i;
+        for (i = 0; i < REFRESHES; i++) {
+            assertReloadHelloWorld(path, timeout);
+        }
+        assertEquals(REFRESHES, i);
+    }
+
+    private void assertReloadHelloWorld(String path, int timeout) throws MalformedURLException {
+        session.getBrowser().setUrl(localUrl(path));
+        timedWaitForIdle();
+        assertTrue(idleTime < timeout);
+        assertTrue(idleTime >= BlockingHelloWorldServlet.BLOCKING_TIME);
+        assertEquals("Hello World", session.dom().getElementById("helloworld").getTextContent());
     }
 
     @SuppressWarnings("serial")

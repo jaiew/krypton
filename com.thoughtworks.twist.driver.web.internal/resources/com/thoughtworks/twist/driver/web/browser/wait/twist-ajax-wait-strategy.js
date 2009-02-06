@@ -1,4 +1,3 @@
-
 if (!Twist) {
     var Twist = {};
 }

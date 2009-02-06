@@ -20,11 +20,15 @@
  ***************************************************************************/
 package com.thoughtworks.selenium.smoke;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.thoughtworks.selenium.*;
+import com.thoughtworks.selenium.DefaultSelenium;
+import com.thoughtworks.selenium.Selenium;
 
 import static org.junit.Assert.*;
 
@@ -49,9 +53,11 @@ public class SmokeTest {
 
 //    @Test
 //	public void testGMail() throws Exception {
+//    	System.out.println("Enter your gmail password: ");
+//    	String password = new BufferedReader(new InputStreamReader(System.in)).readLine();
 //		browser.open("http://mail.google.com");
 //		browser.type("Email", "hakan.raberg");
-//		browser.type("Passwd", getPW());
+//		browser.type("Passwd", password);
 //		browser.click("signIn");
 //		browser.selectFrame("canvas_frame");
 //		System.out.println(browser.getText("//a[contains(text(),'Inbox')]"));
@@ -74,11 +80,4 @@ public class SmokeTest {
     public static void stopBrowser() {
         browser.stop();
     }
-    
-    
-    
-    
-    private String getPW() {
-		return "xxxxxxxx";
-	}
 }
