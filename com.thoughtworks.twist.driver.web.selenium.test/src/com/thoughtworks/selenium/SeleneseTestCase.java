@@ -55,7 +55,6 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.webapp.WebAppContext;
 
 import com.thoughtworks.twist.driver.web.browser.BrowserFamily;
-import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 import com.thoughtworks.twist.driver.web.browser.Decorators.SWTThreadingDecorator;
 import com.thoughtworks.twist.driver.web.selenium.TwistSelenium;
 
@@ -79,7 +78,7 @@ public class SeleneseTestCase extends TestCase {
 	private boolean captureScreetShotOnFailure = false;
 
 	/** Use this object to run all of your selenium tests */
-	protected static DefaultSelenium twistSelenium;
+	protected static DefaultSelenium suiteSelenium;
 	protected Selenium selenium;
 	private static int port = WEBSERVER_PORT;
 
@@ -179,7 +178,6 @@ public class SeleneseTestCase extends TestCase {
 				context.setWar(new File("web").getAbsolutePath());
 			}
 			server.addHandler(context);
-
 			server.setStopAtShutdown(true);
 
 			server.start();
@@ -235,20 +233,19 @@ public class SeleneseTestCase extends TestCase {
 		if (url == null) {
 			url = "http://localhost:" + port;
 		}
-		final String url2 = url;
-		if (twistSelenium == null) {
-			twistSelenium = new DefaultSelenium("", getWebServerPort(), "", url2);
-			twistSelenium.start();
-			twistSelenium.setContext(this.getClass().getSimpleName() + "." + getName());
+		if (suiteSelenium == null) {
+			suiteSelenium = new DefaultSelenium("", getWebServerPort(), "", url);
+			suiteSelenium.start();
+			suiteSelenium.setContext(this.getClass().getSimpleName() + "." + getName());
 		}
-		getTwistSelenium().setBrowserUrl(url2);
-		twistSelenium.selectFrame("relative=top");
-		selenium = twistSelenium;
+		getTwistSelenium().setBrowserUrl(url);
+		selenium = suiteSelenium;
+		selenium.selectFrame("relative=top");
 	}
 
 	@SuppressWarnings("unchecked")
 	private TwistSelenium getTwistSelenium() {
-		Selenium underlyingSelenium = twistSelenium.getUnderyingSelenium();
+		Selenium underlyingSelenium = suiteSelenium.getUnderyingSelenium();
 		if (underlyingSelenium instanceof TwistSelenium) {
 			return (TwistSelenium) underlyingSelenium;
 		}
@@ -528,13 +525,14 @@ public class SeleneseTestCase extends TestCase {
 		// !SWT.getPlatform().equals("win32")) {
 		// selenium.getBrowserSession().waitForActivity();
 		// } else {
-		Thread.sleep(2000);
-		final BrowserSession session = getTwistSelenium().getBrowserSession();
-		session.getBrowser().getDisplay().syncExec(new Runnable() {
-			public void run() {
-				session.waitForIdle();
-			}
-		});
+		Thread.sleep(3000);
+//		final BrowserSession session = getTwistSelenium().getBrowserSession();
+//		session.pumpEvents();
+//		session.getBrowser().getDisplay().syncExec(new Runnable() {
+//			public void run() {
+//				session.waitForIdle();
+//			}
+//		});
 		// }
 	}
 

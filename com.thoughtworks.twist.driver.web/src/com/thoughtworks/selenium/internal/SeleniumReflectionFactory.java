@@ -20,18 +20,15 @@
  ***************************************************************************/
 package com.thoughtworks.selenium.internal;
 
-import java.lang.reflect.Method;
-
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.SeleniumFactory;
 
 public class SeleniumReflectionFactory implements SeleniumFactory {
 	public Selenium create(String browserURL) {
 		try {
-			Class<?> twistSelenium = Class.forName("com.thoughtworks.twist.driver.web.selenium.TwistSelenium");
-			Selenium selenium = (Selenium) twistSelenium.getConstructor(String.class).newInstance(browserURL);
-			Method wrapWithSWTThreading = Class.forName("com.thoughtworks.twist.driver.web.browser.Decorators").getMethod("wrapWithSWTThreading", Class.class, Object.class);
-			return (Selenium) wrapWithSWTThreading.invoke(null, Selenium.class, selenium);
+			Class<?> internalSeleniumFactory = Class.forName("com.thoughtworks.twist.driver.web.selenium.InternalSeleniumFactory");
+			SeleniumFactory factory = (SeleniumFactory) internalSeleniumFactory.newInstance();
+			return factory.create(browserURL);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

@@ -18,30 +18,17 @@
  *   Manish Chakravarty
  *   Pavan K S
  ***************************************************************************/
+/**
+ * 
+ */
 package com.thoughtworks.twist.driver.web.selenium;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceFactory;
-import org.osgi.framework.ServiceRegistration;
-
+import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.SeleniumFactory;
+import com.thoughtworks.twist.driver.web.browser.Decorators;
 
-public class SeleniumActivator implements BundleActivator {
-	private final class SeleniumServiceFactory implements ServiceFactory {
-		public Object getService(Bundle bundle, ServiceRegistration registration) {
-			return new InternalSeleniumFactory();
-		}
-
-		public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {
-		}
-	}
-
-	public void start(BundleContext context) throws Exception {
-		context.registerService(SeleniumFactory.class.getName(), new SeleniumServiceFactory(), null);
-	}
-
-	public void stop(BundleContext context) throws Exception {
+public final class InternalSeleniumFactory implements SeleniumFactory {
+	public Selenium create(String browserURL) {
+		return Decorators.wrapWithSWTThreading(Selenium.class, new TwistSelenium(browserURL));
 	}
 }

@@ -95,15 +95,9 @@ public class TwistSelenium implements Selenium {
 	public TwistSelenium(String browserUrl, final BrowserSession session) {
 		this.browserUrl = browserUrl;
 		this.session = session;
-
-		session.getBrowser().getDisplay().syncExec(new Runnable() {
-			public void run() {
-				init(session);
-			}
-		});
 	}
 
-	private void init(final BrowserSession session) {
+	private void init() {
 		User plainUser = new UserFactory().createUser(session.getBrowser().getShell());
 		user = Decorators.wrapWithLogging(User.class, plainUser);
 
@@ -725,7 +719,6 @@ public class TwistSelenium implements Selenium {
 	public void open(String url) {
 		try {
 			checkModalDialogs();
-			start();
 			if (url.startsWith("/")) {
 				URL realUrl = new URL(browserUrl);
 				url = new URL(realUrl.getProtocol(), realUrl.getHost(), realUrl.getPort(), url).toExternalForm();
@@ -929,6 +922,7 @@ public class TwistSelenium implements Selenium {
 
 	public void start() {
 		session.openBrowser();
+		init();
 	}
 
 	public void stop() {
@@ -987,10 +981,6 @@ public class TwistSelenium implements Selenium {
 
 	public void windowMaximize() {
 		session.getBrowser().getShell().setMaximized(true);
-	}
-
-	public BrowserSession getBrowserSession() {
-		return session;
 	}
 
 	public void addAjaxURLExclusionPattern(String pattern) {
