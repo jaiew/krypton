@@ -41,26 +41,21 @@ public class NameLocatorStrategy extends AttributeLocatorStrategy {
 	public Element locate(BrowserSession session, String locator) {
 		locator = locator.substring(prefix.length());
 		String[] locatorAndFilter = locator.split(" ");
-		List<Node> locateAll = session.locateAll("//*[@" + attribute
-				+ "='" + locatorAndFilter[0] + "']");
+		List<Node> locateAll = session.locateAll("//*[@" + attribute + "='" + locatorAndFilter[0] + "']");
 
-		if (locatorAndFilter.length > 1) {
+		List<Node> matches = locateAll;
+		for (int i = 1; i < locatorAndFilter.length; i++) {
 			for (Filter filter : filters) {
 				if (filter.canFilter(locatorAndFilter[1])) {
-					List<Element> matches = filter.matches(locateAll,
-							locatorAndFilter[1]);
-					if (!matches.isEmpty()) {						
-						return matches.get(0);
-					}
+					matches = filter.matches(locateAll, locatorAndFilter[1]);
+					break;
 				}
 			}
-			return null;
-		} else {
-			if (locateAll.isEmpty()) {
-				return null;
-			}
-			return (Element) locateAll.get(0);
 		}
+		if (!matches.isEmpty()) {
+			return (Element) matches.get(0);
+		}
+		return null;
 	}
 
 	private static class AttributeFilter implements Filter {
@@ -76,15 +71,14 @@ public class NameLocatorStrategy extends AttributeLocatorStrategy {
 			return filter.startsWith(prefix);
 		}
 
-		public List<Element> matches(List<Node> list, String filter) {
+		public List<Node> matches(List<Node> list, String filter) {
 			if (filter.startsWith(prefix)) {
 				filter = filter.substring(prefix.length());
 			}
-			List<Element> matching = new ArrayList<Element>();
-			for (int i = 0; i < list.size(); i++) {
-				Element element = (Element) list.get(i);
-				if (filter.equals(element.getAttribute(attribute))) {
-					matching.add(element);
+			List<Node> matching = new ArrayList<Node>();
+			for (Node node : list) {
+				if (filter.equals(((Element) node).getAttribute(attribute))) {
+					matching.add(node);
 				}
 			}
 			return matching;
@@ -98,15 +92,10 @@ public class NameLocatorStrategy extends AttributeLocatorStrategy {
 			return filter.startsWith(PREFIX);
 		}
 
-		public List<Element> matches(List<Node> list, String filter) {
+		public List<Node> matches(List<Node> list, String filter) {
 			int index = Integer.parseInt(filter.substring(PREFIX.length()));
-			List<Element> matching = new ArrayList<Element>();
-			for (int i = 0; i < list.size(); i++) {
-				Element element = (Element) list.get(i);
-				if (i == index) {
-					matching.add(element);
-				}
-			}
+			List<Node> matching = new ArrayList<Node>();
+			matching.add(list.get(index));
 			return matching;
 		}
 	}
@@ -130,7 +119,7 @@ public class NameLocatorStrategy extends AttributeLocatorStrategy {
 	private static interface Filter {
 		boolean canFilter(String filter);
 
-		List<Element> matches(List<Node> list, String filter);
+		List<Node> matches(List<Node> list, String filter);
 	}
 
 }

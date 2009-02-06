@@ -49,7 +49,6 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.Parser;
-import org.mozilla.javascript.ScriptOrFnNode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -373,8 +372,8 @@ public class SWTBrowserSession implements BrowserSession {
 			CompilerEnvirons compilerEnv = new CompilerEnvirons();
 			compilerEnv.initFromContext(ctx);
 			ErrorReporter compilationErrorReporter = compilerEnv.getErrorReporter();
-			Parser p = new Parser(compilerEnv, compilationErrorReporter);
-			ScriptOrFnNode tree = p.parse(script, "", 1);
+			Parser parser = new Parser(compilerEnv, compilationErrorReporter);
+			parser.parse(script, "", 1);
 		} finally {
 			Context.exit();
 		}
