@@ -71,11 +71,11 @@ public class ConfirmationHandler implements ProgressListener, StatusTextListener
 		return !confirmations.isEmpty();
 	}
 
-	public void chooseCancelOnNextConfirmation() {
+	public void cancel() {
 		session.execute("if (!Twist) { var Twist = {}; } Twist.confirmationAnswer = false");
 	}
 
-	public void chooseOkOnNextConfirmation() {
+	public void ok() {
 		session.execute("if (!Twist) { var Twist = {}; } Twist.confirmationAnswer = true");
 	}
 }

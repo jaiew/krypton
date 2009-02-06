@@ -135,7 +135,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void answerOnNextPrompt(String answer) {
-		promptHandler.answerOnNextPrompt(answer);
+		promptHandler.answer(answer);
 	}
 
 	public void assignId(String locator, String identifier) {
@@ -161,11 +161,11 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void chooseCancelOnNextConfirmation() {
-		confirmationHandler.chooseCancelOnNextConfirmation();
+		confirmationHandler.cancel();
 	}
 
 	public void chooseOkOnNextConfirmation() {
-		confirmationHandler.chooseOkOnNextConfirmation();
+		confirmationHandler.ok();
 	}
 
 	public void click(String locator) {

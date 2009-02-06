@@ -71,7 +71,7 @@ public class PromptHandler implements ProgressListener, StatusTextListener, Dial
 		return !prompts.isEmpty();
 	}
 
-	public void answerOnNextPrompt(String answer) {
+	public void answer(String answer) {
 		session.getBrowser().execute("if (!Twist) { var Twist = {}; } Twist.promptAnswer = '" + answer + "';");
 		session.pumpEvents();
 	}
