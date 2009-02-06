@@ -6,8 +6,9 @@ Includes:
  - SWT, Copyright 2000, 2008 IBM Corporation and others. (Eclipse Public License v1.0)
  - Eclipse, Copyright 2003, 2008 IBM Corporation and others. (Eclipse Public License v1.0)
  - Equinox, Copyright 2008 IBM Corporation and others. (Eclipse Public License v1.0)
- - OSGi, Copyright OSGi Alliance (2000, 2008). (Apache License, Version 2.0)
+ - OSGi, Copyright 2000-2008 OSGi Alliance (Apache License, Version 2.0)
  - Commons Logging Pacakge, (Apache License, Version 2.0)
+ - Rhino, Copyright 1997-2000 Mozilla Foundation, (Mozilla Public License, Version 1.1)
  - Selenium RC, Copyright 2006 ThoughtWorks, Inc. (Apache License, Version 2.0)
 
 
