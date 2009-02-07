@@ -284,7 +284,6 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
 
         timedWaitForIdle();
 
-        System.out.println(idleTime);
         assertTrue(idleTime < timeout);
         assertTrue(Math.abs(idleTime - BlockingHelloWorldServlet.BLOCKING_TIME) < SET_TIMEOUT_PRECISION);
 

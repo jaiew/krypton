@@ -33,30 +33,14 @@ import com.thoughtworks.twist.driver.web.browser.JavascriptException;
 
 public class SetTimeoutWaitStrategy implements LocationListener, WaitStrategy {
 	BrowserSession session;
-    List<String> exclusionPatterns = new ArrayList<String>();
     Log log = LogFactory.getLog(getClass());
 
     public void init(BrowserSession session) {
 		this.session = session;
-
-        addURLExclusionPattern("javascript:.*");
-        addURLExclusionPattern("about:blank");
-        addURLExclusionPattern("about:config");
-
-        // This obviously needs to be configurable somehow.
-        addURLExclusionPattern(".*www.google.com/.*");
-
         session.getBrowser().addLocationListener(this);
     }
 
 	public void changed(LocationEvent event) {
-        String location = event.location;
-        for (String pattern : exclusionPatterns) {
-            if (location.matches(pattern)) {
-                log.trace("skipping excluded " + location);
-                return;
-            }
-        }
 		session.inject("twist-set-timeout-wait-strategy.js", getClass());
 	}
 
@@ -77,13 +61,4 @@ public class SetTimeoutWaitStrategy implements LocationListener, WaitStrategy {
 			return false;
 		}
 	}
-    
-    public void addURLExclusionPattern(String pattern) {
-        exclusionPatterns.add(pattern);
-    }
-
-    public void removeURLExclusionPattern(String pattern) {
-        exclusionPatterns.remove(pattern);
-    }
-
 }

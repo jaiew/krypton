@@ -46,6 +46,7 @@ import com.thoughtworks.twist.driver.web.browser.locator.XPathLocatorStrategy;
 import com.thoughtworks.twist.driver.web.browser.wait.AjaxWaitStrategy;
 import com.thoughtworks.twist.driver.web.browser.wait.DocumentReadyWaitStrategy;
 import com.thoughtworks.twist.driver.web.browser.wait.LocationChangedWaitStrategy;
+import com.thoughtworks.twist.driver.web.browser.wait.SetTimeoutWaitStrategy;
 import com.thoughtworks.twist.driver.web.selenium.dialog.AlertHandler;
 import com.thoughtworks.twist.driver.web.selenium.dialog.ConfirmationHandler;
 import com.thoughtworks.twist.driver.web.selenium.dialog.DialogHandler;
@@ -1028,6 +1029,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	private void addWaitStrategies(final BrowserSession session) {
+		session.addWaitStrategy(new SetTimeoutWaitStrategy());
 		locationChangedWaitStrategy = new LocationChangedWaitStrategy();
 		session.addWaitStrategy(locationChangedWaitStrategy);
 		ajaxWaitStrategy = new AjaxWaitStrategy();

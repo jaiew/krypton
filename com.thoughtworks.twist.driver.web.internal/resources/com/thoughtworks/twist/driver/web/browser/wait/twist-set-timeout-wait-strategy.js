@@ -18,26 +18,28 @@ if (!Twist.setTimeoutWaitStrategy) {
 
         var realSetTimeout = window.setTimeout;
         var realClearTimeout = window.clearTimeout;
+        var inSetTimeout = false;
 
         window.setTimeout = function() {
 	        var target = arguments[0];
 	        var delay = arguments[1];
-	        if (delay > 0) {
+	        if (delay > 0 && !inSetTimeout) {
 		        increaseNumberOfActiveSetTimeouts();
 		        arguments[0] = function() {
-		        	if ("string" === typeof(target)) {
-		        		eval(target);
-		        	} else {
-			        	target.apply(this, arguments);
-		        	}
-			        decreaseNumberOfActiveSetTimeouts();
+		        	try {
+			        	inSetTimeout = true;
+			        	if ("string" === typeof(target)) {
+			        		eval(target);
+			        	} else {
+				        	target.apply(this, arguments);
+			        	}
+		        	} finally {
+				        decreaseNumberOfActiveSetTimeouts();
+				        inSetTimeout = false;
+			        }
 		        };
 	        }
-	        if (realSetTimeout.apply) {
-	        	return realSetTimeout.apply(this, arguments);
-	        } else {
-	        	return realSetTimeout(arguments[0], delay);
-	        }
+	        return Function.prototype.apply.call(realSetTimeout, this, arguments);
         };
 
         window.clearTimeout = function(timeoutID) {

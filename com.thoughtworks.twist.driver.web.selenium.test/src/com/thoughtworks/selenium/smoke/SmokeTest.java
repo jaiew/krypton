@@ -20,9 +20,6 @@
  ***************************************************************************/
 package com.thoughtworks.selenium.smoke;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
