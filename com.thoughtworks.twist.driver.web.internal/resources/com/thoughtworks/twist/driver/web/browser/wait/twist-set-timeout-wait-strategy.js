@@ -33,7 +33,11 @@ if (!Twist.setTimeoutWaitStrategy) {
 			        decreaseNumberOfActiveSetTimeouts();
 		        };
 	        }
-	        return realSetTimeout.apply(this, arguments);
+	        if (realSetTimeout.apply) {
+	        	return realSetTimeout.apply(this, arguments);
+	        } else {
+	        	return realSetTimeout(arguments[0], delay);
+	        }
         };
 
         window.clearTimeout = function(timeoutID) {

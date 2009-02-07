@@ -40,7 +40,7 @@ import static org.junit.Assert.*;
 import static com.thoughtworks.twist.driver.web.browser.BrowserFamily.*;
 
 public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer {
-    private static final int SET_TIMEOUT_PRECISION = 15;
+    private static final int SET_TIMEOUT_PRECISION = 50;
 	private static final int REFRESHES = 3;
     
     @Before
@@ -280,16 +280,21 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
 
         doSetTimeoutCall("'Hello'", BlockingHelloWorldServlet.BLOCKING_TIME);
         assertEquals(1, Integer.parseInt(session.evaluate("Twist.numberOfActiveSetTimeouts")));
+        assertTrue(Integer.parseInt(session.evaluate("slowTimeoutID")) > 0);
 
         timedWaitForIdle();
 
-        assertTrue(Integer.parseInt(session.evaluate("slowTimeoutID")) > 0);
-
+        System.out.println(idleTime);
         assertTrue(idleTime < timeout);
         assertTrue(Math.abs(idleTime - BlockingHelloWorldServlet.BLOCKING_TIME) < SET_TIMEOUT_PRECISION);
-        assertEquals("Hello", session.evaluate("Twist.slowSetTimeoutCalledWith"));
+
+    	assertEquals(getExpectedMessageAsIEDoesntSupportParameters(), session.evaluate("Twist.slowSetTimeoutCalledWith"));
         assertEquals(0, Integer.parseInt(session.evaluate("Twist.numberOfActiveSetTimeouts")));
     }
+
+	private String getExpectedMessageAsIEDoesntSupportParameters() {
+		return BrowserFamily.IE == BrowserFamily.fromSystemProperty() ? "Hello IE" : "Hello";
+	}
     
     @Test
     public void shouldWaitForSetTimeoutAndStopWhenClearingTimeoutUsingSetTimeoutWaitStrategy() throws Exception {
@@ -335,7 +340,7 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
 
 
 	private void doSetTimeoutCall(String parameter, int delay) {
-		session.execute("slowTimeoutID = window.setTimeout(slowSetTimeout, " + delay + ", " + parameter + "); function slowSetTimeout(message) { Twist.slowSetTimeoutCalledWith = message; }");
+		session.execute("slowTimeoutID = window.setTimeout(slowSetTimeout, " + delay + ", " + parameter + "); function slowSetTimeout(message) { Twist.slowSetTimeoutCalledWith = message ? message : 'Hello IE'; }");
 	}
 
     private void loadAndRefreshPageThreeTimes(String path, int timeout) throws Exception {
