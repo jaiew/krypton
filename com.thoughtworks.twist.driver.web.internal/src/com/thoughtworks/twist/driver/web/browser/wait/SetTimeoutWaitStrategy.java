@@ -20,9 +20,6 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.browser.wait;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eclipse.swt.browser.LocationEvent;
@@ -57,7 +54,6 @@ public class SetTimeoutWaitStrategy implements LocationListener, WaitStrategy {
 		} catch (NumberFormatException e) {
 			return false;
 		} catch (JavascriptException e) {
-			System.out.println("NOT INJECTED");
 			return false;
 		}
 	}
