@@ -274,7 +274,7 @@ public class SWTBrowserSession implements BrowserSession {
 				throw new WaitTimedOutException("event loop to become idle, busy strategies: " + getBusyWaitStrategies(), eventLoopTimeout);
 			}
 			try {
-				Thread.sleep(10);
+				Thread.sleep(20);
 			} catch (InterruptedException e) {
 			}
 			if (areWaitStrategiesIdle()) {
@@ -418,7 +418,7 @@ public class SWTBrowserSession implements BrowserSession {
 			String script = "try { window.status = '" + RETURN_VALUE + "' + (" + expression + ");} catch (e) { window.status = '"
 					+ EXCEPTION + "' + e; }";
 			verifyJavaScript(script);
-			
+
 			getBrowser().addStatusTextListener(StatusTransport.this);
 			pumpEvents();
 			getBrowser().execute(script);

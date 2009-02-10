@@ -227,7 +227,9 @@ public class CocoaUser implements User {
 	}
 
 	private void ensureWindowCanAcceptEvents() {
-		shell.setFocus();
+		if ("carbon".equals(SWT.getPlatform())) {			
+			shell.setFocus();
+		}
 		if (window != null) {
 			window.becomeKeyWindow();
 		}

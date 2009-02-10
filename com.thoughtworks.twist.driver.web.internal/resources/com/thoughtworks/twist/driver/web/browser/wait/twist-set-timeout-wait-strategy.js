@@ -23,21 +23,22 @@ if (!Twist.setTimeoutWaitStrategy) {
         window.setTimeout = function() {
 	        var target = arguments[0];
 	        var delay = arguments[1];
+		    var wrapped = function() {
+	        	try {
+			        decreaseNumberOfActiveSetTimeouts();
+		        	inSetTimeout = true;
+		        	if ("string" === typeof(target)) {
+		        		eval(target);
+		        	} else {
+			        	target.apply(this, arguments);
+		        	}
+	        	} finally {
+			        inSetTimeout = false;
+		        }
+	        };
 	        if (delay > 0 && !inSetTimeout) {
+		        arguments[0] = wrapped;
 		        increaseNumberOfActiveSetTimeouts();
-		        arguments[0] = function() {
-		        	try {
-			        	inSetTimeout = true;
-			        	if ("string" === typeof(target)) {
-			        		eval(target);
-			        	} else {
-				        	target.apply(this, arguments);
-			        	}
-		        	} finally {
-				        decreaseNumberOfActiveSetTimeouts();
-				        inSetTimeout = false;
-			        }
-		        };
 	        }
 	        return Function.prototype.apply.call(realSetTimeout, this, arguments);
         };

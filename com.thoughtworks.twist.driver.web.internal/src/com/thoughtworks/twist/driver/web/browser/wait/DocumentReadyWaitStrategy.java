@@ -20,6 +20,9 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.browser.wait;
 
+import java.util.Arrays;
+
+import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
 
@@ -28,38 +31,35 @@ import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 import static com.thoughtworks.twist.driver.web.browser.BrowserFamily.*;
 
 public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener {
-    private BrowserSession session;
-    private boolean hasListener;
+	private BrowserSession session;
+	private boolean hasListener;
 
-    public void init(final BrowserSession session) {
-        this.session = session;
-        session.getBrowser().addLocationListener(this);
-    }
+	public void init(final BrowserSession session) {
+		this.session = session;
+		session.getBrowser().addLocationListener(this);
+	}
 
-    public void changed(LocationEvent event) {
-        if (MOZILLA == session.getBrowserFamily()) {
-            session.execute("if (!Twist) { var Twist = {}; }" +
-                    "if (!Twist.hasContentLoadListener) { document.addEventListener('DOMContentLoaded', function() { " +
-            "Twist.contentLoaded = true; }, false); Twist.hasContentLoadListener = true; }");
-            hasListener = true;
-        }
-    }
+	public void changed(LocationEvent event) {
+		if (MOZILLA == session.getBrowserFamily()) {
+			session.execute("if (!Twist) { var Twist = {}; }"
+					+ "if (!Twist.hasContentLoadListener) { document.addEventListener('DOMContentLoaded', function() { "
+					+ "Twist.contentLoaded = true; }, false); Twist.hasContentLoadListener = true; }");
+			hasListener = true;
+		}
+	}
 
-    public void changing(LocationEvent event) {
-        hasListener = false;
-    }
+	public void changing(LocationEvent event) {
+		hasListener = false;
+	}
 
-    public boolean isBusy() {
-        if (SAFARI == session.getBrowserFamily() || IE == session.getBrowserFamily()) {
-            String readyState = session.evaluate("document.readyState");
-            return !"complete".equals(readyState);
-        } else if (MOZILLA == session.getBrowserFamily()) {
-            boolean isLoading = Boolean.parseBoolean(session
-                    .evaluate("typeof document.getElementsByTagName == 'undefined' " +
-                            (hasListener ? "|| typeof Twist.contentLoaded == 'undefined' " : "") +
-                            "|| document.body == null"));
-            return isLoading;
-        }
-        return false;
-    }
+	public boolean isBusy() {
+		if (SAFARI == session.getBrowserFamily() || IE == session.getBrowserFamily()) {
+			String readyState = session.evaluate("document.readyState");
+			return !("complete".equals(readyState) || "interactive".equals(readyState));
+		} else if (MOZILLA == session.getBrowserFamily()) {
+			return Boolean.parseBoolean(session.evaluate("typeof document.getElementsByTagName == 'undefined' "
+					+ (hasListener ? "|| typeof Twist.contentLoaded == 'undefined' " : "") + "|| document.body == null"));
+		}
+		return false;
+	}
 }

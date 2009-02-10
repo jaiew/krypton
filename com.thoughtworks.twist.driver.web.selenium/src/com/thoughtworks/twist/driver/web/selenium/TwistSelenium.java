@@ -1029,12 +1029,12 @@ public class TwistSelenium implements Selenium {
 	}
 
 	private void addWaitStrategies(final BrowserSession session) {
-		session.addWaitStrategy(new SetTimeoutWaitStrategy());
 		locationChangedWaitStrategy = new LocationChangedWaitStrategy();
 		session.addWaitStrategy(locationChangedWaitStrategy);
 		ajaxWaitStrategy = new AjaxWaitStrategy();
 		session.addWaitStrategy(ajaxWaitStrategy);
 		session.addWaitStrategy(new DocumentReadyWaitStrategy());
+		session.addWaitStrategy(new SetTimeoutWaitStrategy());
 	}
 
 	private void addLocatorStrategies(final BrowserSession session) {
