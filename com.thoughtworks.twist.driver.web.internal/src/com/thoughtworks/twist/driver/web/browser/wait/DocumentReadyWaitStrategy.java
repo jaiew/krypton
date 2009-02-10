@@ -20,9 +20,6 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.browser.wait;
 
-import java.util.Arrays;
-
-import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
 
