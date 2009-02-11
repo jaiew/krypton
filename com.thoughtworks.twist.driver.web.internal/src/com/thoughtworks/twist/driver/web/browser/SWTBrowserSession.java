@@ -28,8 +28,10 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -70,6 +72,7 @@ public class SWTBrowserSession implements BrowserSession {
 	private static final int DEFAULT_PATIENT_LOCATOR_TIMEOUT = (int) (0.5 * 1000);
 
 	private Map<String, String> resourcesByName = new HashMap<String, String>();
+	private Set<String> verifiedJavaScripts = new HashSet<String>();
 
 	private Shell shell;
 	private DocumentBuilder documentBuilder;
@@ -114,9 +117,11 @@ public class SWTBrowserSession implements BrowserSession {
 	public void openBrowser() {
 		log.debug("Opening Browser");
 		if (!shell.isVisible()) {
-			// shell.open();
-			shell.moveBelow(null);
-			shell.setVisible(true);
+//			 shell.open();
+			shell.setVisible(Boolean.parseBoolean(System.getProperty("twist.driver.web.visible", "true")));
+			shell.setFullScreen(Boolean.parseBoolean(System.getProperty("twist.driver.web.fullscreen", "false")));
+			shell.setMinimized(Boolean.parseBoolean(System.getProperty("twist.driver.web.minimized", "false")));
+//			shell.moveBelow(null);
 		}
 	}
 
@@ -200,20 +205,21 @@ public class SWTBrowserSession implements BrowserSession {
 		String[] values = rectangle.split(",");
 		Rectangle boundingRectangle = new Rectangle(Integer.parseInt(values[0]), Integer.parseInt(values[1]), Integer.parseInt(values[2]),
 				Integer.parseInt(values[3]));
-		log.trace("Bounding rectangle of " + element + " is  " + boundingRectangle);
+		log.trace("Bounding rectangle of " + element + " is " + boundingRectangle);
 		return boundingRectangle;
 	}
 
 	public Point center(Element element) {
 		Rectangle rectangle = boundingRectangle(element);
 		Point center = new Point(rectangle.x + rectangle.width / 2, rectangle.y + rectangle.height / 2);
-		log.trace("Center of " + element + " is  " + center);
+		log.trace("Center of " + element + " is " + center);
 		return center;
 	}
 
 	public Element locate(String locator) {
 		long timeout = System.currentTimeMillis() + patientLocatorTimeout;
 		while (System.currentTimeMillis() < timeout) {
+			pumpEvents();
 			for (LocatorStrategy strategy : locatorStrategies) {
 				if (strategy.canLocate(locator)) {
 					Element element = strategy.locate(this, locator);
@@ -224,8 +230,9 @@ public class SWTBrowserSession implements BrowserSession {
 				}
 			}
 			log.debug("Element not found using '" + locator + "', trying again");
+			emptyDocumentCache();
 			try {
-				Thread.sleep(20);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 			}
 		}
@@ -367,6 +374,9 @@ public class SWTBrowserSession implements BrowserSession {
 	}
 
 	private void verifyJavaScript(String script) {
+		if (verifiedJavaScripts.contains(script)) {
+			return;
+		}
 		Context ctx = ContextFactory.getGlobal().enterContext();
 		try {
 			CompilerEnvirons compilerEnv = new CompilerEnvirons();
@@ -374,6 +384,7 @@ public class SWTBrowserSession implements BrowserSession {
 			ErrorReporter compilationErrorReporter = compilerEnv.getErrorReporter();
 			Parser parser = new Parser(compilerEnv, compilationErrorReporter);
 			parser.parse(script, "", 1);
+			verifiedJavaScripts.add(script);
 		} finally {
 			Context.exit();
 		}

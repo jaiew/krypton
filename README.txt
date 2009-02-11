@@ -25,9 +25,8 @@ Requirements:
  svn 1.5
 
 Mozilla:
- XULRunner 1.8.1.3 or higher for Mozilla - Firefox 2 support.
- XULRunner 1.9 or higher for Mozilla - Firefox 3 support.
- There will be a default XULRunner (most likely the last installed), but you can change which XULRunner to use with the org.eclipse.swt.browser.XULRunnerPath Java system (-D) property.
+ Firefox 3 or XULRunner 1.9 or higher for Mozilla support.
+ There will be a default XULRunner (most likely the last installed), but you can change which XULRunner to use with the org.eclipse.swt.browser.XULRunnerPath Java system (-D) property to use your Firefox 3 installation (or another XULRunner), for example /Applications/Firefox.app/Contents/MacOS/ or C:\Program Files\Mozilla Firefox\.
 
 IE:
  Windows will use the default IE engine installed, so to test on both IE 6 and IE 7 you'll need two boxes.
@@ -52,7 +51,7 @@ Ant and svn have to both be on the path.
 Unit/Integration Testing:
 =========================
 
-Lives in com.thoughtworks.twist.driver.web.test. JUnit 4 is used. You can run any tests from within Eclipse. Not all tests pass. The way to run tests for both Mozilla and Safari based on subclassing is simplistic (but works for now).
+Lives in com.thoughtworks.twist.driver.web.test. JUnit 4 is used. You can run any tests from within Eclipse.
 
 
 Acceptance Testing:
@@ -67,7 +66,7 @@ Most tests in com.thoughtworks.selenium.corebased should pass. The package coreb
 Architecture:
 =============
 
-com.thoughtworks.twist.driver.web.internal and com.thoughtworks.twist.driver.web.user contain the actual low level driver. The two major types here are User and BrowserSession. A User abstracts (native OS) event generation, and BrowserSession is the combination of an actual SWT Browser instance and a User controlling it. BrowserSession also provides a basic querying, locating and wait mechanism.
+com.thoughtworks.twist.driver.web.internal and com.thoughtworks.twist.driver.web.user contain the actual low level driver. The two major types here are User and BrowserSession. A User abstracts (native OS) event generation, and BrowserSession is embeding an actual SWT Browser instance and also provides a basic querying, locating and wait mechanism.
 
 com.thoughtworks.twist.driver.web.selenium is an (partial) implementation of the Selenium interface on top of the BrowserSession. Some parts of this layer will most likely be factored down into com.thoughtworks.twist.driver.web.
 

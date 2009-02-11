@@ -525,7 +525,7 @@ public class SeleneseTestCase extends TestCase {
 		// !SWT.getPlatform().equals("win32")) {
 		// selenium.getBrowserSession().waitForActivity();
 		// } else {
-		Thread.sleep(3000);
+//		Thread.sleep(3000);
 //		final BrowserSession session = getTwistSelenium().getBrowserSession();
 //		session.pumpEvents();
 //		session.getBrowser().getDisplay().syncExec(new Runnable() {

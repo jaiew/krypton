@@ -36,9 +36,9 @@ public class TestWaitForNot extends SeleneseTestCase
 			// assertValue|theField|oldValue
 			assertEquals("oldValue", selenium.getValue("theField"));
 			// click|theButton|
+			assertEquals("oldValue", selenium.getValue("theField"));
 			selenium.click("theButton");
 			// assertValue|theField|oldValue
-			assertEquals("oldValue", selenium.getValue("theField"));
 			boolean sawCondition7 = false;
 			for (int second = 0; second < 60; second++) {
 				try {
@@ -59,9 +59,9 @@ public class TestWaitForNot extends SeleneseTestCase
 			// assertText|theSpan|Some text
 			assertEquals("Some text", selenium.getText("theSpan"));
 			// click|theSpanButton|
+			assertEquals("Some text", selenium.getText("theSpan"));
 			selenium.click("theSpanButton");
 			// assertText|theSpan|Some text
-			assertEquals("Some text", selenium.getText("theSpan"));
 			boolean sawCondition12 = false;
 			for (int second = 0; second < 60; second++) {
 				try {

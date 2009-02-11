@@ -255,7 +255,6 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public String getAlert() {
-		waitForIdle();
 		if (!alertHandler.isDialogPresent()) {
 			throw new IllegalStateException("No alert present");
 		}
@@ -306,7 +305,6 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public String getConfirmation() {
-		waitForIdle();
 		if (!confirmationHandler.isDialogPresent()) {
 			throw new IllegalStateException("No confirmation present");
 		}
@@ -390,7 +388,6 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public String getPrompt() {
-		waitForIdle();
 		if (!promptHandler.isDialogPresent()) {
 			throw new IllegalStateException("No prompt present");
 		}
@@ -504,7 +501,6 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public String getTitle() {
-		// waitForIdle();
 		return session.evaluate(session.getDocumentExpression() + ".title").trim();
 	}
 
@@ -537,7 +533,6 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public boolean isAlertPresent() {
-		waitForIdle();
 		return alertHandler.isDialogPresent();
 	}
 
@@ -546,7 +541,6 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public boolean isConfirmationPresent() {
-		waitForIdle();
 		return confirmationHandler.isDialogPresent();
 	}
 
@@ -594,7 +588,6 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public boolean isPromptPresent() {
-		waitForIdle();
 		return promptHandler.isDialogPresent();
 	}
 
@@ -1001,7 +994,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	private Element locate(String locator) {
-		waitForIdle();
+//		waitForIdle();
 		Element locate = session.locate(locator);
 		session.evaluate(session.domExpression(locate) + ".scrollIntoView()");
 		return locate;

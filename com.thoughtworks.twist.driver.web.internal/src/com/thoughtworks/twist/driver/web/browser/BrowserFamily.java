@@ -69,6 +69,7 @@ public enum BrowserFamily {
             long timeout = System.currentTimeMillis() + 4000;
             boolean configLoaded = false;
             while (!configLoaded) {
+            	session.pumpEvents();
                 try {
                     session.evaluate("gPrefBranch");
                     configLoaded = true;
@@ -80,7 +81,7 @@ public enum BrowserFamily {
                         throw new IllegalStateException("Could not load about:config properly");                    
                     }
                     try {
-                        Thread.sleep(50);
+                        Thread.sleep(20);
                     } catch (InterruptedException ignore) {
                     }
                 }
