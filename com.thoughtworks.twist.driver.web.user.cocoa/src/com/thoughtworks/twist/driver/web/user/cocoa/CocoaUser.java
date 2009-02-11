@@ -34,6 +34,7 @@ import com.thoughtworks.twist.driver.web.user.KeyTranslator.TransaltedKey;
 
 @SuppressWarnings( { "deprecation" })
 public class CocoaUser implements User {
+	private static final boolean CARBON = "carbon".equals(SWT.getPlatform());
 	private static final int LEFT = 1;
 	private static final int RIGHT = 2;
 
@@ -206,7 +207,6 @@ public class CocoaUser implements User {
 
 		ensureWindowCanAcceptEvents();
 		window.sendEvent(mouseEvent);
-		window.displayIfNeeded();
 	}
 
 	private void keyEvent(int type, final char c, final short keyCode, boolean wasTranslated) {
@@ -223,11 +223,10 @@ public class CocoaUser implements User {
 
 		ensureWindowCanAcceptEvents();
 		window.sendEvent(keyEvent);
-		window.displayIfNeeded();
 	}
 
 	private void ensureWindowCanAcceptEvents() {
-		if ("carbon".equals(SWT.getPlatform())) {			
+		if (CARBON) {			
 			shell.setFocus();
 		}
 		if (window != null) {
