@@ -36,6 +36,7 @@ public class SeleniumOSGiFactory implements SeleniumFactory {
 
 			if (isMac()) {
 				verifyOnFirstThread();
+				System.setProperty("osgi.ws", "cocoa");
 				launcher = new EmbeddedEquinoxLauncher(getAndVerifyCocoaClasspath().toURL());
 			} else {
 				launcher = new EmbeddedEquinoxLauncher();

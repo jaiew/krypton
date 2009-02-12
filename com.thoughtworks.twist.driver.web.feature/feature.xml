@@ -4,7 +4,7 @@
       label="com.thoughtworks.twist.driver.web"
       version="1.0.0"
       os="macosx,linux,win32"
-      ws="carbon,gtk,win32"
+      ws="cocoa,gtk,win32"
       arch="x86">
 
    <description url="http://www.example.com/description">
@@ -275,7 +275,7 @@
    <plugin
          id="com.thoughtworks.twist.driver.web.user.cocoa"
          os="macosx"
-         ws="carbon"
+         ws="cocoa"
          arch="x86"
          download-size="0"
          install-size="0"
