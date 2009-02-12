@@ -43,6 +43,7 @@ public class CocoaUser implements User {
 	private int modifiers;
 	private final Shell shell;
 
+	// Use -NSTraceEvents YES as application arguments to log Cocoa events to System.err.
 	private static NSWindow findCocoaWindowForShell() {
 		NSApplication application = NSApplication.sharedApplication();
 		Enumeration<?> windows = application.windows().reverseObjectEnumerator();
@@ -57,7 +58,7 @@ public class CocoaUser implements User {
 		this.window = window;
 		this.shell = shell;
 		translator = new CocoaKeyTranslator();
-		ensureWindowCanAcceptEvents();
+//		ensureWindowCanAcceptEvents();
 	}
 
 	public void click(int x, int y) {
@@ -206,7 +207,8 @@ public class CocoaUser implements User {
 				0.0, window.windowNumber(), NSApplication.sharedApplication().context(), 0, clickCount, pressure);
 
 		ensureWindowCanAcceptEvents();
-		window.sendEvent(mouseEvent);
+//		window.sendEvent(mouseEvent);
+		window.postEvent(mouseEvent, false);
 	}
 
 	private void keyEvent(int type, final char c, final short keyCode, boolean wasTranslated) {
@@ -222,7 +224,8 @@ public class CocoaUser implements User {
 				false, keyCode);
 
 		ensureWindowCanAcceptEvents();
-		window.sendEvent(keyEvent);
+//		window.sendEvent(keyEvent);
+		window.postEvent(keyEvent, false);
 	}
 
 	private void ensureWindowCanAcceptEvents() {
