@@ -58,7 +58,6 @@ public class CocoaUser implements User {
 		this.window = window;
 		this.shell = shell;
 		translator = new CocoaKeyTranslator();
-//		ensureWindowCanAcceptEvents();
 	}
 
 	public void click(int x, int y) {
@@ -207,7 +206,6 @@ public class CocoaUser implements User {
 				0.0, window.windowNumber(), NSApplication.sharedApplication().context(), 0, clickCount, pressure);
 
 		ensureWindowCanAcceptEvents();
-//		window.sendEvent(mouseEvent);
 		window.postEvent(mouseEvent, false);
 	}
 
@@ -224,7 +222,6 @@ public class CocoaUser implements User {
 				false, keyCode);
 
 		ensureWindowCanAcceptEvents();
-//		window.sendEvent(keyEvent);
 		window.postEvent(keyEvent, false);
 	}
 
