@@ -34,8 +34,7 @@ if (!Twist.setTimeoutWaitStrategy) {
                     else {
                         target.apply(this, arguments);
                     }
-                }
-                finally {
+                } finally {
                     inSetTimeout = false;
                 }
             };

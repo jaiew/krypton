@@ -165,6 +165,7 @@ public enum BrowserFamily {
         BrowserSession session = new SWTBrowserSession(browser, this);
         init(session);
         browser.setUrl("about:blank");
+        session.pumpEvents();
 
         Text location = addLocationBar(shell);
         Label userAgent = addUserAgentLabel(shell);

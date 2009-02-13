@@ -27,7 +27,8 @@ import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 
 import static com.thoughtworks.twist.driver.web.browser.BrowserFamily.*;
 
-public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener {
+public class DocumentReadyWaitStrategy implements WaitStrategy,
+		LocationListener {
 	private BrowserSession session;
 	private boolean hasListener;
 
@@ -38,9 +39,10 @@ public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener
 
 	public void changed(LocationEvent event) {
 		if (MOZILLA == session.getBrowserFamily()) {
-			session.execute("if (!Twist) { var Twist = {}; }"
-					+ "if (!Twist.hasContentLoadListener) { document.addEventListener('DOMContentLoaded', function() { "
-					+ "Twist.contentLoaded = true; }, false); Twist.hasContentLoadListener = true; }");
+			session
+					.execute("if (!Twist) { var Twist = {}; }"
+							+ "if (!Twist.hasContentLoadListener) { document.addEventListener('DOMContentLoaded', function() { "
+							+ "Twist.contentLoaded = true; }, false); Twist.hasContentLoadListener = true; }");
 			hasListener = true;
 		}
 	}
@@ -50,12 +52,18 @@ public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener
 	}
 
 	public boolean isBusy() {
-		if (SAFARI == session.getBrowserFamily() || IE == session.getBrowserFamily()) {
+		if (SAFARI == session.getBrowserFamily()) {
 			String readyState = session.evaluate("document.readyState");
 			return !("complete".equals(readyState) || "interactive".equals(readyState));
+		} else if (IE == session.getBrowserFamily()) {
+			String readyState = session.evaluate("document.readyState");
+			return !"complete".equals(readyState);
 		} else if (MOZILLA == session.getBrowserFamily()) {
-			return Boolean.parseBoolean(session.evaluate("typeof document.getElementsByTagName == 'undefined' "
-					+ (hasListener ? "|| typeof Twist.contentLoaded == 'undefined' " : "") + "|| document.body == null"));
+			return Boolean
+					.parseBoolean(session
+							.evaluate("typeof document.getElementsByTagName == 'undefined' "
+									+ (hasListener ? "|| typeof Twist.contentLoaded == 'undefined' "
+											: "") + "|| document.body == null"));
 		}
 		return false;
 	}
