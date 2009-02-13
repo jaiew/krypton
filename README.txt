@@ -25,8 +25,8 @@ Requirements:
  svn 1.5
 
 Mozilla:
- Firefox 3 or XULRunner 1.9 or higher for Mozilla support.
- There will be a default XULRunner (most likely the last installed), but you can change which XULRunner to use with the org.eclipse.swt.browser.XULRunnerPath Java system (-D) property to use your Firefox 3 installation (or another XULRunner), for example /Applications/Firefox.app/Contents/MacOS/ or C:\Program Files\Mozilla Firefox\.
+ Firefox 3 (doesn't work on Windows) or XULRunner 1.9 or higher for Mozilla support.
+ There will be a default XULRunner (most likely the last installed), but you can change which XULRunner to use with the org.eclipse.swt.browser.XULRunnerPath Java system (-D) property to use your Firefox 3 installation (or another XULRunner), for example /Applications/Firefox.app/Contents/MacOS/.
 
 IE:
  Windows will use the default IE engine installed, so to test on both IE 6 and IE 7 you'll need two boxes.

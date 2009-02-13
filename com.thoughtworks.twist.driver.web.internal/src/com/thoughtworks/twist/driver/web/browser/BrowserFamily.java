@@ -31,9 +31,14 @@ import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.browser.TitleEvent;
 import org.eclipse.swt.browser.TitleListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -111,12 +116,16 @@ public enum BrowserFamily {
 
     IE {
         public Browser create(Composite composite) {
-            String platform = SWT.getPlatform();
-            if ("win32".equals(platform)) {                
+            if (isSupported()) {                
                 return new Browser(composite, SWT.NONE);
             }
-            throw new IllegalStateException("Cannot create Internet Explorer on platform: " + platform);
+            throw new IllegalStateException("Cannot create Internet Explorer on platform: " + SWT.getPlatform());
         }
+
+		public boolean isSupported() {
+            String platform = SWT.getPlatform();
+			return "win32".equals(platform);
+		}
 
         public String referenceError(String reference) {
             return "[object Error]";
@@ -129,16 +138,78 @@ public enum BrowserFamily {
 
     SAFARI {
         public Browser create(Composite composite) {
-            String platform = SWT.getPlatform();
-            if ("carbon".equals(platform) || "cocoa".equals(platform)) {                
+            if (isSupported()) {                
                 return new Browser(composite, SWT.NONE);
             }
-            throw new IllegalStateException("Cannot create Safari on platform: " + platform);
+            throw new IllegalStateException("Cannot create Safari on platform: " + SWT.getPlatform());
         }
+
+		public boolean isSupported() {
+            String platform = SWT.getPlatform();
+			return "carbon".equals(platform) || "cocoa".equals(platform);
+		}
 
         public String referenceError(String reference) {
             return "ReferenceError: Can't find variable: " + reference;
         }
+    },
+    
+    INTERACTIVE {
+    	BrowserFamily actual;
+    	
+		public Browser create(Composite composite) {
+			if (actual == null) {
+				askUser();
+			}
+			return actual.create(composite);
+		}
+
+		private void askUser() {
+			final Shell shell = new Shell(SWT.TITLE | SWT.APPLICATION_MODAL);
+			shell.setLayout(new FillLayout());
+			shell.setText("Choose Browser");
+
+			Button mozilla = new Button(shell, SWT.NONE);
+			mozilla.setText("Mozilla");
+			mozilla.setEnabled(MOZILLA.isSupported());
+			Button ie = new Button(shell, SWT.NONE);
+			ie.setText("IE");
+			ie.setEnabled(IE.isSupported());
+			Button safari = new Button(shell, SWT.NONE);
+			safari.setText("Safari");
+			safari.setEnabled(SAFARI.isSupported());
+			
+			SelectionListener listener = new SelectionListener(){
+				public void widgetSelected(SelectionEvent e) {
+					System.setProperty(SYSTEM_PROPERTY, ((Button) e.getSource()).getText());
+					actual = BrowserFamily.fromSystemProperty();
+
+					shell.close();
+					shell.dispose();
+				}
+			
+				public void widgetDefaultSelected(SelectionEvent e) {
+				}
+			};
+
+			mozilla.addSelectionListener(listener);
+			ie.addSelectionListener(listener);
+			safari.addSelectionListener(listener);
+
+			shell.pack();
+			shell.open();
+			
+			Display display = shell.getDisplay();
+			while (!shell.isDisposed()) {
+				if (!display.readAndDispatch()) {
+					display.sleep();
+				}
+			}
+		}
+
+		public String referenceError(String reference) {
+			return actual.referenceError(reference);
+		}
     };
 
     public static final String SYSTEM_PROPERTY = "twist.driver.web.browser";
@@ -238,6 +309,10 @@ public enum BrowserFamily {
     abstract Browser create(Composite composite);
     
     public abstract String referenceError(String reference);
+    
+    public boolean isSupported() {
+    	return true;
+    }
     
     public static BrowserFamily fromSystemProperty() {
     	return BrowserFamily.valueOf(System.getProperty(SYSTEM_PROPERTY, "mozilla").toUpperCase());
