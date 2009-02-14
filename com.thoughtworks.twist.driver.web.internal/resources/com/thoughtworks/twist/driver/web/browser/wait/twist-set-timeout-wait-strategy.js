@@ -4,19 +4,18 @@ if (!Twist) {
 }
 
 if (!Twist.setTimeoutWaitStrategy) {
-
-    Twist.numberOfActiveSetTimeouts = 0;
+	Twist.activeTimeouts = {};
+    
+    Twist.getNumberOfActiveSetTimeouts = function () {
+    	var result = 0;
+    	for (p in Twist.activeTimeouts) {
+    		result++;
+    	}
+    	return result;
+    };
     
     Twist.setTimeoutWaitStrategy = function(){
-    
-        function increaseNumberOfActiveSetTimeouts(){
-            Twist.numberOfActiveSetTimeouts++;
-        }
-        
-        function decreaseNumberOfActiveSetTimeouts(){
-            Twist.numberOfActiveSetTimeouts--;
-        }
-        
+
         var realSetTimeout = window.setTimeout;
         var realClearTimeout = window.clearTimeout;
         var inSetTimeout = false;
@@ -26,7 +25,7 @@ if (!Twist.setTimeoutWaitStrategy) {
             var delay = arguments[1];
             var wrapped = function(){
                 try {
-                    decreaseNumberOfActiveSetTimeouts();
+		        	delete Twist.activeTimeouts[wrapped.timeoutID + ''];
                     inSetTimeout = true;
                     if ("string" === typeof(target)) {
                         eval(target);
@@ -38,18 +37,20 @@ if (!Twist.setTimeoutWaitStrategy) {
                     inSetTimeout = false;
                 }
             };
-            if (delay > 0 && !inSetTimeout) {
+            if (delay > 0 && delay < 5000 && !inSetTimeout) {
                 arguments[0] = wrapped;
-                increaseNumberOfActiveSetTimeouts();
             }
-            return Function.prototype.apply.call(realSetTimeout, this, arguments);
+            var timeoutID = Function.prototype.apply.call(realSetTimeout, this, arguments);
+            if (wrapped == arguments[0]) {
+	            wrapped.timeoutID = timeoutID;
+	            Twist.activeTimeouts[timeoutID + ''] = arguments[0];
+            }
+            return timeoutID;
         };
         
         window.clearTimeout = function(timeoutID){
+        	delete Twist.activeTimeouts[timeoutID + ''];
             realClearTimeout(timeoutID);
-            if (Twist.numberOfActiveSetTimeouts > 0) {
-                decreaseNumberOfActiveSetTimeouts();
-            }
         };
     }();
 }

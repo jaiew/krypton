@@ -275,7 +275,8 @@ public class SWTBrowserSession implements BrowserSession {
 	public void waitForIdle() {
 		log.debug("Waiting for Browser to become idle");
 		long timeout = System.currentTimeMillis() + eventLoopTimeout;
-		while (!browser.isDisposed()) {
+		int count = 0;
+		while (!browser.isDisposed() && count < 2) {
 			pumpEvents();
 			if (System.currentTimeMillis() > timeout) {
 				throw new WaitTimedOutException("event loop to become idle, busy strategies: " + getBusyWaitStrategies(), eventLoopTimeout);
@@ -285,11 +286,11 @@ public class SWTBrowserSession implements BrowserSession {
 			} catch (InterruptedException e) {
 			}
 			if (areWaitStrategiesIdle()) {
-				break;
+				count++;
 			}
 		}
-		pumpEvents();
 		emptyDocumentCache();
+		pumpEvents();
 	}
 
 	public void pumpEvents() {
