@@ -744,7 +744,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void refresh() {
-		session.getBrowser().refresh();
+        session.getBrowser().setUrl(getLocation());
 		waitForIdle();
 	}
 

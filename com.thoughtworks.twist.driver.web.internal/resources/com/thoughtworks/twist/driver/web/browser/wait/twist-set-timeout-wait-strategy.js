@@ -41,7 +41,7 @@ if (!Twist.setTimeoutWaitStrategy) {
                 arguments[0] = wrapped;
             }
             var timeoutID = Function.prototype.apply.call(realSetTimeout, this, arguments);
-            if (wrapped == arguments[0]) {
+            if (wrapped === arguments[0]) {
 	            wrapped.timeoutID = timeoutID;
 	            Twist.activeTimeouts[timeoutID + ''] = arguments[0];
             }
