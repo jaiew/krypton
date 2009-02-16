@@ -37,6 +37,7 @@ import org.w3c.dom.NodeList;
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 import com.thoughtworks.selenium.Selenium;
+import com.thoughtworks.twist.driver.web.browser.BrowserFamily;
 import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 import com.thoughtworks.twist.driver.web.browser.BrowserSessionFactory;
 import com.thoughtworks.twist.driver.web.browser.Decorators;
@@ -940,10 +941,13 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void typeKeys(String locator, String value) {
-		click(locator);
+		if (BrowserFamily.IE == session.getBrowserFamily()) {			
+			// Don't like this, but it makes it more consistent in IE.
+			focus(locator);
+		} else {
+			click(locator);
+		}
 
-		// Don't like this, but it makes it more consistent in IE.
-		focus(locator);
 		user.type(value);
 		waitForIdle();
 	}
