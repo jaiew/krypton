@@ -270,10 +270,6 @@ public class SWTBrowserSession implements BrowserSession {
 			if (System.currentTimeMillis() > timeout) {
 				throw new WaitTimedOutException("event loop to become idle, busy strategies: " + getBusyWaitStrategies(), eventLoopTimeout);
 			}
-			try {
-				Thread.sleep(20);
-			} catch (InterruptedException e) {
-			}
 			if (areWaitStrategiesIdle()) {
 				count++;
 			}
