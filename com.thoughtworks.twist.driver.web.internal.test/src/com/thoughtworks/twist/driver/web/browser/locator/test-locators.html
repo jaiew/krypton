@@ -1,1 +1,1 @@
-<html><body><div id="1"><input type="text" name="2"/><a href="">My Link</a><script>setTimeout(function() { var div = document.createElement("div"); div.id = '3'; div.innerHTML = "Slow Div"; document.body.appendChild(div); }, 400);</script></body></html>
+<html><head><script>function init() { setTimeout(function() { var div = document.createElement("div"); div.id = '3'; div.innerHTML = "Slow Div"; document.body.appendChild(div); }, 400); }</script></head><body onload="init();"><div id="1"><input type="text" name="2"/><a href="">My Link</a></body></html>

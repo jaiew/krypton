@@ -6,12 +6,11 @@ if (!Twist) {
 if (!Twist.setTimeoutWaitStrategy) {
 	Twist.activeTimeouts = {};
     
-    Twist.getNumberOfActiveSetTimeouts = function () {
-    	var result = 0;
+    Twist.hasActiveSetTimeouts = function () {
     	for (p in Twist.activeTimeouts) {
-    		result++;
+			return true;
     	}
-    	return result;
+    	return false;
     };
     
     Twist.setTimeoutWaitStrategy = function(){

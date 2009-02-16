@@ -88,8 +88,6 @@ public interface BrowserSession {
 
 	void setEventLoopTimeout(int timeout);
 
-	void setPatientLocatorTimeout(int timeout);
-
 	// Strategies
 
 	void addLocatorStrategy(LocatorStrategy locatorStrategy);

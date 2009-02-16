@@ -49,10 +49,8 @@ public class SetTimeoutWaitStrategy implements LocationListener, WaitStrategy {
 			if (session.getBrowser().isDisposed()) {
 				return false;
 			}
-			String timeouts = session.evaluate("Twist.getNumberOfActiveSetTimeouts()");
-			return Integer.parseInt(timeouts) > 0;
-		} catch (NumberFormatException e) {
-			return false;
+			String hasTimeouts = session.evaluate("Twist.hasActiveSetTimeouts()");
+			return Boolean.parseBoolean(hasTimeouts);
 		} catch (JavascriptException e) {
 			return false;
 		}

@@ -30,6 +30,7 @@ import org.w3c.dom.Element;
 
 import com.thoughtworks.twist.driver.web.browser.AbstractBaseBrowserSession;
 import com.thoughtworks.twist.driver.web.browser.BrowserSession;
+import com.thoughtworks.twist.driver.web.browser.wait.SetTimeoutWaitStrategy;
 
 public class LocatorStrategiesTest extends AbstractBaseBrowserSession {
     @Test
@@ -164,10 +165,13 @@ public class LocatorStrategiesTest extends AbstractBaseBrowserSession {
         }
     }
 
+    // Fixed this test using an explicit SetTimeoutWaitStrategy, but should really be removed.
     @Test
     public void shouldReturnElementPatiently() throws Exception {
         session.addLocatorStrategy(new DomLocatorStrategy());
+        session.addWaitStrategy(new SetTimeoutWaitStrategy());
         render(readResource("test-locators.html"));
+        session.waitForIdle();
         Element actualDiv = session.locate("document.getElementById('3')");
         assertXmlEquals((Element) session.dom().getElementById("3"), actualDiv);
     }
@@ -176,7 +180,6 @@ public class LocatorStrategiesTest extends AbstractBaseBrowserSession {
     public void shouldThrowElementNotFoundExceptionIfNotPatientEnough() throws Exception {
         String locator = "document.getElementById('3')";
         try {
-            session.setPatientLocatorTimeout(250);
             session.addLocatorStrategy(new DomLocatorStrategy());
             render(readResource("test-locators.html"));
             session.locate(locator);

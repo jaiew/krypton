@@ -139,6 +139,7 @@ public class TwistSelenium implements Selenium {
 
 	public void assignId(String locator, String identifier) {
 		session.evaluate(session.domExpression(locate(locator)) + ".setAttribute('id', '" + identifier + "')");
+		waitForIdle();
 	}
 
 	public void attachFile(String fieldLocator, String fileLocator) {

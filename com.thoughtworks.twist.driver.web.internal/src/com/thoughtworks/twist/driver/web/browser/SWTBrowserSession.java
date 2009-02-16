@@ -69,7 +69,6 @@ public class SWTBrowserSession implements BrowserSession {
 			+ "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n";
 
 	private static final int DEFAULT_EVENTLOOP_TIMEOUT = 10 * 1000;
-	private static final int DEFAULT_PATIENT_LOCATOR_TIMEOUT = (int) (0.5 * 1000);
 
 	private Map<String, String> resourcesByName = new HashMap<String, String>();
 	private Set<String> verifiedJavaScripts = new HashSet<String>();
@@ -83,7 +82,6 @@ public class SWTBrowserSession implements BrowserSession {
 	private List<WaitStrategy> waitStrategies = new ArrayList<WaitStrategy>();
 
 	private int eventLoopTimeout = DEFAULT_EVENTLOOP_TIMEOUT;
-	private long patientLocatorTimeout = DEFAULT_PATIENT_LOCATOR_TIMEOUT;
 
 	private XPath xpath;
 
@@ -117,11 +115,11 @@ public class SWTBrowserSession implements BrowserSession {
 	public void openBrowser() {
 		log.debug("Opening Browser");
 		if (!shell.isVisible()) {
-//			 shell.open();
+			// shell.open();
 			shell.setVisible(Boolean.parseBoolean(System.getProperty("twist.driver.web.visible", "true")));
 			shell.setFullScreen(Boolean.parseBoolean(System.getProperty("twist.driver.web.fullscreen", "false")));
 			shell.setMinimized(Boolean.parseBoolean(System.getProperty("twist.driver.web.minimized", "false")));
-//			shell.moveBelow(null);
+			// shell.moveBelow(null);
 		}
 	}
 
@@ -217,23 +215,14 @@ public class SWTBrowserSession implements BrowserSession {
 	}
 
 	public Element locate(String locator) {
-		long timeout = System.currentTimeMillis() + patientLocatorTimeout;
-		while (System.currentTimeMillis() < timeout) {
-			pumpEvents();
-			for (LocatorStrategy strategy : locatorStrategies) {
-				if (strategy.canLocate(locator)) {
-					Element element = strategy.locate(this, locator);
-					if (element != null) {
-						log.debug("Located " + element + " using '" + locator + "'");
-						return element;
-					}
+		pumpEvents();
+		for (LocatorStrategy strategy : locatorStrategies) {
+			if (strategy.canLocate(locator)) {
+				Element element = strategy.locate(this, locator);
+				if (element != null) {
+					log.debug("Located " + element + " using '" + locator + "'");
+					return element;
 				}
-			}
-			log.debug("Element not found using '" + locator + "', trying again");
-			emptyDocumentCache();
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
 			}
 		}
 		throw new ElementNotFoundException(locator);
@@ -340,10 +329,6 @@ public class SWTBrowserSession implements BrowserSession {
 
 	public void setEventLoopTimeout(int timeout) {
 		this.eventLoopTimeout = timeout;
-	}
-
-	public void setPatientLocatorTimeout(int timeout) {
-		this.patientLocatorTimeout = timeout;
 	}
 
 	public String readResource(String resource, Class<?> baseClass) {
