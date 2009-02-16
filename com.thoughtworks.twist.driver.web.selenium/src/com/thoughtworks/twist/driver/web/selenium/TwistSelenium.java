@@ -936,16 +936,21 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void type(String locator, String value) {
-		session.evaluate(session.domExpression(locate(locator)) + ".value = ''");
-		typeKeys(locator, value);
+		Element element = locate(locator);
+		session.evaluate(session.domExpression(element) + ".value = ''");
+		typeKeys(element, value);
 	}
 
 	public void typeKeys(String locator, String value) {
+		typeKeys(locate(locator), value);
+	}
+
+	private void typeKeys(Element element, String value) {
 		if (BrowserFamily.IE == session.getBrowserFamily()) {			
 			// Don't like this, but it makes it more consistent in IE.
-			focus(locator);
+			session.evaluate(session.domExpression(element) + ".focus()");
 		} else {
-			click(locator);
+			click(element);
 		}
 
 		user.type(value);

@@ -7,7 +7,7 @@ if (!Twist.setTimeoutWaitStrategy) {
 	Twist.activeTimeouts = {};
     
     Twist.hasActiveSetTimeouts = function () {
-    	for (p in Twist.activeTimeouts) {
+    	for (var p in Twist.activeTimeouts) {
 			return true;
     	}
     	return false;
