@@ -32,12 +32,12 @@ public class GoogleTestSearch extends SeleneseTestCase
 //           System.out.println(i);
 //       }
 	}
-private void runGoogleTest() {
+private void runGoogleTest() throws InterruptedException {
     try {
 
 /* Google Test Search */
 		// open|http://www.google.com|
-		selenium.open("http://www.google.com/webhp");
+		selenium.open("http://www.google.com/ig");
 		
 		// verifyTitle|Google|
 		verifyEquals("*Google", selenium.getTitle());

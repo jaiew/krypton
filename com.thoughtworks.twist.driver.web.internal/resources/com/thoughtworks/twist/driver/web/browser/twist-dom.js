@@ -91,7 +91,7 @@ if (!Twist.dom) {
                     xml += attributeString(property.toLowerCase(), value);
                 }
             }
-        }
+        }		
         
         xml += attributeString("Twist.domIndex", Twist.domIndex(element));
         

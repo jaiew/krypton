@@ -29,16 +29,22 @@ import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 import com.thoughtworks.twist.driver.web.browser.JavascriptException;
 
 public class SetTimeoutWaitStrategy implements LocationListener, WaitStrategy {
+	private static final int DEFAULT_SET_TIMEOUT_MAX_DELAY = 2000;
 	BrowserSession session;
     Log log = LogFactory.getLog(getClass());
 
-    public void init(BrowserSession session) {
+    private int setTimeoutMaxDelay = DEFAULT_SET_TIMEOUT_MAX_DELAY;
+
+	public void init(BrowserSession session) {
 		this.session = session;
         session.getBrowser().addLocationListener(this);
     }
 
 	public void changed(LocationEvent event) {
-		session.inject("twist-set-timeout-wait-strategy.js", getClass());
+		if (event.top) {
+			session.inject("twist-set-timeout-wait-strategy.js", getClass());
+			session.execute("Twist.setTimeoutMaxDelay = " + setTimeoutMaxDelay);
+		}
 	}
 
 	public void changing(LocationEvent event) {
@@ -49,10 +55,14 @@ public class SetTimeoutWaitStrategy implements LocationListener, WaitStrategy {
 			if (session.getBrowser().isDisposed()) {
 				return false;
 			}
-			String hasTimeouts = session.evaluate("Twist.hasActiveSetTimeouts()");
-			return Boolean.parseBoolean(hasTimeouts);
+			String timeouts = session.evaluate("Twist.getNumberOfActiveSetTimeouts()");
+			return Integer.parseInt(timeouts) > 0;
 		} catch (JavascriptException e) {
 			return false;
 		}
+	}
+
+    public void setSetTimeoutMaxDelay(int maxDelay) {
+		this.setTimeoutMaxDelay = maxDelay;
 	}
 }

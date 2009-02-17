@@ -45,6 +45,7 @@ public class LocationChangedWaitStrategy implements LocationListener, WaitStrate
 
         // This obviously needs to be configurable somehow.
         addURLExclusionPattern(".*analytics.live.com.*");
+        addURLExclusionPattern(".*www.google.com/ig/ifpc_relay.*");
     }
 
     public synchronized boolean isBusy() {

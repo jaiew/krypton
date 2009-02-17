@@ -215,8 +215,8 @@ public enum BrowserFamily {
     public static final String SYSTEM_PROPERTY = "twist.driver.web.browser";
 
 	static {
-//        Logger.getLogger("").setLevel(Level.FINEST);
-//        Logger.getLogger("").getHandlers()[0].setLevel(Level.FINEST);
+        Logger.getLogger("").setLevel(Level.FINEST);
+        Logger.getLogger("").getHandlers()[0].setLevel(Level.FINEST);
     }
     
     Log log = LogFactory.getLog(getClass());

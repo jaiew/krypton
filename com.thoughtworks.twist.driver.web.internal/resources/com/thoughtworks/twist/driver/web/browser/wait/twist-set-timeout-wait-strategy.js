@@ -5,12 +5,14 @@ if (!Twist) {
 
 if (!Twist.setTimeoutWaitStrategy) {
 	Twist.activeTimeouts = {};
+	Twist.setTimeoutMaxDelay = 0;
     
-    Twist.hasActiveSetTimeouts = function () {
+    Twist.getNumberOfActiveSetTimeouts = function () {
+		var result = 0;
     	for (var p in Twist.activeTimeouts) {
-			return true;
+			result++;
     	}
-    	return false;
+    	return result;
     };
     
     Twist.setTimeoutWaitStrategy = function(){
@@ -36,7 +38,7 @@ if (!Twist.setTimeoutWaitStrategy) {
                     inSetTimeout = false;
                 }
             };
-            if (delay > 0 && delay < 5000 && !inSetTimeout) {
+            if (delay > 0 && delay < Twist.setTimeoutMaxDelay && !inSetTimeout) {
                 arguments[0] = wrapped;
             }
             var timeoutID = Function.prototype.apply.call(realSetTimeout, this, arguments);

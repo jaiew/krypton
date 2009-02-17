@@ -279,7 +279,7 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
         load(localUrl(path));
 
         doSetTimeoutCall("'Hello'", BlockingHelloWorldServlet.BLOCKING_TIME);
-        assertTrue(Boolean.parseBoolean(session.evaluate("Twist.hasActiveSetTimeouts()")));
+        assertEquals(1, Integer.parseInt(session.evaluate("Twist.getNumberOfActiveSetTimeouts()")));
         assertTrue(Integer.parseInt(session.evaluate("slowTimeoutID")) > 0);
 
         timedWaitForIdle();
@@ -288,7 +288,7 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
         assertTrue(Math.abs(idleTime - BlockingHelloWorldServlet.BLOCKING_TIME) < SET_TIMEOUT_PRECISION);
 
     	assertEquals(getExpectedMessageAsIEDoesntSupportParameters(), session.evaluate("Twist.slowSetTimeoutCalledWith"));
-        assertFalse(Boolean.parseBoolean(session.evaluate("Twist.hasActiveSetTimeouts()")));
+        assertEquals(0, Integer.parseInt(session.evaluate("Twist.getNumberOfActiveSetTimeouts()")));
     }
 
 	private String getExpectedMessageAsIEDoesntSupportParameters() {
@@ -306,7 +306,7 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
         load(localUrl(path));
 
         doSetTimeoutCall("'Hello'", timeout);
-        assertTrue(Boolean.parseBoolean(session.evaluate("Twist.hasActiveSetTimeouts()")));
+        assertEquals(1, Integer.parseInt(session.evaluate("Twist.getNumberOfActiveSetTimeouts()")));
 
         int timeoutID = Integer.parseInt(session.evaluate("slowTimeoutID"));
 		assertTrue(timeoutID > 0);
@@ -318,7 +318,7 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
         assertTrue(idleTime >= BlockingHelloWorldServlet.BLOCKING_TIME);
 
         assertEquals("undefined", session.evaluate("Twist.slowSetTimeoutCalledWith"));
-        assertFalse(Boolean.parseBoolean(session.evaluate("Twist.hasActiveSetTimeouts()")));
+        assertEquals(0, Integer.parseInt(session.evaluate("Twist.getNumberOfActiveSetTimeouts()")));
     }
 
 	private void clearTimeoutInSeparateThread(final int timeoutID, final int delay) {
