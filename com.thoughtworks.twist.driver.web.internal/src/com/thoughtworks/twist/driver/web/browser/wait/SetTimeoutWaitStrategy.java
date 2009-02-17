@@ -20,8 +20,12 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.browser.wait;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
 
@@ -34,6 +38,9 @@ public class SetTimeoutWaitStrategy implements LocationListener, WaitStrategy {
     Log log = LogFactory.getLog(getClass());
 
     private int setTimeoutMaxDelay = DEFAULT_SET_TIMEOUT_MAX_DELAY;
+	private BrowserFunction addActiveSetTimeout;
+	private BrowserFunction removeActiveSetTimeout;
+	private Set<Integer> activeSetTimeouts = new HashSet<Integer>();
 
 	public void init(BrowserSession session) {
 		this.session = session;
@@ -42,6 +49,25 @@ public class SetTimeoutWaitStrategy implements LocationListener, WaitStrategy {
 
 	public void changed(LocationEvent event) {
 		if (event.top) {
+			activeSetTimeouts.clear();
+			if (addActiveSetTimeout != null) {
+				addActiveSetTimeout.dispose();
+			}
+			addActiveSetTimeout = new BrowserFunction(session.getBrowser(), "addActiveSetTimeout") {
+				public Object function(Object[] arguments) {
+					activeSetTimeouts.add(((Number) arguments[0]).intValue());
+					return null;
+				}
+			};
+			if (removeActiveSetTimeout != null) {
+				removeActiveSetTimeout.dispose();
+			}
+			removeActiveSetTimeout = new BrowserFunction(session.getBrowser(), "removeActiveSetTimeout") {
+				public Object function(Object[] arguments) {
+					activeSetTimeouts.remove(((Number) arguments[0]).intValue());
+					return null;
+				}
+			};
 			session.inject("twist-set-timeout-wait-strategy.js", getClass());
 			session.execute("Twist.setTimeoutMaxDelay = " + setTimeoutMaxDelay);
 		}
@@ -55,8 +81,7 @@ public class SetTimeoutWaitStrategy implements LocationListener, WaitStrategy {
 			if (session.getBrowser().isDisposed()) {
 				return false;
 			}
-			String timeouts = session.evaluate("Twist.getNumberOfActiveSetTimeouts()");
-			return Integer.parseInt(timeouts) > 0;
+			return !activeSetTimeouts.isEmpty();
 		} catch (JavascriptException e) {
 			return false;
 		}
@@ -64,5 +89,9 @@ public class SetTimeoutWaitStrategy implements LocationListener, WaitStrategy {
 
     public void setSetTimeoutMaxDelay(int maxDelay) {
 		this.setTimeoutMaxDelay = maxDelay;
+	}
+
+	public int getNumberOfActiveSetTimeouts() {
+		return activeSetTimeouts.size();
 	}
 }

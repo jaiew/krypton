@@ -23,6 +23,7 @@ package com.thoughtworks.twist.driver.web.browser.wait;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
 
@@ -32,6 +33,10 @@ import com.thoughtworks.twist.driver.web.browser.JavascriptException;
 public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
 	BrowserSession session;
 	List<String> exclusionPatterns = new ArrayList<String>();
+	
+	private int numberOfActiveAjaxRequests = 0;
+	private BrowserFunction increaseNumberOfActiveAjaxRequests;
+	private BrowserFunction decreaseNumberOfActiveAjaxRequests;
 
 	public void init(BrowserSession session) {
 		this.session = session;
@@ -39,10 +44,41 @@ public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
 	}
 
 	public void changed(LocationEvent event) {
-		session.inject("twist-ajax-wait-strategy.js", getClass());
-		for (String pattern : exclusionPatterns) {
-			session.execute("Twist.ajaxExclusionPatterns.push(new RegExp('" + pattern + "'))");
+		if (event.top) {
+			numberOfActiveAjaxRequests = 0;
+			if (increaseNumberOfActiveAjaxRequests != null) {
+				increaseNumberOfActiveAjaxRequests.dispose();
+			}
+			increaseNumberOfActiveAjaxRequests = new BrowserFunction(session.getBrowser(), "increaseNumberOfActiveAjaxRequests") {
+				public Object function(Object[] arguments) {
+					if (!isUrlExcluded(arguments[0].toString())) {						
+						numberOfActiveAjaxRequests++;
+					}
+					return null;
+				}
+			};
+			if (decreaseNumberOfActiveAjaxRequests != null) {
+				decreaseNumberOfActiveAjaxRequests.dispose();
+			}
+			decreaseNumberOfActiveAjaxRequests = new BrowserFunction(session.getBrowser(), "decreaseNumberOfActiveAjaxRequests") {
+				public Object function(Object[] arguments) {
+					if (!isUrlExcluded(arguments[0].toString())) {						
+						numberOfActiveAjaxRequests--;
+					}
+					return null;
+				}
+			};
+			session.inject("twist-ajax-wait-strategy.js", getClass());
 		}
+	}
+
+	protected boolean isUrlExcluded(String url) {
+        for (String pattern : exclusionPatterns) {
+            if (url.matches(pattern)) {
+                return true;
+            }
+        }
+		return false;
 	}
 
 	public void changing(LocationEvent event) {
@@ -53,8 +89,7 @@ public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
 			if (session.getBrowser().isDisposed()) {
 				return false;
 			}
-			String requests = session.evaluate("Twist.numberOfActiveAjaxRequests");
-			return Integer.parseInt(requests) > 0;
+			return numberOfActiveAjaxRequests > 0;
 		} catch (NumberFormatException e) {
 			return false;
 		} catch (JavascriptException e) {
@@ -68,5 +103,9 @@ public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
 
 	public void removeURLExclusionPattern(String pattern) {
 		exclusionPatterns.remove(pattern);
+	}
+
+	public int getNumberOfActiveAjaxRequests() {
+		return numberOfActiveAjaxRequests;
 	}
 }

@@ -206,18 +206,19 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
         String path = "/blocking-servlet";
         handler.addServletWithMapping(BlockingHelloWorldServlet.class, path);
         int timeout = BlockingHelloWorldServlet.BLOCKING_TIME * 2;
-        session.addWaitStrategy(new AjaxWaitStrategy());
+        AjaxWaitStrategy strategy = new AjaxWaitStrategy();
+		session.addWaitStrategy(strategy);
 
         session.openBrowser();
         load(localUrl(path));
 
         doLocalAjaxRequest(path);
-        assertEquals(1, Integer.parseInt(session.evaluate("Twist.numberOfActiveAjaxRequests")));
+        assertEquals(1, strategy.getNumberOfActiveAjaxRequests());
         timedWaitForIdle();
 
         assertTrue("idle < timeout: " + idleTime + " < " + timeout, idleTime < timeout);
         assertTrue("idle >= blocking: " + idleTime + " >= " + BlockingHelloWorldServlet.BLOCKING_TIME, idleTime >= BlockingHelloWorldServlet.BLOCKING_TIME);
-        assertEquals(0, Integer.parseInt(session.evaluate("Twist.numberOfActiveAjaxRequests")));
+        assertEquals(0, strategy.getNumberOfActiveAjaxRequests());
     }
 
     @Test
@@ -232,11 +233,11 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
         load(localUrl(path));
 
         doLocalAjaxRequest(path);
-        assertEquals(0, Integer.parseInt(session.evaluate("Twist.numberOfActiveAjaxRequests")));
+        assertEquals(0, strategy.getNumberOfActiveAjaxRequests());
         timedWaitForIdle();
 
         assertTrue("idle < blocking: " + idleTime + " < " + BlockingHelloWorldServlet.BLOCKING_TIME, idleTime < BlockingHelloWorldServlet.BLOCKING_TIME);
-        assertEquals(0, Integer.parseInt(session.evaluate("Twist.numberOfActiveAjaxRequests")));
+        assertEquals(0, strategy.getNumberOfActiveAjaxRequests());
     }
 
     @Test
@@ -274,13 +275,14 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
         String path = "/hello-world-servlet";
         handler.addServletWithMapping(HelloWorldServlet.class, path);
         int timeout = BlockingHelloWorldServlet.BLOCKING_TIME * 2;
-        session.addWaitStrategy(new SetTimeoutWaitStrategy());
+        SetTimeoutWaitStrategy waitStrategy = new SetTimeoutWaitStrategy();
+		session.addWaitStrategy(waitStrategy);
 
         session.openBrowser();
         load(localUrl(path));
 
         doSetTimeoutCall("'Hello'", BlockingHelloWorldServlet.BLOCKING_TIME);
-        assertEquals(1, Integer.parseInt(session.evaluate("Twist.getNumberOfActiveSetTimeouts()")));
+        assertEquals(1, waitStrategy.getNumberOfActiveSetTimeouts());
         int slowTimeoutID = Integer.parseInt(session.evaluate("slowTimeoutID"));
 		assertTrue("slowTimeoutID > 0: " + slowTimeoutID + " > 0", slowTimeoutID > 0);
 
@@ -290,7 +292,7 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
         assertTrue("idle == blocking (precision " + SET_TIMEOUT_PRECISION + "): " + idleTime + " == " + BlockingHelloWorldServlet.BLOCKING_TIME, Math.abs(idleTime - BlockingHelloWorldServlet.BLOCKING_TIME) < SET_TIMEOUT_PRECISION);
 
     	assertEquals(getExpectedMessageAsIEDoesntSupportParameters(), session.evaluate("Twist.slowSetTimeoutCalledWith"));
-        assertEquals(0, Integer.parseInt(session.evaluate("Twist.getNumberOfActiveSetTimeouts()")));
+        assertEquals(0, waitStrategy.getNumberOfActiveSetTimeouts());
     }
 
 	private String getExpectedMessageAsIEDoesntSupportParameters() {
@@ -302,13 +304,14 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
         String path = "/hello-world-servlet";
         handler.addServletWithMapping(HelloWorldServlet.class, path);
         final int timeout = BlockingHelloWorldServlet.BLOCKING_TIME * 2;
-        session.addWaitStrategy(new SetTimeoutWaitStrategy());
+        SetTimeoutWaitStrategy waitStrategy = new SetTimeoutWaitStrategy();
+		session.addWaitStrategy(waitStrategy);
 
         session.openBrowser();
         load(localUrl(path));
 
         doSetTimeoutCall("'Hello'", timeout);
-        assertEquals(1, Integer.parseInt(session.evaluate("Twist.getNumberOfActiveSetTimeouts()")));
+        assertEquals(1, waitStrategy.getNumberOfActiveSetTimeouts());
 
         int timeoutID = Integer.parseInt(session.evaluate("slowTimeoutID"));
         int slowTimeoutID = Integer.parseInt(session.evaluate("slowTimeoutID"));
@@ -321,7 +324,7 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
         assertTrue("idle >= blocking: " + idleTime + " >= " + BlockingHelloWorldServlet.BLOCKING_TIME, idleTime >= BlockingHelloWorldServlet.BLOCKING_TIME);
 
         assertEquals("undefined", session.evaluate("Twist.slowSetTimeoutCalledWith"));
-        assertEquals(0, Integer.parseInt(session.evaluate("Twist.getNumberOfActiveSetTimeouts()")));
+        assertEquals(0, waitStrategy.getNumberOfActiveSetTimeouts());
     }
 
 	private void clearTimeoutInSeparateThread(final int timeoutID, final int delay) {
@@ -343,6 +346,7 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
 
 	private void doSetTimeoutCall(String parameter, int delay) {
 		session.execute("slowTimeoutID = window.setTimeout(slowSetTimeout, " + delay + ", " + parameter + "); function slowSetTimeout(message) { Twist.slowSetTimeoutCalledWith = message ? message : 'Hello IE'; }");
+		session.pumpEvents();
 	}
 
     private void loadAndRefreshPageThreeTimes(String path, int timeout) throws Exception {

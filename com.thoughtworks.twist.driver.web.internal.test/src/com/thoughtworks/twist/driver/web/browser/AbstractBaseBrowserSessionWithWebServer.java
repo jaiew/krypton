@@ -81,6 +81,7 @@ public abstract class AbstractBaseBrowserSessionWithWebServer extends AbstractBa
 
     protected void doLocalAjaxRequest(String path) throws MalformedURLException {
         session.execute("var http = " + createXMLHttpRequest() + "; http.open('GET', '" + localUrl(path) + "', true);  http.send('');");
+        session.pumpEvents();
     }
 
     protected String createXMLHttpRequest() {

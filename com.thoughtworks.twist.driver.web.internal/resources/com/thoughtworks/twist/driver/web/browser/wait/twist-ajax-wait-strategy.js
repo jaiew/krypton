@@ -3,32 +3,7 @@ if (!Twist) {
 }
 
 if (!Twist.ajaxWaitStrategy) {
-    Twist.numberOfActiveAjaxRequests = 0;
-    Twist.ajaxExclusionPatterns = [];
-    
     Twist.ajaxWaitStrategy = function(){
-    
-        function increaseNumberOfActiveAjaxRequests(url){
-			if (!isURLExcluded(url)) {				
-	            Twist.numberOfActiveAjaxRequests++;
-			}
-        }
-        
-        function decreaseNumberOfActiveAjaxRequests(url){
-			if (!isURLExcluded(url)) {
-				Twist.numberOfActiveAjaxRequests--;
-			}
-        }
-        
-        function isURLExcluded(url){
-            for (var i = 0; i < Twist.ajaxExclusionPatterns.length; i++) {
-                if (Twist.ajaxExclusionPatterns[i].test(url)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-        
         function interceptActiveXObject(){
             if (window.RealActiveXObject) {
                 return;
