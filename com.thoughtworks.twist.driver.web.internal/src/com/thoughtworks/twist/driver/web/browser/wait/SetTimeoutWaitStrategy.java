@@ -29,7 +29,7 @@ import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 import com.thoughtworks.twist.driver.web.browser.JavascriptException;
 
 public class SetTimeoutWaitStrategy implements LocationListener, WaitStrategy {
-	private static final int DEFAULT_SET_TIMEOUT_MAX_DELAY = 2000;
+	private static final int DEFAULT_SET_TIMEOUT_MAX_DELAY = 2500;
 	BrowserSession session;
     Log log = LogFactory.getLog(getClass());
 

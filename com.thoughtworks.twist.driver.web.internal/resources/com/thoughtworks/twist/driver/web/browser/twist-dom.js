@@ -110,7 +110,7 @@ if (!Twist.dom) {
                 for (var i = 0; child = childNodes[i++];) {
                 	try {
 	                    xml += Twist.dom(child);
-                	} catch (e) {
+                	} catch (dontForgetThisSwallowedException) {
                 	}
                 }
             }

@@ -53,7 +53,7 @@ public class DocumentReadyWaitStrategy implements WaitStrategy,
 
 	public boolean isBusy() {
 		if (SAFARI == session.getBrowserFamily()) {
-			String readyState = session.evaluate("document.readyState");
+			String readyState = session.evaluate("document ? document.readyState : ''");
 			return !("complete".equals(readyState) || "interactive".equals(readyState));
 		} else if (IE == session.getBrowserFamily()) {
 			String readyState = session.evaluate("document ? document.readyState : ''");
