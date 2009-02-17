@@ -45,15 +45,15 @@ if (!Twist.dom) {
         for (var i = 0; i < properties.length; i++) {
             var property = properties[i];
             var value = element[property];
-            if (property === "action") {
-                value = element.getAttribute("action");
+
+            var attrs = ["action", "href", "src"];
+            for (var j = 0; j < attrs.length; j++) {
+	            if (property === attrs[j]) {
+	                value = element.getAttribute(property);
+		            break;
+	            }
             }
-            if (property === "href") {
-                value = element.getAttribute("href");
-            }
-            if (property === "src") {
-                value = element.getAttribute("src");
-            }
+
             var typeOf = typeof(value);
             if (typeOf !== "undefined" && value !== null) {
                 if (property === "className") {
@@ -94,7 +94,7 @@ if (!Twist.dom) {
         }		
         
         xml += attributeString("Twist.domIndex", Twist.domIndex(element));
-        
+    
         if (element.hasChildNodes() || tagName === "script" || tagName === "link") {
             xml += ">";
             var needsCData = tagName === "script" || tagName === "noscript" || tagName === "style";
@@ -108,7 +108,10 @@ if (!Twist.dom) {
                 var childNodes = element.childNodes;
                 var child = null;
                 for (var i = 0; child = childNodes[i++];) {
-                    xml += Twist.dom(child);
+                	try {
+	                    xml += Twist.dom(child);
+                	} catch (e) {
+                	}
                 }
             }
             if (needsCData) {
