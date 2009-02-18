@@ -717,7 +717,7 @@ public class TwistSelenium implements Selenium {
 				URL realUrl = new URL(browserUrl);
 				url = new URL(realUrl.getProtocol(), realUrl.getHost(), realUrl.getPort(), url).toExternalForm();
 			}
-			boolean isSameURL = url.equals(getLocation());
+			boolean isSameURL = url.equals(getLocation()) && !(session.getBrowserFamily() == BrowserFamily.SAFARI);
 			if (isSameURL) {
 				addLocationURLExclusionPattern(url);
 			}
@@ -1004,7 +1004,6 @@ public class TwistSelenium implements Selenium {
 	}
 
 	private Element locate(String locator) {
-//		waitForIdle();
 		Element locate = session.locate(locator);
 		session.evaluate(session.domExpression(locate) + ".scrollIntoView()");
 		return locate;
