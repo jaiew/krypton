@@ -45,7 +45,7 @@ Building:
 =========
 
 Run ant -q to build all the projects. Runt ant all-tests to run the Selenium suite in parallel in all installed and supported browsers.
-Ant and svn have to both be on the path.
+Ant and svn have to both be on the path. On Mac you have to set ANT_OPTS=-Dosgi.ws=cocoa until Eclipse changes it's default osgi.ws from carbon on Mac.
 
 
 Unit/Integration Testing:
