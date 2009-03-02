@@ -146,6 +146,7 @@ public class SeleneseTestCase extends TestCase {
 		});
 		while ((!display.isDisposed())) {
 			try {
+//				display.update();
 				display.readAndDispatch();
 			} catch (Exception whoCares) {
 			}

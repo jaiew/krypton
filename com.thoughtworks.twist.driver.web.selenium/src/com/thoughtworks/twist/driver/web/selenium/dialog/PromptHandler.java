@@ -25,42 +25,43 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.eclipse.swt.browser.ProgressEvent;
-import org.eclipse.swt.browser.ProgressListener;
-import org.eclipse.swt.browser.StatusTextEvent;
-import org.eclipse.swt.browser.StatusTextListener;
+import org.eclipse.swt.browser.BrowserFunction;
+import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.LocationListener;
 
 import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 
-public class PromptHandler implements ProgressListener, StatusTextListener, DialogHandler {
-	private static final String JAVASCRIPT_PROMPT = "javascript-prompt: ";
-
+public class PromptHandler implements LocationListener, DialogHandler {
 	private final BrowserSession session;
 	private List<String> prompts = new ArrayList<String>();
 	Log log = LogFactory.getLog(getClass());
 
+	private String answer = "";
+
+	private BrowserFunction prompt;
+
 	public PromptHandler(BrowserSession session) {
 		this.session = session;
-		session.getBrowser().addProgressListener(this);
-		session.getBrowser().addStatusTextListener(this);
-		completed(null);
+		session.getBrowser().addLocationListener(this);
 	}
 
-	public void changed(ProgressEvent event) {
-	}
-
-	public void completed(ProgressEvent event) {
-		session.execute(
-						"if (!Twist) { var Twist = {}; } if (Twist.promptAnswer === undefined) { Twist.promptAnswer = ''; } window.prompt = function(message, value) { window.status = '"
-								+ JAVASCRIPT_PROMPT
-								+ "' + message; window.status =''; var answer = Twist.promptAnswer; if (value) { answer = value; } Twist.promptAnswer = ''; return answer; }");
-	}
-
-	public void changed(StatusTextEvent event) {
-		if (event.text.startsWith(JAVASCRIPT_PROMPT)) {
-			prompts.add(event.text.substring(JAVASCRIPT_PROMPT.length()));
-			log.info("prompt: " + prompts.get(prompts.size() - 1));
+	public void changed(LocationEvent event) {
+		if (event.top) {			
+			if (prompt != null) {
+				prompt.dispose();
+			}
+			prompt = new BrowserFunction(session.getBrowser(), "prompt") {
+				public Object function(Object[] arguments) {
+					prompts.add((String) arguments[0]);
+					String result = arguments.length == 2 ? arguments[1] + "" : answer;
+					answer = "";
+					return result;
+				}
+			};
 		}
+	}
+
+	public void changing(LocationEvent event) {
 	}
 
 	public String getMessage() {
@@ -72,7 +73,6 @@ public class PromptHandler implements ProgressListener, StatusTextListener, Dial
 	}
 
 	public void answer(String answer) {
-		session.getBrowser().execute("if (!Twist) { var Twist = {}; } Twist.promptAnswer = '" + answer + "';");
-		session.pumpEvents();
+		this.answer = answer;
 	}
 }

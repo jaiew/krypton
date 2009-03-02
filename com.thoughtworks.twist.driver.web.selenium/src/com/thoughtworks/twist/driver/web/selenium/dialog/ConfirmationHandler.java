@@ -25,42 +25,42 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.eclipse.swt.browser.ProgressEvent;
-import org.eclipse.swt.browser.ProgressListener;
-import org.eclipse.swt.browser.StatusTextEvent;
-import org.eclipse.swt.browser.StatusTextListener;
+import org.eclipse.swt.browser.BrowserFunction;
+import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.LocationListener;
 
 import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 
-public class ConfirmationHandler implements ProgressListener, StatusTextListener, DialogHandler {
-	private static final String JAVASCRIPT_CONFIRM = "javascript-confirm: ";
-
+public class ConfirmationHandler implements LocationListener, DialogHandler {
 	private final BrowserSession session;
 	private List<String> confirmations = new ArrayList<String>();
+	private boolean confirmationAnswer = true;
+	private BrowserFunction confirm;
+
 	Log log = LogFactory.getLog(getClass());
 
 	public ConfirmationHandler(BrowserSession session) {
 		this.session = session;
-		session.getBrowser().addProgressListener(this);
-		session.getBrowser().addStatusTextListener(this);
-		completed(null);
+		session.getBrowser().addLocationListener(this);
 	}
 
-	public void changed(ProgressEvent event) {
-	}
-
-	public void completed(ProgressEvent event) {
-		session.execute(
-						"if (!Twist) { var Twist = {}; } if (Twist.confirmationAnswer === undefined) { Twist.confirmationAnswer = true; } window.confirm = function(message) { window.status = '"
-								+ JAVASCRIPT_CONFIRM
-								+ "' + message; window.status = ''; var answer = Twist.confirmationAnswer; Twist.confirmationAnswer = true; return answer; }");
-	}
-
-	public void changed(StatusTextEvent event) {
-		if (event.text.startsWith(JAVASCRIPT_CONFIRM)) {
-			confirmations.add(event.text.substring(JAVASCRIPT_CONFIRM.length()));
-			log.info("confirmation: " + confirmations.get(confirmations.size() - 1));
+	public void changed(LocationEvent event) {
+		if (event.top) {			
+			if (confirm != null) {
+				confirm.dispose();
+			}
+			confirm = new BrowserFunction(session.getBrowser(), "confirm") {
+				public Object function(Object[] arguments) {
+					confirmations.add((String) arguments[0]);
+					boolean result = confirmationAnswer;
+					confirmationAnswer = true;
+					return result;
+				}
+			};
 		}
+	}
+
+	public void changing(LocationEvent event) {
 	}
 
 	public String getMessage() {
@@ -72,10 +72,10 @@ public class ConfirmationHandler implements ProgressListener, StatusTextListener
 	}
 
 	public void cancel() {
-		session.execute("if (!Twist) { var Twist = {}; } Twist.confirmationAnswer = false");
+		confirmationAnswer = false;
 	}
 
 	public void ok() {
-		session.execute("if (!Twist) { var Twist = {}; } Twist.confirmationAnswer = true");
+		confirmationAnswer = true;
 	}
 }

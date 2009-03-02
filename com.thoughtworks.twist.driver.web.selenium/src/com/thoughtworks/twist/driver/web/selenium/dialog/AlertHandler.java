@@ -25,40 +25,40 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.eclipse.swt.browser.ProgressEvent;
-import org.eclipse.swt.browser.ProgressListener;
-import org.eclipse.swt.browser.StatusTextEvent;
-import org.eclipse.swt.browser.StatusTextListener;
+import org.eclipse.swt.browser.BrowserFunction;
+import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.LocationListener;
 
 import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 
-public class AlertHandler implements ProgressListener, StatusTextListener, DialogHandler {
-	private static final String JAVASCRIPT_ALERT = "javascript-alert: ";
-
+public class AlertHandler implements LocationListener, DialogHandler {
 	private final BrowserSession session;
 	private List<String> alerts = new ArrayList<String>();
     Log log = LogFactory.getLog(getClass());
 
+	private BrowserFunction alert;
+
 	public AlertHandler(BrowserSession session) {
 		this.session = session;
-		session.getBrowser().addProgressListener(this);
-		session.getBrowser().addStatusTextListener(this);
-		completed(null);
+		session.getBrowser().addLocationListener(this);
 	}
 
-	public void changed(ProgressEvent event) {
-	}
 
-	public void completed(ProgressEvent event) {
-		session.execute("window.alert = function(message) { window.status = '"
-				+ JAVASCRIPT_ALERT + "' + message; window.status = ''; }");
-	}
-
-	public void changed(StatusTextEvent event) {
-		if (event.text.startsWith(JAVASCRIPT_ALERT)) {
-			alerts.add(event.text.substring(JAVASCRIPT_ALERT.length()));
-			log.info("alert: " + alerts.get(alerts.size() - 1));
+	public void changed(LocationEvent event) {
+		if (event.top) {
+			if (alert != null) {
+				alert.dispose();
+			}
+			alert = new BrowserFunction(session.getBrowser(), "alert") {
+				public Object function(Object[] arguments) {
+					alerts.add((String) arguments[0]);
+					return null;
+				}
+			};
 		}
+	}
+
+	public void changing(LocationEvent event) {
 	}
 
 	public String getMessage() {
