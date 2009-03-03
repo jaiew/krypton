@@ -266,7 +266,7 @@
 
 				<jvmarg value="${extra.jvm.arg}" />
 				<jvmarg value="-Dtwist.driver.web.browser=@{browser}" />
-
+				<jvmarg value="-Dorg.eclipse.swt.browser.XULRunnerPath=${org.eclipse.swt.browser.XULRunnerPath}" />
 				<formatter type="xml" />
 
 				<batchtest todir="${junit.output.dir}/@{browser}">
