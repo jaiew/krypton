@@ -178,7 +178,6 @@ public class SeleneseTestCase extends TestCase {
 				context.setWar(new File("web").getAbsolutePath());
 			}
 			server.addHandler(context);
-			server.setStopAtShutdown(true);
 
 			server.start();
 		} catch (BindException alreadyRunning) {

@@ -30,7 +30,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -220,24 +219,23 @@ public class TwistSelenium implements Selenium {
 	}
 
 	private void internalSetCookie(String name, String value, String optionsString) {
-		String path = "";
-		String expires = "";
+		String cookie = name.trim() + "=" + value;
 		
 		Matcher matcher = Pattern.compile("max_age=(-?\\d+)").matcher(optionsString);
 		if (matcher.find()) {
 			int days = Integer.parseInt(matcher.group(1));
 			Date date = new Date();
 			date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-			expires = "; expires=' + new Date(" + date.getTime() + ").toUTCString() + '";
+			cookie += "; expires=' + new Date(" + date.getTime() + ").toUTCString() + '";
 		}
+
 		matcher = Pattern.compile("path=([\\w|/|-]+)").matcher(optionsString);
+		String path = "";
 		if (matcher.find()) {
 			path = matcher.group(1);
 		} else if (optionsString.startsWith("/")) {
 			path = optionsString;
-		}
-
-		if (path.length() == 0) {
+		} else {			
 			try {
 				path = new URL(getLocation()).getPath();
 				if (path.contains("/")) {					
@@ -247,9 +245,8 @@ public class TwistSelenium implements Selenium {
 				throw new RuntimeException(e);
 			}
 		}
-		path = "; path=" + path.trim();
+		cookie += "; path=" + path.trim();
 		
-		String cookie = name.trim() + "=" + value + expires + path;
 		session.evaluate(session.getDocumentExpression() + ".cookie = '" + cookie + "'");
 	}
 
