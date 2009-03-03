@@ -18,7 +18,7 @@
  *   Manish Chakravarty
  *   Pavan K S
  ***************************************************************************/
-package com.thoughtworks.selenium.corebasedskip;
+package com.thoughtworks.selenium.corebased;
 import com.thoughtworks.selenium.*;
 /**
  * @author XlateHtmlSeleneseToJava

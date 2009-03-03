@@ -25,10 +25,16 @@ import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.swt.SWT;
 import org.w3c.dom.Element;
@@ -201,7 +207,8 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void createCookie(String nameValuePair, String optionsString) {
-		throw new UnsupportedOperationException();
+		String[] nameAndValue = nameValuePair.split("=");
+		internalSetCookie(nameAndValue[0], nameAndValue[1], optionsString);
 	}
 
 	public void deleteAllVisibleCookies() {
@@ -209,7 +216,41 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void deleteCookie(String name, String optionsString) {
-		throw new UnsupportedOperationException();
+		internalSetCookie(name, "", "max_age=-1, " + optionsString);
+	}
+
+	private void internalSetCookie(String name, String value, String optionsString) {
+		String path = "";
+		String expires = "";
+		
+		Matcher matcher = Pattern.compile("max_age=(-?\\d+)").matcher(optionsString);
+		if (matcher.find()) {
+			int days = Integer.parseInt(matcher.group(1));
+			Date date = new Date();
+			date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+			expires = "; expires=' + new Date(" + date.getTime() + ").toUTCString() + '";
+		}
+		matcher = Pattern.compile("path=([\\w|/|-]+)").matcher(optionsString);
+		if (matcher.find()) {
+			path = matcher.group(1);
+		} else if (optionsString.startsWith("/")) {
+			path = optionsString;
+		}
+
+		if (path.length() == 0) {
+			try {
+				path = new URL(getLocation()).getPath();
+				if (path.contains("/")) {					
+					path = path.substring(0, path.lastIndexOf("/") + 1);
+				}
+			} catch (MalformedURLException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		path = "; path=" + path.trim();
+		
+		String cookie = name.trim() + "=" + value + expires + path;
+		session.evaluate(session.getDocumentExpression() + ".cookie = '" + cookie + "'");
 	}
 
 	public void doubleClick(String locator) {
@@ -314,11 +355,21 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public String getCookie() {
-		throw new UnsupportedOperationException();
+		return session.evaluate(session.getDocumentExpression() + ".cookie");
 	}
 
 	public String getCookieByName(String name) {
-		throw new UnsupportedOperationException();
+		try {
+			for (String cookie : getCookie().split(";")) {
+				String[] nameAndValue = cookie.split("=");
+				if (name.equals(URLDecoder.decode(nameAndValue[0], "UTF-8"))) {
+					return URLDecoder.decode(nameAndValue[1], "UTF-8");
+				}
+			}
+			throw new IllegalArgumentException("Cookie '" + name + "' not found.");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public Number getCursorPosition(String locator) {
@@ -547,7 +598,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public boolean isCookiePresent(String name) {
-		throw new UnsupportedOperationException();
+		return getCookieByName(name) != null;
 	}
 
 	public boolean isEditable(String locator) {
@@ -746,7 +797,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void refresh() {
-        session.getBrowser().setUrl(getLocation());
+		session.getBrowser().setUrl(getLocation());
 		waitForIdle();
 	}
 
@@ -946,7 +997,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	private void typeKeys(Element element, String value) {
-		if (BrowserFamily.IE == session.getBrowserFamily()) {			
+		if (BrowserFamily.IE == session.getBrowserFamily()) {
 			// Don't like this, but it makes it more consistent in IE.
 			session.evaluate(session.domExpression(element) + ".focus()");
 		} else {

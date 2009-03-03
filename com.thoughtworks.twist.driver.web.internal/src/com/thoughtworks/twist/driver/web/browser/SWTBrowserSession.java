@@ -156,21 +156,6 @@ public class SWTBrowserSession implements BrowserSession {
 		return browserFamily;
 	}
 
-	private static long maxParseTimeInJs = 0;
-	private static long parses = 0;
-	private static long totalParseTimeInJs = 0;
-
-	static {
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			public void run() {
-				if (parses > 0) {
-					System.out.println("Average parse time " + (totalParseTimeInJs / parses) + " out of " + parses + " (max: "
-							+ maxParseTimeInJs + ")");
-				}
-			}
-		});
-	}
-
 	public Document dom() {
 		if (document != null) {
 			return document;
