@@ -59,7 +59,7 @@
 	<property name="twist.driver.web.browser" value="mozilla" />
 
 	<target name="init-svn.version" unless="svn.version">
-		<exec executable="svn" output="${java.io.tmpdir}/svn.properties" dir="." failifexecutionfails="false">
+		<exec executable="svn" output="${java.io.tmpdir}/svn.properties" dir="${workspace.dir}" failifexecutionfails="false">
 			<arg value="info" />
 		</exec>
 
@@ -267,6 +267,7 @@
 				<jvmarg value="${extra.jvm.arg}" />
 				<jvmarg value="-Dtwist.driver.web.browser=@{browser}" />
 				<jvmarg value="-Dorg.eclipse.swt.browser.XULRunnerPath=${org.eclipse.swt.browser.XULRunnerPath}" />
+
 				<formatter type="xml" />
 
 				<batchtest todir="${junit.output.dir}/@{browser}">
