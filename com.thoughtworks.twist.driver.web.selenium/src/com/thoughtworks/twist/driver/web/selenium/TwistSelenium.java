@@ -211,7 +211,14 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void deleteAllVisibleCookies() {
-		throw new UnsupportedOperationException();
+		try {
+			for (String cookie : getCookie().split(";")) {
+				String[] nameAndValue = cookie.split("=");
+				deleteCookie(URLDecoder.decode(nameAndValue[0], "UTF-8"), "");
+			}
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public void deleteCookie(String name, String optionsString) {

@@ -166,17 +166,13 @@ public class SeleneseTestCase extends TestCase {
 			port = findAvailablePort();
 			connector.setPort(port);
 			server.addConnector(connector);
-
+			
 			WebAppContext context = new WebAppContext();
 			context.setContextPath("/selenium-server");
 
-			if (new File("com.thoughtworks.twist.driver.web.selenium.test/web").isDirectory()) {
-				context.setWar(new File("com.thoughtworks.twist.driver.web.selenium.test/web").getAbsolutePath());
-			} else if (new File("../com.thoughtworks.twist.driver.web.selenium.test/web").isDirectory()) {
-				context.setWar(new File("../com.thoughtworks.twist.driver.web.selenium.test/web").getAbsolutePath());
-			} else {
-				context.setWar(new File("web").getAbsolutePath());
-			}
+			File file = new File(SeleneseTestCase.class.getClassLoader().getResource("tests").toURI());
+			context.setWar(file.getParent());
+
 			server.addHandler(context);
 
 			server.start();
