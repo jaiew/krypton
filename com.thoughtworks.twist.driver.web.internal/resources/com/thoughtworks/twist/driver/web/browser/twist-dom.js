@@ -17,12 +17,17 @@ if (!Twist.dom) {
     };
     
     function textContent(element){
-        var text = element.textContent ? element.textContent : element.data;
+        var text = element.textContent;
+		if (!text) {
+			text = element.data;
+		}
         if (!text) {
             return "";
         }
         return escapeXml(text);
     }
+	
+	Twist.domProperties = ["checked", "value", "selected", "disabled", "readOnly", "type", "id", "name", "className", "title", "style", "action", "href", "multiple", "alt", "src", "maxLength", "length", "rows", "size", "cols", "htmlFor", "width", "height", "caption", "colSpan", "rowSpan"];
     
     Twist.dom = function(element){
         if (element.nodeType === 8) {
@@ -39,20 +44,14 @@ if (!Twist.dom) {
         }
         var xml = "<" + tagName;
         
-        var attributes = {};
-        
-        var properties = ["checked", "value", "selected", "disabled", "readOnly", "type", "id", "name", "className", "title", "style", "action", "href", "multiple", "alt", "src", "maxLength", "length", "rows", "size", "cols", "htmlFor", "width", "height", "caption", "colSpan", "rowSpan"];
-        for (var i = 0; i < properties.length; i++) {
-            var property = properties[i];
-            var value = element[property];
-
-            var attrs = ["action", "href", "src"];
-            for (var j = 0; j < attrs.length; j++) {
-	            if (property === attrs[j]) {
-	                value = element.getAttribute(property);
-		            break;
-	            }
-            }
+        for (var i = 0; i < Twist.domProperties.length; i++) {
+            var property = Twist.domProperties[i];
+			
+			if (/^(?:action|href|src)$/.test(property)) {
+                value = element.getAttribute(property);
+			} else {
+	            var value = element[property];
+			}
 
             var typeOf = typeof(value);
             if (typeOf !== "undefined" && value !== null) {
@@ -65,16 +64,14 @@ if (!Twist.dom) {
                 if (property === "style") {
                     if (element.style.cssText) {
                         value = element.style.cssText;
-                    }
-                    else {
+                    } else {
                         value = "";
                     }
                 }
-                if (typeOf === "object") {
-                    if (property === "name") {
-                        value = element.attributes["name"].value;
-                    }
+                if (typeOf === "object" && property === "name") {
+                    value = element.attributes["name"].value;
                 }
+
                 value = value.toString();
                 if (value === "" && property === "value") {
                     if (element.type === "reset") {
@@ -105,13 +102,13 @@ if (!Twist.dom) {
                 xml += element.value;
             }
             else {
-                var childNodes = element.childNodes;
-                var child = null;
-                for (var i = 0; child = childNodes[i++];) {
+                var child = element.firstChild;
+                while (child != null) {
                 	try {
 	                    xml += Twist.dom(child);
                 	} catch (dontForgetThisSwallowedException) {
-                	}
+                	}                    
+                    child = child.nextSibling;
                 }
             }
             if (needsCData) {
@@ -125,12 +122,11 @@ if (!Twist.dom) {
     };
     
     Twist.domIndex = function(element){
-        var parent = element.parentNode;
-        for (var i = 0; i < parent.childNodes.length; i++) {
-            if (parent.childNodes[i] === element) {
-                return i;
-            }
+        var index = -1;
+        while (element != null) {
+            index++;
+            element = element.previousSibling;
         }
-        return -1;
+        return index;
     };
 }
