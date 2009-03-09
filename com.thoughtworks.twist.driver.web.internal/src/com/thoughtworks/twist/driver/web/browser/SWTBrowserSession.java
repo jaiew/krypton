@@ -197,7 +197,7 @@ public class SWTBrowserSession implements BrowserSession {
 		parser.parse(new InputSource(new StringReader(dom)));
 		document = parser.getDocument();
 		postProcesAttributes(document);
-		log.warn("innerHTML took: " + (System.currentTimeMillis() - now) + " ms.");
+		log.warn("innerHTML took: " + (System.currentTimeMillis() - now) + " ms. (" + dom.length() + " chars)");
 		return dom;
 	}
 

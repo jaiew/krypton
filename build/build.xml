@@ -59,18 +59,7 @@
 	<property name="twist.driver.web.browser" value="mozilla" />
 
 	<target name="init-svn.version" unless="svn.version">
-		<exec executable="svn" output="${java.io.tmpdir}/svn.properties" dir="${workspace.dir}" failifexecutionfails="false">
-			<arg value="info" />
-		</exec>
-
-		<loadproperties srcfile="${java.io.tmpdir}/svn.properties">
-			<filterchain>
-				<prefixlines prefix="svn." />
-				<deletecharacters chars="\ " />
-			</filterchain>
-		</loadproperties>
-
-		<property name="svn.version" value="${svn.LastChangedRev}" />
+		<exec executable="svnversion" outputproperty="svn.version" dir="${workspace.dir}" failifexecutionfails="false" />
 	</target>
 
 	<target name="init" depends="init-svn.version">

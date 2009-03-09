@@ -16,4 +16,6 @@ Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/commons-logging-1.1.1.jar,
  .,
  resources/,
- lib/js.jar
+ lib/js.jar,
+ lib/nekohtml-1.9.11.jar,
+ lib/xercesImpl-2.9.1.jar
