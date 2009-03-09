@@ -514,23 +514,6 @@ public class SeleneseTestCase extends TestCase {
 		this.captureScreetShotOnFailure = captureScreetShotOnFailure;
 	}
 
-	protected void waitForActivity() throws InterruptedException {
-		// String browserName = selenium.getBrowserSession().getBrowserName();
-		// if ("Mozilla".equals(browserName) &&
-		// !SWT.getPlatform().equals("win32")) {
-		// selenium.getBrowserSession().waitForActivity();
-		// } else {
-//		Thread.sleep(3000);
-//		final BrowserSession session = getTwistSelenium().getBrowserSession();
-//		session.pumpEvents();
-//		session.getBrowser().getDisplay().syncExec(new Runnable() {
-//			public void run() {
-//				session.waitForIdle();
-//			}
-//		});
-		// }
-	}
-
 	private void runBareWithOneThread() throws Throwable, Exception {
 		if (!isCaptureScreetShotOnFailure()) {
 			// startJetty();

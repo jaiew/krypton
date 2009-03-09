@@ -53,8 +53,6 @@ public class TestRefresh extends SeleneseTestCase {
             selenium.click("slowRefresh");
             selenium.waitForPageToLoad("5000");
 
-            waitForActivity();
-
             assertTrue(!selenium.isTextPresent("Changed the text"));
 
             checkForVerificationErrors();

@@ -18,16 +18,16 @@ if (!Twist.dom) {
     
     function textContent(element){
         var text = element.textContent;
-		if (!text) {
-			text = element.data;
-		}
+        if (!text) {
+            text = element.data;
+        }
         if (!text) {
             return "";
         }
         return escapeXml(text);
     }
-	
-	Twist.domProperties = ["checked", "value", "selected", "disabled", "readOnly", "type", "id", "name", "className", "title", "style", "action", "href", "multiple", "alt", "src", "maxLength", "length", "rows", "size", "cols", "htmlFor", "width", "height", "caption", "colSpan", "rowSpan"];
+    
+    Twist.domProperties = ["checked", "value", "selected", "disabled", "readOnly", "type", "id", "name", "className", "title", "style", "action", "href", "multiple", "alt", "src", "maxLength", "length", "rows", "size", "cols", "htmlFor", "width", "height", "caption", "colSpan", "rowSpan"];
     
     Twist.dom = function(element){
         if (element.nodeType === 8) {
@@ -46,13 +46,14 @@ if (!Twist.dom) {
         
         for (var i = 0; i < Twist.domProperties.length; i++) {
             var property = Twist.domProperties[i];
-			
-			if (/^(?:action|href|src)$/.test(property)) {
+            
+            if (/^(?:action|href|src)$/.test(property)) {
                 value = element.getAttribute(property);
-			} else {
-	            var value = element[property];
-			}
-
+            }
+            else {
+                var value = element[property];
+            }
+            
             var typeOf = typeof(value);
             if (typeOf !== "undefined" && value !== null) {
                 if (property === "className") {
@@ -64,14 +65,15 @@ if (!Twist.dom) {
                 if (property === "style") {
                     if (element.style.cssText) {
                         value = element.style.cssText;
-                    } else {
+                    }
+                    else {
                         value = "";
                     }
                 }
                 if (typeOf === "object" && property === "name") {
                     value = element.attributes["name"].value;
                 }
-
+                
                 value = value.toString();
                 if (value === "" && property === "value") {
                     if (element.type === "reset") {
@@ -88,10 +90,10 @@ if (!Twist.dom) {
                     xml += attributeString(property.toLowerCase(), value);
                 }
             }
-        }		
+        }
         
-        xml += attributeString("Twist.domIndex", Twist.domIndex(element));
-    
+        xml += attributeString("twist.domindex", Twist.domIndex(element));
+        
         if (element.hasChildNodes() || tagName === "script" || tagName === "link") {
             xml += ">";
             var needsCData = tagName === "script" || tagName === "noscript" || tagName === "style";
@@ -104,10 +106,11 @@ if (!Twist.dom) {
             else {
                 var child = element.firstChild;
                 while (child != null) {
-                	try {
-	                    xml += Twist.dom(child);
-                	} catch (dontForgetThisSwallowedException) {
-                	}                    
+                    try {
+                        xml += Twist.dom(child);
+                    } 
+                    catch (dontForgetThisSwallowedException) {
+                    }
                     child = child.nextSibling;
                 }
             }
@@ -128,5 +131,61 @@ if (!Twist.dom) {
             element = element.previousSibling;
         }
         return index;
+    };
+    
+    Twist.domFromInnerHTML = function(element){
+        var clone = element.cloneNode(true);
+
+        Twist.walkDom(clone, element);
+
+        var tagName = clone.tagName.toLowerCase();
+        return "<" + tagName + ">" + clone.innerHTML + "</" + tagName + ">";
+    };
+    
+    Twist.walkDom = function(element, original){
+        var index = 0;
+        while (element != null) {
+            Twist.updateAttributes(element, original, index);
+
+            Twist.walkDom(element.firstChild, original.firstChild);
+
+            element = element.nextSibling;
+            original = original.nextSibling;
+            index++;
+        }
+    };
+    
+    var propertiesOverAttributes = ["checked", "value", "selected", "disabled", "readOnly", "id", "name", "multiple"];
+    
+    Twist.updateAttributes = function(element, original, index){
+        if (element.nodeType !== 1) {
+            return;
+        }
+        element.setAttribute("twist.domindex", index);
+
+        for (var i = 0; i < propertiesOverAttributes.length; i++) {
+            var property = propertiesOverAttributes[i];
+            var value = original[property];
+
+            var typeOf = typeof(value);
+            if (typeOf === "undefined" || value === null) {
+                continue;
+            }
+
+            if (value === "" && property === "value") {
+                if (element.type === "reset") {
+                    value = "Reset";
+                }
+                if (element.type === "submit") {
+                    value = "Submit";
+                }
+                if (element.type === "checkbox" || element.type === "radio") {
+                    value = "on";
+                }
+            }
+            if (value !== "" || property === "value") {
+                element.setAttribute(property, value.toString());
+            }
+        }
     };
 }

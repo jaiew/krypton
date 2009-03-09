@@ -49,7 +49,6 @@ public class TestWaitForNot extends SeleneseTestCase
 				}
 				catch (Exception ignore) {
 				}
-				waitForActivity();
 				pause(1000);
 			}
 			assertTrue(sawCondition7);
@@ -72,7 +71,6 @@ public class TestWaitForNot extends SeleneseTestCase
 				}
 				catch (Exception ignore) {
 				}
-                waitForActivity();
 				pause(1000);
 			}
 			assertTrue(sawCondition12);

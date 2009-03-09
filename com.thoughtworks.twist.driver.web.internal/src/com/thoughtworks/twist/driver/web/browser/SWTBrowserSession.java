@@ -22,9 +22,11 @@ package com.thoughtworks.twist.driver.web.browser;
 
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.io.BufferedReader;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +44,8 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.xerces.parsers.DOMParser;
+import org.cyberneko.html.HTMLConfiguration;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.StatusTextEvent;
 import org.eclipse.swt.browser.StatusTextListener;
@@ -51,6 +55,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.Parser;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -59,6 +64,7 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.thoughtworks.twist.driver.web.browser.jsmin.JSMin;
 import com.thoughtworks.twist.driver.web.browser.locator.ElementNotFoundException;
 import com.thoughtworks.twist.driver.web.browser.locator.LocatorStrategy;
 import com.thoughtworks.twist.driver.web.browser.wait.WaitStrategy;
@@ -72,6 +78,7 @@ public class SWTBrowserSession implements BrowserSession {
 
 	private Map<String, String> resourcesByName = new HashMap<String, String>();
 	private Set<String> verifiedJavaScripts = new HashSet<String>();
+	private Map<String, String> minifiedJavaScripts = new HashMap<String, String>();
 
 	private Shell shell;
 	private DocumentBuilder documentBuilder;
@@ -106,6 +113,11 @@ public class SWTBrowserSession implements BrowserSession {
 
 			xpath = XPathFactory.newInstance().newXPath();
 
+			HTMLConfiguration configuration = new HTMLConfiguration();
+			configuration.setProperty("http://cyberneko.org/html/properties/names/elems", "lower");
+			configuration.setProperty("http://cyberneko.org/html/properties/names/attrs", "lower");
+			parser = new DOMParser(configuration);
+
 			log.info("Created BrowserSession using browser " + getBrowserFamily());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -119,6 +131,7 @@ public class SWTBrowserSession implements BrowserSession {
 			shell.setVisible(Boolean.parseBoolean(System.getProperty("twist.driver.web.visible", "true")));
 			shell.setFullScreen(Boolean.parseBoolean(System.getProperty("twist.driver.web.fullscreen", "false")));
 			shell.setMinimized(Boolean.parseBoolean(System.getProperty("twist.driver.web.minimized", "false")));
+			shell.setMaximized(Boolean.parseBoolean(System.getProperty("twist.driver.web.maximized", "false")));
 			// shell.moveBelow(null);
 		}
 	}
@@ -149,11 +162,16 @@ public class SWTBrowserSession implements BrowserSession {
 		log.trace("Injecting " + script + " base class is " + baseClass);
 		String code = readResource(script, baseClass);
 		verifyJavaScript(code);
+		code = minifyJavaScript(script, code);
 		browser.execute(code);
 	}
 
 	public BrowserFamily getBrowserFamily() {
 		return browserFamily;
+	}
+
+	DOMParser parser;
+	{
 	}
 
 	public Document dom() {
@@ -163,16 +181,45 @@ public class SWTBrowserSession implements BrowserSession {
 		String dom = "";
 		try {
 			inject("twist-dom.js");
-			// parses++;
-			long now = System.currentTimeMillis();
-			dom = XHTML1_STRICT_DOCTYPE + domAsString();
+			// long now = System.currentTimeMillis();
+			// dom = XHTML1_STRICT_DOCTYPE + domAsString();
+			// document = documentBuilder.parse(new InputSource(new
+			// StringReader(dom)));
+			// log.warn("Parsing DOM took: " + (System.currentTimeMillis() -
+			// now) + " ms. (" + dom.length() + " chars)");
 
-			document = documentBuilder.parse(new InputSource(new StringReader(dom)));
-			log.debug("Parsing DOM took: " + (System.currentTimeMillis() - now) + " ms. (" + dom.length() + " chars)");
+			long now = System.currentTimeMillis();
+			dom = evaluate("Twist.domFromInnerHTML(" + getDocumentExpression() + ".documentElement)");
+			parser.parse(new InputSource(new StringReader(dom)));
+			document = parser.getDocument();
+			patchIds(document);
+
+			log.warn("innerHTML took: " + (System.currentTimeMillis() - now) + " ms.");
+			System.out.println((Runtime.getRuntime().totalMemory()));
+
+			// long now = System.currentTimeMillis();
+			// HtmlCleaner cleaner = new HtmlCleaner(new StringReader(dom));
+			// cleaner.clean();
+			// System.out.println(cleaner.getBrowserCompactXmlAsString());
+			// document = cleaner.createDOM();
+			// log.warn("innerHTML took: " + (System.currentTimeMillis() - now)
+			// + " ms.");
+
 			return document;
 		} catch (Exception e) {
 			log.error(dom, e);
 			throw new RuntimeException(e);
+		}
+	}
+
+	private void patchIds(Document document) {
+		NodeList allElements = document.getElementsByTagName("*");
+		for (int i = 0; i < allElements.getLength(); i++) {
+			Element element = (Element) allElements.item(i);
+			Attr id = element.getAttributeNode("id");
+			if (id != null) {
+				element.setIdAttributeNode(id, true);
+			}
 		}
 	}
 
@@ -229,13 +276,13 @@ public class SWTBrowserSession implements BrowserSession {
 	public void fireEvent(Element element, String eventName) {
 		inject("twist-events.js", getClass());
 		log.debug("Firing JavaScript event '" + eventName + "' on " + element);
-		evaluate("Twist.fireEvent(" + domExpression(element) + ", '" + eventName + "')");
+		execute("Twist.fireEvent(" + domExpression(element) + ", '" + eventName + "')");
 	}
 
 	public void setCursorPosition(Element element, int position) {
 		inject("twist-cursor-position.js", getClass());
 		log.debug("Setting cursor positon to " + position + " at " + element);
-		evaluate("Twist.setCursorPosition(" + domExpression(element) + ", " + position + ")");
+		execute("Twist.setCursorPosition(" + domExpression(element) + ", " + position + ")");
 	}
 
 	public int getCursorPosition(Element element) {
@@ -299,7 +346,7 @@ public class SWTBrowserSession implements BrowserSession {
 		String expression = "";
 		Element original = element;
 		while (!(element.getParentNode() instanceof Document)) {
-			expression = ".childNodes[" + element.getAttribute("Twist.domIndex") + "]" + expression;
+			expression = ".childNodes[" + element.getAttribute("twist.domindex") + "]" + expression;
 			element = (Element) element.getParentNode();
 		}
 		String domExpression = getDocumentExpression() + ".documentElement" + expression;
@@ -316,15 +363,15 @@ public class SWTBrowserSession implements BrowserSession {
 		if (resourcesByName.containsKey(key)) {
 			return resourcesByName.get(key);
 		}
-
-		BufferedReader in = null;
+		InputStream in = null;
 		try {
-			in = new BufferedReader(new InputStreamReader(baseClass.getResourceAsStream(resource)));
-			String line = null;
-			String resourceAsString = "";
-			while ((line = in.readLine()) != null) {
-				resourceAsString += line + "\n";
+			in = new BufferedInputStream(baseClass.getResourceAsStream(resource));
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			int b = -1;
+			while ((b = in.read()) != -1) {
+				out.write(b);
 			}
+			String resourceAsString = new String(out.toByteArray(), "UTF-8");
 			resourcesByName.put(key, resourceAsString);
 			return resourceAsString;
 		} catch (IOException e) {
@@ -353,6 +400,21 @@ public class SWTBrowserSession implements BrowserSession {
 			verifiedJavaScripts.add(script);
 		} finally {
 			Context.exit();
+		}
+	}
+
+	private String minifyJavaScript(String script, String code) {
+		if (minifiedJavaScripts.containsKey(script)) {
+			return minifiedJavaScripts.get(script);
+		}
+		try {
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			new JSMin(new ByteArrayInputStream(code.getBytes("UTF-8")), out).jsmin();
+			String minified = new String(out.toByteArray(), "UTF-8");
+			minifiedJavaScripts.put(script, minified);
+			return minified;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 

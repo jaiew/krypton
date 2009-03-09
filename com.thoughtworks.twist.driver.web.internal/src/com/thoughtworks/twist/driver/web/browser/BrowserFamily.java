@@ -249,14 +249,6 @@ public enum BrowserFamily {
         return session;
     }
 
-//    private void addTwistLogo(Shell shell) {
-//        Image image = new Image(shell.getDisplay(), Browsers.class.getResourceAsStream("/products-twist.gif"));        
-//        Label logo = new Label(shell, SWT.NONE);
-//        GridData data = new GridData();
-//        logo.setLayoutData(data);
-//        logo.setImage(image);
-//    }
-
     private void addListeners(final Shell shell, final Text location, final Browser browser) {
         browser.addLocationListener(new LocationListener() {
             public void changed(LocationEvent event) {

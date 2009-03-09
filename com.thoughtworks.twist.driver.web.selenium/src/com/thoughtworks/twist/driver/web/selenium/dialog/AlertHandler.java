@@ -43,7 +43,6 @@ public class AlertHandler implements LocationListener, DialogHandler {
 		session.getBrowser().addLocationListener(this);
 	}
 
-
 	public void changed(LocationEvent event) {
 		if (event.top) {
 			if (alert != null) {
@@ -51,7 +50,9 @@ public class AlertHandler implements LocationListener, DialogHandler {
 			}
 			alert = new BrowserFunction(session.getBrowser(), "alert") {
 				public Object function(Object[] arguments) {
-					alerts.add((String) arguments[0]);
+					String message = arguments[0] + "";
+					log.info("alert: " + message);
+					alerts.add(message);
 					return null;
 				}
 			};

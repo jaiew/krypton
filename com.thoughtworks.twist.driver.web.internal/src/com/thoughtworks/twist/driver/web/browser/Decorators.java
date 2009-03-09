@@ -44,6 +44,8 @@ public class Decorators {
 					return method.invoke(anInstance, args);
 				} catch (InvocationTargetException e) {
 					throw unwind(e);
+				} finally {
+					Display.getDefault().update();
 				}
 			}
 			try {
@@ -54,6 +56,8 @@ public class Decorators {
 							result[0] = method.invoke(anInstance, args);
 						} catch (Exception e) {
 							throw new RuntimeException(unwind(e));
+						} finally {
+							Display.getDefault().update();
 						}
 					}
 				});

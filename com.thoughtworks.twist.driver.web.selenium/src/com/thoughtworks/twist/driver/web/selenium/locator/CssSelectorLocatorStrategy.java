@@ -29,13 +29,33 @@ import com.thoughtworks.twist.driver.web.browser.locator.XPathLocatorStrategy;
 
 public class CssSelectorLocatorStrategy extends XPathLocatorStrategy {
     private static final String CSS_EQUALS_PREFIX = "css=";
-
+//	private Context context;
+//	private ScriptableObject scope;
+    
     public boolean canLocate(String locator) {
         return locator != null && locator.startsWith(CSS_EQUALS_PREFIX);
     }
 
     public Element locate(BrowserSession session, String locator) {
-        session.inject("twist-dom-to-xpath.js", DomLocatorStrategy.class);
+//		if (context == null) {
+//			context = new ContextFactory().enterContext();
+//			scope = context.initStandardObjects();
+//			context.evaluateString(scope, session.readResource("twist-cssQuery.js", getClass()), "", 0, null);
+//			context.evaluateString(scope, session.readResource("twist-cssQuery-standard.js", getClass()), "", 0, null);
+//			context.evaluateString(scope, session.readResource("twist-cssQuery-level2.js", getClass()), "", 0, null);
+//			context.evaluateString(scope, session.readResource("twist-cssQuery-level3.js", getClass()), "", 0, null);
+//			ScriptableObject.putProperty(scope, "out", Context.javaToJS(System.out, scope));
+//		}
+//		ScriptableObject.putProperty(scope, "document", Context.javaToJS(session.dom(), scope));
+//		
+//		Object result = context.evaluateString(scope, "Twist.cssQuery('" + locator.substring(CSS_EQUALS_PREFIX.length()) + "')[0]", "", 0, null);
+//		if (result instanceof Undefined) {
+//			return null;
+//		} else {
+//			return (Element) Context.jsToJava(result, Element.class);
+//		}
+
+    	session.inject("twist-dom-to-xpath.js", DomLocatorStrategy.class);
         session.inject("twist-cssQuery.js", getClass());
         session.inject("twist-cssQuery-standard.js", getClass());
         session.inject("twist-cssQuery-level2.js", getClass());

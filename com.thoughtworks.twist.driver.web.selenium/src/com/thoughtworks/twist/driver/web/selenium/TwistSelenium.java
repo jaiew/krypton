@@ -74,6 +74,9 @@ import com.thoughtworks.twist.driver.web.user.UserFactory;
 import static java.util.Arrays.*;
 
 public class TwistSelenium implements Selenium {
+	private static final Pattern COOKIE_PATH_PATTERN = Pattern.compile("path=([\\w|/|-]+)");
+	private static final Pattern COOKIE_MAX_AGE_PATTERN = Pattern.compile("max_age=(-?\\d+)");
+
 	private BrowserSession session;
 	private String title;
 	private List<StringMatcher> stringMatchers = new ArrayList<StringMatcher>();
@@ -144,7 +147,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void assignId(String locator, String identifier) {
-		session.evaluate(session.domExpression(locate(locator)) + ".setAttribute('id', '" + identifier + "')");
+		session.execute(session.domExpression(locate(locator)) + ".setAttribute('id', '" + identifier + "')");
 		waitForIdle();
 	}
 
@@ -228,7 +231,7 @@ public class TwistSelenium implements Selenium {
 	private void internalSetCookie(String name, String value, String optionsString) {
 		String cookie = name.trim() + "=" + value;
 		
-		Matcher matcher = Pattern.compile("max_age=(-?\\d+)").matcher(optionsString);
+		Matcher matcher = COOKIE_MAX_AGE_PATTERN.matcher(optionsString);
 		if (matcher.find()) {
 			int days = Integer.parseInt(matcher.group(1));
 			Date date = new Date();
@@ -236,7 +239,7 @@ public class TwistSelenium implements Selenium {
 			cookie += "; expires=' + new Date(" + date.getTime() + ").toUTCString() + '";
 		}
 
-		matcher = Pattern.compile("path=([\\w|/|-]+)").matcher(optionsString);
+		matcher = COOKIE_PATH_PATTERN.matcher(optionsString);
 		String path = "";
 		if (matcher.find()) {
 			path = matcher.group(1);
@@ -254,7 +257,7 @@ public class TwistSelenium implements Selenium {
 		}
 		cookie += "; path=" + path.trim();
 		
-		session.evaluate(session.getDocumentExpression() + ".cookie = '" + cookie + "'");
+		session.execute(session.getDocumentExpression() + ".cookie = '" + cookie + "'");
 	}
 
 	public void doubleClick(String locator) {
@@ -298,7 +301,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void focus(String locator) {
-		session.evaluate(session.domExpression(locate(locator)) + ".focus()");
+		session.execute(session.domExpression(locate(locator)) + ".focus()");
 	}
 
 	public String getAlert() {
@@ -776,7 +779,7 @@ public class TwistSelenium implements Selenium {
 			if (isSameURL) {
 				addLocationURLExclusionPattern(url);
 			}
-			session.evaluate(session.getDocumentExpression() + ".location = '" + url + "'");
+			session.execute(session.getDocumentExpression() + ".location = '" + url + "'");
 			waitForIdle();
 			if (isSameURL) {
 				removeLocationURLExclusionPattern(url);
@@ -894,7 +897,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	private void setProperty(Element element, String property, String value) {
-		session.evaluate(session.domExpression(element) + "." + property + " = " + value);
+		session.execute(session.domExpression(element) + "." + property + " = " + value);
 	}
 
 	public void selectFrame(String locator) {
@@ -992,7 +995,7 @@ public class TwistSelenium implements Selenium {
 
 	public void type(String locator, String value) {
 		Element element = locate(locator);
-		session.evaluate(session.domExpression(element) + ".value = ''");
+		session.execute(session.domExpression(element) + ".value = ''");
 		typeKeys(element, value);
 	}
 
@@ -1003,7 +1006,7 @@ public class TwistSelenium implements Selenium {
 	private void typeKeys(Element element, String value) {
 		if (BrowserFamily.IE == session.getBrowserFamily()) {
 			// Don't like this, but it makes it more consistent in IE.
-			session.evaluate(session.domExpression(element) + ".focus()");
+			session.execute(session.domExpression(element) + ".focus()");
 		} else {
 			click(element);
 		}
@@ -1060,7 +1063,7 @@ public class TwistSelenium implements Selenium {
 
 	private Element locate(String locator) {
 		Element locate = session.locate(locator);
-		session.evaluate(session.domExpression(locate) + ".scrollIntoView()");
+		session.execute(session.domExpression(locate) + ".scrollIntoView()");
 		return locate;
 	}
 

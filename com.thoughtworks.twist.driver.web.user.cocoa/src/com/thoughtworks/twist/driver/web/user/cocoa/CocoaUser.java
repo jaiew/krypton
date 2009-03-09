@@ -54,10 +54,11 @@ public class CocoaUser implements User {
 		this(findCocoaWindowForShell(), shell);
 	}
 
-	public CocoaUser(NSWindow window, Shell shell) {
+	public CocoaUser(final NSWindow window, final Shell shell) {
 		this.window = window;
 		this.shell = shell;
 		translator = new CocoaKeyTranslator();
+		window.setAutodisplay(false);
 	}
 
 	public void click(int x, int y) {
@@ -105,9 +106,21 @@ public class CocoaUser implements User {
 	// }
 
 	public void type(String string) {
-		for (int i = 0; i < string.length(); i++) {
-			key(string.charAt(i));
+		try {
+			window.disableFlushWindow();
+			for (int i = 0; i < string.length(); i++) {
+				key(string.charAt(i));
+			}
+			pumpEvents();
+		} finally {
+			window.enableFlushWindow();
+			window.flushWindowIfNeeded();
+//			window.display();
 		}
+	}
+
+	private void pumpEvents() {
+		while (!shell.isDisposed() && shell.getDisplay().readAndDispatch());
 	}
 
 	public void key(int c) {
