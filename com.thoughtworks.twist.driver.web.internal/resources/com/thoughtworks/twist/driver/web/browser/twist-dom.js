@@ -156,6 +156,7 @@ if (!Twist.dom) {
     };
     
     var propertiesOverAttributes = ["checked", "value", "selected", "disabled", "readOnly", "id", "name", "multiple"];
+    var isIE = window.ActiveXObject ? true : false;
     
     Twist.updateAttributes = function(element, original, index){
         if (element.nodeType !== 1) {
@@ -171,10 +172,6 @@ if (!Twist.dom) {
             if (typeOf === "undefined" || value === null) {
                 continue;
             }
-            if (window.ActiveXObject) {
-                element[property] = value;
-                continue;
-            }
             
             if (value === "" && property === "value") {
                 if (element.type === "reset") {
@@ -187,7 +184,9 @@ if (!Twist.dom) {
                     value = "on";
                 }
             }
-            if (value !== "" || property === "value") {
+            if (isIE) {
+                element[property] = value;
+            } else  if (value !== "" || property === "value") {
                 element.setAttribute(property, value.toString());
             }
         }
