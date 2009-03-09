@@ -23,6 +23,8 @@ package com.thoughtworks.twist.driver.web.browser.wait;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
@@ -31,7 +33,9 @@ import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 import com.thoughtworks.twist.driver.web.browser.JavascriptException;
 
 public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
-	BrowserSession session;
+    Log log = LogFactory.getLog(getClass());
+
+    BrowserSession session;
 	List<String> exclusionPatterns = new ArrayList<String>();
 	
 	private int numberOfActiveAjaxRequests = 0;
@@ -53,6 +57,7 @@ public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
 				public Object function(Object[] arguments) {
 					if (!isUrlExcluded(arguments[0].toString())) {						
 						numberOfActiveAjaxRequests++;
+						log.debug("new Ajax request, total: " + numberOfActiveAjaxRequests);
 					}
 					return null;
 				}
@@ -64,6 +69,7 @@ public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
 				public Object function(Object[] arguments) {
 					if (!isUrlExcluded(arguments[0].toString())) {						
 						numberOfActiveAjaxRequests--;
+						log.debug("done Ajax request, total: " + numberOfActiveAjaxRequests);
 					}
 					return null;
 				}

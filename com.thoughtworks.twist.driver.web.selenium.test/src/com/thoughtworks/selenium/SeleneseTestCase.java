@@ -520,7 +520,6 @@ public class SeleneseTestCase extends TestCase {
 			SeleneseTestCase.super.runBare();
 			return;
 		}
-		System.out.println("About to run setUp");
 		setUp();
 		try {
 			runTest();

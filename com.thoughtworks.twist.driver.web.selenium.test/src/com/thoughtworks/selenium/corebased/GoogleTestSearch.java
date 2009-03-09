@@ -51,6 +51,7 @@ private void runGoogleTest() throws InterruptedException {
 //        }
 		
 		// type|q|Selenium OpenQA
+		
 		selenium.type("q", "Selenium OpenQA");
 		// verifyValue|q|Selenium OpenQA
 		verifyEquals("Selenium OpenQA", selenium.getValue("q"));

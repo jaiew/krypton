@@ -55,7 +55,9 @@ public class SetTimeoutWaitStrategy implements LocationListener, WaitStrategy {
 			}
 			addActiveSetTimeout = new BrowserFunction(session.getBrowser(), "addActiveSetTimeout") {
 				public Object function(Object[] arguments) {
-					activeSetTimeouts.add(((Number) arguments[0]).intValue());
+					int timeoutId = ((Number) arguments[0]).intValue();
+					activeSetTimeouts.add(timeoutId);
+					log.debug("new setTimeout: " + timeoutId + " total: " + activeSetTimeouts.size());
 					return null;
 				}
 			};
@@ -64,7 +66,9 @@ public class SetTimeoutWaitStrategy implements LocationListener, WaitStrategy {
 			}
 			removeActiveSetTimeout = new BrowserFunction(session.getBrowser(), "removeActiveSetTimeout") {
 				public Object function(Object[] arguments) {
-					activeSetTimeouts.remove(((Number) arguments[0]).intValue());
+					int timeoutId = ((Number) arguments[0]).intValue();
+					activeSetTimeouts.remove(timeoutId);
+					log.debug("done setTimeout: " + timeoutId + " total: " + activeSetTimeouts.size());
 					return null;
 				}
 			};

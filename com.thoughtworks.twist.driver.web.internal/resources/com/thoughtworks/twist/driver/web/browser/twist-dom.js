@@ -135,9 +135,9 @@ if (!Twist.dom) {
     
     Twist.domFromInnerHTML = function(element){
         var clone = element.cloneNode(true);
-
+        
         Twist.walkDom(clone, element);
-
+        
         var tagName = clone.tagName.toLowerCase();
         return "<" + tagName + ">" + clone.innerHTML + "</" + tagName + ">";
     };
@@ -146,9 +146,9 @@ if (!Twist.dom) {
         var index = 0;
         while (element != null) {
             Twist.updateAttributes(element, original, index);
-
+            
             Twist.walkDom(element.firstChild, original.firstChild);
-
+            
             element = element.nextSibling;
             original = original.nextSibling;
             index++;
@@ -162,16 +162,20 @@ if (!Twist.dom) {
             return;
         }
         element.setAttribute("twist.domindex", index);
-
+        
         for (var i = 0; i < propertiesOverAttributes.length; i++) {
             var property = propertiesOverAttributes[i];
             var value = original[property];
-
+            
             var typeOf = typeof(value);
             if (typeOf === "undefined" || value === null) {
                 continue;
             }
-
+            if (window.ActiveXObject) {
+                element[property] = value;
+                continue;
+            }
+            
             if (value === "" && property === "value") {
                 if (element.type === "reset") {
                     value = "Reset";

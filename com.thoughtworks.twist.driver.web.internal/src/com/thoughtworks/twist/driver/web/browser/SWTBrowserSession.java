@@ -71,6 +71,8 @@ import com.thoughtworks.twist.driver.web.browser.wait.WaitStrategy;
 import com.thoughtworks.twist.driver.web.browser.wait.WaitTimedOutException;
 
 public class SWTBrowserSession implements BrowserSession {
+	private static final String[] BOOLEAN_ATTRIBUTES = { "checked", "selected", "disabled", "readonly", "multiple" };
+
 	private static final String XHTML1_STRICT_DOCTYPE = "<!DOCTYPE html\n" + "PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n"
 			+ "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n";
 
@@ -127,12 +129,10 @@ public class SWTBrowserSession implements BrowserSession {
 	public void openBrowser() {
 		log.debug("Opening Browser");
 		if (!shell.isVisible()) {
-			// shell.open();
 			shell.setVisible(Boolean.parseBoolean(System.getProperty("twist.driver.web.visible", "true")));
 			shell.setFullScreen(Boolean.parseBoolean(System.getProperty("twist.driver.web.fullscreen", "false")));
 			shell.setMinimized(Boolean.parseBoolean(System.getProperty("twist.driver.web.minimized", "false")));
 			shell.setMaximized(Boolean.parseBoolean(System.getProperty("twist.driver.web.maximized", "false")));
-			// shell.moveBelow(null);
 		}
 	}
 
@@ -181,30 +181,8 @@ public class SWTBrowserSession implements BrowserSession {
 		String dom = "";
 		try {
 			inject("twist-dom.js");
-			// long now = System.currentTimeMillis();
-			// dom = XHTML1_STRICT_DOCTYPE + domAsString();
-			// document = documentBuilder.parse(new InputSource(new
-			// StringReader(dom)));
-			// log.warn("Parsing DOM took: " + (System.currentTimeMillis() -
-			// now) + " ms. (" + dom.length() + " chars)");
-
-			long now = System.currentTimeMillis();
-			dom = evaluate("Twist.domFromInnerHTML(" + getDocumentExpression() + ".documentElement)");
-			parser.parse(new InputSource(new StringReader(dom)));
-			document = parser.getDocument();
-			patchIds(document);
-
-			log.warn("innerHTML took: " + (System.currentTimeMillis() - now) + " ms.");
-			System.out.println((Runtime.getRuntime().totalMemory()));
-
-			// long now = System.currentTimeMillis();
-			// HtmlCleaner cleaner = new HtmlCleaner(new StringReader(dom));
-			// cleaner.clean();
-			// System.out.println(cleaner.getBrowserCompactXmlAsString());
-			// document = cleaner.createDOM();
-			// log.warn("innerHTML took: " + (System.currentTimeMillis() - now)
-			// + " ms.");
-
+			// dom = parseDOMUsingConstructedXML();
+			dom = parseDOMUsingInnerHTML();
 			return document;
 		} catch (Exception e) {
 			log.error(dom, e);
@@ -212,14 +190,53 @@ public class SWTBrowserSession implements BrowserSession {
 		}
 	}
 
-	private void patchIds(Document document) {
+	private String parseDOMUsingInnerHTML() throws SAXException, IOException {
+		String dom;
+		long now = System.currentTimeMillis();
+		dom = evaluate("Twist.domFromInnerHTML(" + getDocumentExpression() + ".documentElement)");
+		parser.parse(new InputSource(new StringReader(dom)));
+		document = parser.getDocument();
+		postProcesAttributes(document);
+		log.warn("innerHTML took: " + (System.currentTimeMillis() - now) + " ms.");
+		return dom;
+	}
+
+	private String parseDOMUsingConstructedXML() throws SAXException, IOException {
+		String dom;
+		long now = System.currentTimeMillis();
+		dom = XHTML1_STRICT_DOCTYPE + domAsString();
+		document = documentBuilder.parse(new InputSource(new StringReader(dom)));
+		log.warn("Parsing DOM took: " + (System.currentTimeMillis() - now) + " ms. (" + dom.length() + " chars)");
+		return dom;
+	}
+
+	private void postProcesAttributes(Document document) {
 		NodeList allElements = document.getElementsByTagName("*");
 		for (int i = 0; i < allElements.getLength(); i++) {
 			Element element = (Element) allElements.item(i);
-			Attr id = element.getAttributeNode("id");
-			if (id != null) {
-				element.setIdAttributeNode(id, true);
+			patchId(element);
+			patchAttributesForIE(element);
+		}
+	}
+
+	private void patchAttributesForIE(Element element) {
+		if (browserFamily == BrowserFamily.IE) {
+			for (String attribute : BOOLEAN_ATTRIBUTES) {
+				element.setAttribute(attribute, element.hasAttribute(attribute) + "");
 			}
+			if ("textarea".equals(element.getTagName())) {
+				element.setAttribute("value", getText(element));
+			}
+			if ("input".equals(element.getTagName()) && "password".equals(element.getAttribute("type"))) {
+				element.setAttribute("value", evaluate(domExpression(element) + ".value"));
+			}
+		}
+	}
+
+	private void patchId(Element element) {
+		Attr id = element.getAttributeNode("id");
+		if (id != null) {
+			element.setIdAttributeNode(id, true);
 		}
 	}
 

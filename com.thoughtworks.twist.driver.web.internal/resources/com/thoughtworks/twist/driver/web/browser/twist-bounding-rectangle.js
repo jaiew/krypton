@@ -33,7 +33,7 @@ if (!Twist.boundingRectangle) {
 					break;
 				}
 	        }
-		    var scroll = window.scrollX ? window.scrollX : document.body.scrollLeft;
+		    var scroll = window.scrollX ? window.scrollX : document.documentElement.scrollLeft;
 		    return left - scroll;
 		};
 
@@ -66,7 +66,7 @@ if (!Twist.boundingRectangle) {
 					break;
 				}
 			}
-		    var scroll = window.scrollY ? window.scrollY : document.body.scrollTop;
+		    var scroll = window.scrollY ? window.scrollY : document.documentElement.scrollTop;
 		    return top - scroll;
 		};
 

@@ -20,6 +20,8 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.selenium;
 
+import static java.util.Arrays.asList;
+
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
@@ -70,8 +72,6 @@ import com.thoughtworks.twist.driver.web.selenium.stringmatch.RegexpMatcher;
 import com.thoughtworks.twist.driver.web.selenium.stringmatch.StringMatcher;
 import com.thoughtworks.twist.driver.web.user.User;
 import com.thoughtworks.twist.driver.web.user.UserFactory;
-
-import static java.util.Arrays.*;
 
 public class TwistSelenium implements Selenium {
 	private static final Pattern COOKIE_PATH_PATTERN = Pattern.compile("path=([\\w|/|-]+)");
@@ -1071,7 +1071,6 @@ public class TwistSelenium implements Selenium {
 		Point center = session.center(element);
 		user.click(center.x, center.y);
 		waitForIdle();
-		// showPoint(center);
 	}
 
 	// private void showPoint(Point point) {
