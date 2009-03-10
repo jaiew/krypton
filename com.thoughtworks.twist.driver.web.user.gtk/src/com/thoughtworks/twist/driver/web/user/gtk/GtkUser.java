@@ -32,7 +32,6 @@ import org.eclipse.swt.widgets.Shell;
 import com.thoughtworks.twist.driver.web.user.KeyTranslator;
 import com.thoughtworks.twist.driver.web.user.User;
 
-@SuppressWarnings("restriction")
 public class GtkUser implements User {
 	private static final int GDK_MOTION_NOTIFY = 3;
 	private final Shell window;
@@ -71,8 +70,13 @@ public class GtkUser implements User {
 	}
 
 	public void type(String string) {
-		for (char c : string.toCharArray()) {
-			key(shift ? Character.toUpperCase(c) : c);
+		try {			
+			window.setRedraw(false);
+			for (char c : string.toCharArray()) {
+				key(shift ? Character.toUpperCase(c) : c);
+			}
+		} finally {			
+			window.setRedraw(true);
 		}
 	}
 
