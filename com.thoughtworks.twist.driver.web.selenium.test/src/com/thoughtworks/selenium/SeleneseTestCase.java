@@ -171,6 +171,7 @@ public class SeleneseTestCase extends TestCase {
 			context.setContextPath("/selenium-server");
 
 			File file = new File(SeleneseTestCase.class.getClassLoader().getResource("tests").toURI());
+//			context.setResourceBase(file.getParent());
 			context.setWar(file.getParent());
 
 			server.addHandler(context);
