@@ -55,7 +55,7 @@ public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
 			}
 			increaseNumberOfActiveAjaxRequests = new BrowserFunction(session.getBrowser(), "increaseNumberOfActiveAjaxRequests") {
 				public Object function(Object[] arguments) {
-					if (!isUrlExcluded(arguments[0].toString())) {						
+					if (!isUrlExcluded(arguments[0].toString())) {
 						numberOfActiveAjaxRequests++;
 						log.debug("new Ajax request, total: " + numberOfActiveAjaxRequests);
 					}

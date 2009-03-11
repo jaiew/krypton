@@ -119,6 +119,7 @@ public class SWTBrowserSession implements BrowserSession {
 			HTMLConfiguration configuration = new HTMLConfiguration();
 			configuration.setProperty("http://cyberneko.org/html/properties/names/elems", "lower");
 			configuration.setProperty("http://cyberneko.org/html/properties/names/attrs", "lower");
+
 			parser = new DOMParser(configuration);
 
 			log.info("Created BrowserSession using browser " + getBrowserFamily());
@@ -178,7 +179,6 @@ public class SWTBrowserSession implements BrowserSession {
 		String dom = "";
 		try {
 			inject("twist-dom.js");
-//			 return parseDOMUsingConstructedXML();
 			return parseDOMUsingInnerHTML();
 		} catch (Exception e) {
 			log.error(dom, e);
@@ -209,27 +209,43 @@ public class SWTBrowserSession implements BrowserSession {
 		for (int i = 0; i < allElements.getLength(); i++) {
 			Element element = (Element) allElements.item(i);
 			patchId(element);
-			patchAttributesForIE(element);
-			if ("textarea".equals(element.getTagName())) {
-				element.setAttribute("value", evaluate(domExpression(element) + ".value"));
-				element.setTextContent(element.getAttribute("value"));				
-			}
-			if ("option".equals(element.getTagName())) {				
-				element.setAttribute("selected", evaluate(domExpression(element) + ".selected"));
-			}
-			if ("select".equals(element.getTagName())) {				
-				element.setAttribute("value", evaluate(domExpression(element) + ".value"));
-			}
+			patchAttributes(element);
 		}
 	}
 
-	private void patchAttributesForIE(Element element) {
-		if (browserFamily == BrowserFamily.IE) {
-			for (String attribute : BOOLEAN_ATTRIBUTES) {
-				element.setAttribute(attribute, element.hasAttribute(attribute) + "");
+	private void patchAttributes(Element element) {
+		for (String attribute : BOOLEAN_ATTRIBUTES) {
+			element.setAttribute(attribute, element.hasAttribute(attribute) + "");
+		}
+		if ("textarea".equals(element.getTagName())) {
+			element.setAttribute("value", evaluate(domExpression(element) + ".value"));
+			element.setTextContent(element.getAttribute("value"));
+		}
+
+		if (browserFamily != BrowserFamily.IE) {
+			if ("option".equals(element.getTagName())) {
+				element.setAttribute("selected", evaluate(domExpression(element) + ".selected"));
 			}
-			if ("input".equals(element.getTagName()) && "password".equals(element.getAttribute("type"))) {
+			if ("select".equals(element.getTagName())) {
 				element.setAttribute("value", evaluate(domExpression(element) + ".value"));
+			}
+		}
+
+		if ("input".equals(element.getTagName())) {
+			if ("password".equals(element.getAttribute("type"))) {
+				element.setAttribute("value", evaluate(domExpression(element) + ".value"));
+			}
+			if (browserFamily != BrowserFamily.IE) {
+				element.setAttribute("value", evaluate(domExpression(element) + ".value"));
+				if ("radio".equals(element.getAttribute("type")) || "checkbox".equals(element.getAttribute("type"))) {
+					element.setAttribute("checked", evaluate(domExpression(element) + ".checked"));
+				}
+			}
+			if ("".equals(element.getAttribute("type"))) {
+				element.setAttribute("type", "text");
+			}
+			if (!element.hasAttribute("value")) {
+				element.setAttribute("value", "");
 			}
 		}
 	}

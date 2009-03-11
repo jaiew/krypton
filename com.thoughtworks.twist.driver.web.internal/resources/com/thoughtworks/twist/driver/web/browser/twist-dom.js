@@ -134,14 +134,15 @@ if (!Twist.dom) {
     };
     
     Twist.domFromInnerHTML = function(element){
-        var clone = element.cloneNode(true);
-        if (isIE) {
-            clone.innerHTML = element.innerHTML;
-        }
+//		if (isIE) {
+			var clone = element;			
+//		} else {
+//			var clone = element.cloneNode(true);
+//		}
 
         Twist.walkDom(clone);
 
-        var tagName = clone.tagName.toLowerCase();
+        var tagName = clone.tagName;
         return "<" + tagName + ">" + clone.innerHTML + "</" + tagName + ">";
     };
     
@@ -165,37 +166,39 @@ if (!Twist.dom) {
             return;
         }
         element.setAttribute("twist.domindex", index);
-        
-        for (var i = 0; i < propertiesOverAttributes.length; i++) {
-            var property = propertiesOverAttributes[i];
-            var value = element[property];
-            
-            var typeOf = typeof(value);
-            if (typeOf === "undefined" || value === null) {
-                continue;
-            }            
-            
-            if (value === "" && property === "value") {
-                if (element.type === "reset") {
-                    value = "Reset";
-                }
-                if (element.type === "submit") {
-                    value = "Submit";
-                }
-                if (element.type === "checkbox" || element.type === "radio") {
-                    value = "on";
-                }
-            }
-            if (isIE) {
-                element[property] = value;
-            } else  if (value !== "" || property === "value") {
-                var isUncheckedRadioButton = property === "checked" && element.type === "radio"  && !value;
-                if (isUncheckedRadioButton) {
-                    element.removeAttribute(property);                   
-                } else {
-                    element.setAttribute(property, value.toString());
-                }
-            }
-        }
+		if (isIE) {
+			return;
+		}
+
+//        for (var i = 0; i < propertiesOverAttributes.length; i++) {
+//            var property = propertiesOverAttributes[i];
+//            var value = element[property];
+//			
+//            var typeOf = typeof(value);
+//            if (typeOf === "undefined" || value === null) {
+//                continue;
+//            }            
+//            
+//            if (value === "" && property === "value") {
+//                if (element.type === "reset") {
+//                    value = "Reset";
+//                }
+//                if (element.type === "submit") {
+//                    value = "Submit";
+//                }
+//                if (element.type === "checkbox" || element.type === "radio") {
+//                    value = "on";
+//                }
+//            }
+//			
+//			if (value !== "" || property === "value") {
+//                var isUncheckedRadioButton = property === "checked" && element.type === "radio"  && !value;
+//                if (isUncheckedRadioButton) {
+//                    element.removeAttribute(property);                   
+//                } else {
+//                    element.setAttribute(property, value.toString());
+//                }
+//            }
+//        }
     };
 }

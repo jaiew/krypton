@@ -101,6 +101,7 @@ public class BrowserSessionTest extends AbstractBaseBrowserSession {
     public void shouldUseCheckedPropertyFalseForNonExistingCheckedAttributeForCheckbox() throws Exception {
         render("<html><head/><body><input id=\"1\" type=\"checkbox\"/></body></html>");
         Element checkbox = session.dom().getElementById("1");
+        assertEquals("checkbox", checkbox.getAttribute("type"));
         assertEquals(Boolean.FALSE.toString(), checkbox.getAttribute("checked"));
     }
 
@@ -123,6 +124,7 @@ public class BrowserSessionTest extends AbstractBaseBrowserSession {
     public void shouldUseValueEmptyStringForNonExistingValueAttributeForTextField() throws Exception {
         render("<html><head/><body><input id=\"1\" type=\"text\"/></body></html>");
         Element textfield = session.dom().getElementById("1");
+        assertEquals("text", textfield.getAttribute("type"));
         assertEquals("", textfield.getAttribute("value"));
         assertTrue(textfield.hasAttribute("value"));
     }
