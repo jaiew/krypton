@@ -93,6 +93,7 @@ public class SWTBrowserSession implements BrowserSession {
 	private int eventLoopTimeout = DEFAULT_EVENTLOOP_TIMEOUT;
 
 	private XPath xpath;
+	private DOMParser parser;
 
 	private Document document;
 
@@ -170,10 +171,6 @@ public class SWTBrowserSession implements BrowserSession {
 		return browserFamily;
 	}
 
-	DOMParser parser;
-	{
-	}
-
 	public Document dom() {
 		if (document != null) {
 			return document;
@@ -181,41 +178,48 @@ public class SWTBrowserSession implements BrowserSession {
 		String dom = "";
 		try {
 			inject("twist-dom.js");
-			// dom = parseDOMUsingConstructedXML();
-			dom = parseDOMUsingInnerHTML();
-			return document;
+//			 return parseDOMUsingConstructedXML();
+			return parseDOMUsingInnerHTML();
 		} catch (Exception e) {
 			log.error(dom, e);
 			throw new RuntimeException(e);
 		}
 	}
 
-	private String parseDOMUsingInnerHTML() throws SAXException, IOException {
-		String dom;
+	private Document parseDOMUsingInnerHTML() throws SAXException, IOException {
 		long now = System.currentTimeMillis();
-		dom = evaluate("Twist.domFromInnerHTML(" + getDocumentExpression() + ".documentElement)");
+		String dom = evaluate("Twist.domFromInnerHTML(" + getDocumentExpression() + ".documentElement)");
 		parser.parse(new InputSource(new StringReader(dom)));
 		document = parser.getDocument();
-		postProcesAttributes(document);
+		postProcessAttributes(document);
 		log.warn("innerHTML took: " + (System.currentTimeMillis() - now) + " ms. (" + dom.length() + " chars)");
-		return dom;
+		return document;
 	}
 
-	private String parseDOMUsingConstructedXML() throws SAXException, IOException {
-		String dom;
+	private Document parseDOMUsingConstructedXML() throws SAXException, IOException {
 		long now = System.currentTimeMillis();
-		dom = XHTML1_STRICT_DOCTYPE + domAsString();
+		String dom = XHTML1_STRICT_DOCTYPE + domAsString();
 		document = documentBuilder.parse(new InputSource(new StringReader(dom)));
 		log.warn("Parsing DOM took: " + (System.currentTimeMillis() - now) + " ms. (" + dom.length() + " chars)");
-		return dom;
+		return document;
 	}
 
-	private void postProcesAttributes(Document document) {
+	private void postProcessAttributes(Document document) {
 		NodeList allElements = document.getElementsByTagName("*");
 		for (int i = 0; i < allElements.getLength(); i++) {
 			Element element = (Element) allElements.item(i);
 			patchId(element);
 			patchAttributesForIE(element);
+			if ("textarea".equals(element.getTagName())) {
+				element.setAttribute("value", evaluate(domExpression(element) + ".value"));
+				element.setTextContent(element.getAttribute("value"));				
+			}
+			if ("option".equals(element.getTagName())) {				
+				element.setAttribute("selected", evaluate(domExpression(element) + ".selected"));
+			}
+			if ("select".equals(element.getTagName())) {				
+				element.setAttribute("value", evaluate(domExpression(element) + ".value"));
+			}
 		}
 	}
 
@@ -223,9 +227,6 @@ public class SWTBrowserSession implements BrowserSession {
 		if (browserFamily == BrowserFamily.IE) {
 			for (String attribute : BOOLEAN_ATTRIBUTES) {
 				element.setAttribute(attribute, element.hasAttribute(attribute) + "");
-			}
-			if ("textarea".equals(element.getTagName())) {
-				element.setAttribute("value", getText(element));
 			}
 			if ("input".equals(element.getTagName()) && "password".equals(element.getAttribute("type"))) {
 				element.setAttribute("value", evaluate(domExpression(element) + ".value"));

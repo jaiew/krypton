@@ -135,22 +135,24 @@ if (!Twist.dom) {
     
     Twist.domFromInnerHTML = function(element){
         var clone = element.cloneNode(true);
-        
-        Twist.walkDom(clone, element);
-        
+        if (isIE) {
+            clone.innerHTML = element.innerHTML;
+        }
+
+        Twist.walkDom(clone);
+
         var tagName = clone.tagName.toLowerCase();
         return "<" + tagName + ">" + clone.innerHTML + "</" + tagName + ">";
     };
     
-    Twist.walkDom = function(element, original){
+    Twist.walkDom = function(element){
         var index = 0;
         while (element != null) {
-            Twist.updateAttributes(element, original, index);
+            Twist.updateAttributes(element, index);
             
-            Twist.walkDom(element.firstChild, original.firstChild);
+            Twist.walkDom(element.firstChild);
             
             element = element.nextSibling;
-            original = original.nextSibling;
             index++;
         }
     };
@@ -158,7 +160,7 @@ if (!Twist.dom) {
     var propertiesOverAttributes = ["checked", "value", "selected", "disabled", "readOnly", "id", "name", "multiple"];
     var isIE = window.ActiveXObject ? true : false;
     
-    Twist.updateAttributes = function(element, original, index){
+    Twist.updateAttributes = function(element, index){
         if (element.nodeType !== 1) {
             return;
         }
@@ -166,12 +168,12 @@ if (!Twist.dom) {
         
         for (var i = 0; i < propertiesOverAttributes.length; i++) {
             var property = propertiesOverAttributes[i];
-            var value = original[property];
+            var value = element[property];
             
             var typeOf = typeof(value);
             if (typeOf === "undefined" || value === null) {
                 continue;
-            }
+            }            
             
             if (value === "" && property === "value") {
                 if (element.type === "reset") {
@@ -187,7 +189,12 @@ if (!Twist.dom) {
             if (isIE) {
                 element[property] = value;
             } else  if (value !== "" || property === "value") {
-                element.setAttribute(property, value.toString());
+                var isUncheckedRadioButton = property === "checked" && element.type === "radio"  && !value;
+                if (isUncheckedRadioButton) {
+                    element.removeAttribute(property);                   
+                } else {
+                    element.setAttribute(property, value.toString());
+                }
             }
         }
     };

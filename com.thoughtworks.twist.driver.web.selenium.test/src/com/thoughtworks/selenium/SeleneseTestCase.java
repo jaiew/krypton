@@ -37,6 +37,7 @@
 
 package com.thoughtworks.selenium;
 
+
 import java.io.File;
 import java.lang.reflect.Proxy;
 import java.net.BindException;
@@ -171,8 +172,7 @@ public class SeleneseTestCase extends TestCase {
 			context.setContextPath("/selenium-server");
 
 			File file = new File(SeleneseTestCase.class.getClassLoader().getResource("tests").toURI());
-//			context.setResourceBase(file.getParent());
-			context.setWar(file.getParent());
+			context.setResourceBase(file.getParent());
 
 			server.addHandler(context);
 
