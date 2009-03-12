@@ -214,14 +214,13 @@ public class SWTBrowserSession implements BrowserSession {
 	}
 
 	private void patchAttributes(Element element) {
-		for (String attribute : BOOLEAN_ATTRIBUTES) {
-			element.setAttribute(attribute, element.hasAttribute(attribute) + "");
-		}
 		if ("textarea".equals(element.getTagName())) {
 			element.setAttribute("value", evaluate(domExpression(element) + ".value"));
 			element.setTextContent(element.getAttribute("value"));
 		}
-
+		for (String attribute : BOOLEAN_ATTRIBUTES) {
+			element.setAttribute(attribute, element.hasAttribute(attribute) + "");
+		}
 		if (browserFamily != BrowserFamily.IE) {
 			if ("option".equals(element.getTagName())) {
 				element.setAttribute("selected", evaluate(domExpression(element) + ".selected"));
@@ -229,23 +228,26 @@ public class SWTBrowserSession implements BrowserSession {
 			if ("select".equals(element.getTagName())) {
 				element.setAttribute("value", evaluate(domExpression(element) + ".value"));
 			}
-		}
-
-		if ("input".equals(element.getTagName())) {
-			if ("password".equals(element.getAttribute("type"))) {
-				element.setAttribute("value", evaluate(domExpression(element) + ".value"));
-			}
-			if (browserFamily != BrowserFamily.IE) {
+			if ("input".equals(element.getTagName())) {			
 				element.setAttribute("value", evaluate(domExpression(element) + ".value"));
 				if ("radio".equals(element.getAttribute("type")) || "checkbox".equals(element.getAttribute("type"))) {
 					element.setAttribute("checked", evaluate(domExpression(element) + ".checked"));
 				}
 			}
-			if ("".equals(element.getAttribute("type"))) {
-				element.setAttribute("type", "text");
+		} else {
+			for (String attribute : BOOLEAN_ATTRIBUTES) {
+				element.setAttribute(attribute, element.hasAttribute(attribute) + "");
 			}
-			if (!element.hasAttribute("value")) {
-				element.setAttribute("value", "");
+			if ("input".equals(element.getTagName())) {
+				if ("password".equals(element.getAttribute("type"))) {
+					element.setAttribute("value", evaluate(domExpression(element) + ".value"));
+				}
+				if ("".equals(element.getAttribute("type"))) {
+					element.setAttribute("type", "text");
+				}
+				if (!element.hasAttribute("value")) {
+					element.setAttribute("value", "");
+				}
 			}
 		}
 	}

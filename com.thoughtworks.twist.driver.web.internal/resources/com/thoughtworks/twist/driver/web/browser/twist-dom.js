@@ -134,11 +134,11 @@ if (!Twist.dom) {
     };
     
     Twist.domFromInnerHTML = function(element){
-//		if (isIE) {
+		if (isIE) {
 			var clone = element;			
-//		} else {
-//			var clone = element.cloneNode(true);
-//		}
+		} else {
+			var clone = element.cloneNode(true);
+		}
 
         Twist.walkDom(clone);
 
@@ -166,10 +166,9 @@ if (!Twist.dom) {
             return;
         }
         element.setAttribute("twist.domindex", index);
-		if (isIE) {
-			return;
-		}
-
+//		if (isIE) {
+//			return;
+//		}
 //        for (var i = 0; i < propertiesOverAttributes.length; i++) {
 //            var property = propertiesOverAttributes[i];
 //            var value = element[property];

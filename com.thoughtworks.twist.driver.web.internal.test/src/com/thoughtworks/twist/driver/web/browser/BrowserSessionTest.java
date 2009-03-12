@@ -221,7 +221,7 @@ public class BrowserSessionTest extends AbstractBaseBrowserSession {
     }
 
     @Test
-    public void shouldUseNFalseyForNonExistingReadonlyAttributeForTextField() throws Exception {
+    public void shouldUseFalseForNonExistingReadonlyAttributeForTextField() throws Exception {
         render("<html><head/><body><input id=\"1\" type=\"text\"/></body></html>");
         Element textfield = session.dom().getElementById("1");
         assertEquals(Boolean.FALSE.toString(), textfield.getAttribute("readonly"));
