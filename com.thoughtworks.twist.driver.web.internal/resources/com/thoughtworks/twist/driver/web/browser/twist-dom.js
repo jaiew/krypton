@@ -140,28 +140,36 @@ if (!Twist.dom) {
 			var clone = element.cloneNode(true);
 		}
 
-        Twist.walkDom(clone);
+        Twist.walkDom(clone, element);
 
         var tagName = clone.tagName;
         return "<" + tagName + ">" + clone.innerHTML + "</" + tagName + ">";
     };
     
-    Twist.walkDom = function(element){
+    Twist.walkDom = function(element, original){
         var index = 0;
         while (element != null) {
-            Twist.updateAttributes(element, index);
-            
-            Twist.walkDom(element.firstChild);
+            Twist.updateAttributes(element, original, index);
+
+            Twist.walkDom(element.firstChild, original.firstChild);
+    
+            if (element.nodeName.toLowerCase() === "textarea") {
+                element.textContent = original.value;
+            }
             
             element = element.nextSibling;
+            original = original.nextSibling;
             index++;
         }
     };
     
-    var propertiesOverAttributes = ["checked", "value", "selected", "disabled", "readOnly", "id", "name", "multiple"];
+    var propertiesOverAttributes = ["id", "name", "className"];
+    var formPropertiesOverAttributes = propertiesOverAttributes.concat(["checked", "value", "selected", "disabled", "readOnly", "multiple", "htmlFor"]);
+
+    var formElements = ["from", "input", "button", "select", "option", "textarea", "label"];
     var isIE = window.ActiveXObject ? true : false;
     
-    Twist.updateAttributes = function(element, index){
+    Twist.updateAttributes = function(element, original, index){
         if (element.nodeType !== 1) {
             return;
         }
@@ -170,35 +178,51 @@ if (!Twist.dom) {
 			return;
 		}
 
-//        for (var i = 0; i < propertiesOverAttributes.length; i++) {
-//            var property = propertiesOverAttributes[i];
-//            var value = element[property];
-//			
-//            var typeOf = typeof(value);
-//            if (typeOf === "undefined" || value === null) {
-//                continue;
-//            }            
-//            
-//            if (value === "" && property === "value") {
-//                if (element.type === "reset") {
-//                    value = "Reset";
-//                }
-//                if (element.type === "submit") {
-//                    value = "Submit";
-//                }
-//                if (element.type === "checkbox" || element.type === "radio") {
-//                    value = "on";
-//                }
-//            }
-//			
-//			if (value !== "" || property === "value") {
-//                var isUncheckedRadioButton = property === "checked" && element.type === "radio"  && !value;
-//                if (isUncheckedRadioButton) {
-//                    element.removeAttribute(property);                   
-//                } else {
-//                    element.setAttribute(property, value.toString());
-//                }
-//            }
-//        }
+        var properties;
+        switch(element.tagName.toLowerCase()) {
+            case "form":
+            case "input":
+            case "button":
+            case "select":
+            case "option":
+            case "textarea":
+            case "label":
+                properties = formPropertiesOverAttributes;
+                break;
+            default:
+                properties = propertiesOverAttributes;    
+        };
+
+        for (var i = 0; i < properties.length; i++) {
+            var property = properties[i];
+            var value = original[property];
+
+            var typeOf = typeof(value);
+            if (typeOf === "undefined" || value === null) {
+                continue;
+            }            
+            if (property === "className") {
+                property = "class";
+            }
+            if (property === "htmlFor") {
+                property = "for";
+            }
+            
+            if (value === "" && property === "value") {
+                if (element.type === "reset") {
+                    value = "Reset";
+                }
+                if (element.type === "submit") {
+                    value = "Submit";
+                }
+                if (element.type === "checkbox" || element.type === "radio") {
+                    value = "on";
+                }
+            }
+			
+			if (value !== "" || property === "value") {
+                element.setAttribute(property, value.toString());
+            }
+        }
     };
 }

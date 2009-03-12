@@ -44,119 +44,121 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 public enum BrowserFamily {
-    MOZILLA {
-        public Browser create(Composite composite) {
-            return new Browser(composite, SWT.MOZILLA);
-        }
-        
-        void init(BrowserSession session) {
-            configureXULRunnerUsingAboutConfig(session);
-//            loadAboutBlank(session);
-        }
+	MOZILLA {
+		public Browser create(Composite composite) {
+			return new Browser(composite, SWT.MOZILLA);
+		}
 
-        private void configureXULRunnerUsingAboutConfig(BrowserSession session) {
-            session.getBrowser().setUrl("about:config");
-            session.pumpEvents();
+		void init(BrowserSession session) {
+			configureXULRunnerUsingAboutConfig(session);
+			// loadAboutBlank(session);
+		}
 
-            waitForAboutConfigToInitialize(session);
+		private void configureXULRunnerUsingAboutConfig(BrowserSession session) {
+			session.getBrowser().setUrl("about:config");
+			session.pumpEvents();
 
-//            setStringPreference(session, "general.useragent.extra.firefox", "Gecko/2008070206 Firefox/3.0.1");
-//            setStringPreference(session, "general.useragent.extra.firefox", "Firefox/2.0.0.13");
+			waitForAboutConfigToInitialize(session);
+			// setStringPreference(session, "general.useragent.extra.firefox",
+			// "Gecko/2008070206 Firefox/3.0.1");
+			// setStringPreference(session, "general.useragent.extra.firefox",
+			// "Firefox/2.0.0.13");
 
-            setBooleanPreference(session, "security.warn_entering_secure", false);
-            setBooleanPreference(session, "security.warn_entering_weak", false);
-            setBooleanPreference(session, "security.warn_leaving_secure", false);
-            setBooleanPreference(session, "security.warn_submit_insecure", false);
-            setBooleanPreference(session, "security.warn_viewing_mixed", false);
-        }
+			setBooleanPreference(session, "security.warn_entering_secure", false);
+			setBooleanPreference(session, "security.warn_entering_weak", false);
+			setBooleanPreference(session, "security.warn_leaving_secure", false);
+			setBooleanPreference(session, "security.warn_submit_insecure", false);
+			setBooleanPreference(session, "security.warn_viewing_mixed", false);
+		}
 
-        private void waitForAboutConfigToInitialize(BrowserSession session) {
-            long timeout = System.currentTimeMillis() + 4000;
-            boolean configLoaded = false;
-            while (!configLoaded) {
-            	session.pumpEvents();
-                try {
-                    session.evaluate("gPrefBranch");
-                    configLoaded = true;
-                } catch (JavascriptException e) {
-                    if (!referenceError("gPrefBranch").equals(e.getMessage())) {
-                        throw e;
-                    }
-                    if (System.currentTimeMillis() >= timeout) {
-                        throw new IllegalStateException("Could not load about:config properly");                    
-                    }
-                    try {
-                        Thread.sleep(20);
-                    } catch (InterruptedException ignore) {
-                    }
-                }
-            }
-        }
+		private void waitForAboutConfigToInitialize(BrowserSession session) {
+			long timeout = System.currentTimeMillis() + 4000;
+			boolean configLoaded = false;
+			while (!configLoaded) {
+				session.pumpEvents();
+				try {
+					session.evaluate("gPrefBranch");
+					configLoaded = true;
+				} catch (JavascriptException e) {
+					if (!referenceError("gPrefBranch").equals(e.getMessage())) {
+						throw e;
+					}
+					if (System.currentTimeMillis() >= timeout) {
+						throw new IllegalStateException("Could not load about:config properly");
+					}
+					try {
+						Thread.sleep(20);
+					} catch (InterruptedException ignore) {
+					}
+				}
+			}
+		}
 
-        private void setPreference(BrowserSession session, String type, String key, Object value) {
-            Object javaScriptValue = value instanceof String ? "'" + value + "'" : value;
-            session.evaluate("gPrefBranch.set" + type + "Pref('" + key + "', " + javaScriptValue + ")");
-            if (!value.toString().equals(session.evaluate("gPrefBranch.get" + type + "Pref('" + key + "')"))) {
-                throw new IllegalStateException("Failed to change preference " + key + " to " + value);
-            }
-        }
+		private void setPreference(BrowserSession session, String type, String key, Object value) {
+			Object javaScriptValue = value instanceof String ? "'" + value + "'" : value;
+			session.evaluate("gPrefBranch.set" + type + "Pref('" + key + "', " + javaScriptValue + ")");
+			if (!value.toString().equals(session.evaluate("gPrefBranch.get" + type + "Pref('" + key + "')"))) {
+				throw new IllegalStateException("Failed to change preference " + key + " to " + value);
+			}
+		}
 
-//        private void setStringPreference(BrowserSession session, String key, String value) {
-//            setPreference(session, "Char", key, value);
-//        }
+		// private void setStringPreference(BrowserSession session, String key,
+		// String value) {
+		// setPreference(session, "Char", key, value);
+		// }
 
-        private void setBooleanPreference(BrowserSession session, String key, boolean value) {
-            setPreference(session, "Bool", key, value);
-        }
+		private void setBooleanPreference(BrowserSession session, String key, boolean value) {
+			setPreference(session, "Bool", key, value);
+		}
 
-        public String referenceError(String reference) {
-            return "ReferenceError: " + reference + " is not defined";
-        }
-    },
+		public String referenceError(String reference) {
+			return "ReferenceError: " + reference + " is not defined";
+		}
+	},
 
-    IE {
-        public Browser create(Composite composite) {
-            if (isSupported()) {                
-                return new Browser(composite, SWT.NONE);
-            }
-            throw new IllegalStateException("Cannot create Internet Explorer on platform: " + SWT.getPlatform());
-        }
+	IE {
+		public Browser create(Composite composite) {
+			if (isSupported()) {
+				return new Browser(composite, SWT.NONE);
+			}
+			throw new IllegalStateException("Cannot create Internet Explorer on platform: " + SWT.getPlatform());
+		}
 
 		public boolean isSupported() {
-            String platform = SWT.getPlatform();
+			String platform = SWT.getPlatform();
 			return "win32".equals(platform);
 		}
 
-        public String referenceError(String reference) {
-            return "[object Error]";
-        }
+		public String referenceError(String reference) {
+			return "[object Error]";
+		}
 
-        public String newXmlHttpRequestCode() {
-    		return "new ActiveXObject('Microsoft.XMLHTTP')";
-    	}
-    },
+		public String newXmlHttpRequestCode() {
+			return "new ActiveXObject('Microsoft.XMLHTTP')";
+		}
+	},
 
-    SAFARI {
-        public Browser create(Composite composite) {
-            if (isSupported()) {                
-                return new Browser(composite, SWT.NONE);
-            }
-            throw new IllegalStateException("Cannot create Safari on platform: " + SWT.getPlatform());
-        }
+	SAFARI {
+		public Browser create(Composite composite) {
+			if (isSupported()) {
+				return new Browser(composite, SWT.NONE);
+			}
+			throw new IllegalStateException("Cannot create Safari on platform: " + SWT.getPlatform());
+		}
 
 		public boolean isSupported() {
-            String platform = SWT.getPlatform();
+			String platform = SWT.getPlatform();
 			return "carbon".equals(platform) || "cocoa".equals(platform);
 		}
 
-        public String referenceError(String reference) {
-            return "ReferenceError: Can't find variable: " + reference;
-        }
-    },
-    
-    INTERACTIVE {
-    	BrowserFamily actual;
-    	
+		public String referenceError(String reference) {
+			return "ReferenceError: Can't find variable: " + reference;
+		}
+	},
+
+	INTERACTIVE {
+		BrowserFamily actual;
+
 		public Browser create(Composite composite) {
 			if (actual == null) {
 				askUser();
@@ -178,8 +180,8 @@ public enum BrowserFamily {
 			Button safari = new Button(shell, SWT.NONE);
 			safari.setText("Safari");
 			safari.setEnabled(SAFARI.isSupported());
-			
-			SelectionListener listener = new SelectionListener(){
+
+			SelectionListener listener = new SelectionListener() {
 				public void widgetSelected(SelectionEvent e) {
 					System.setProperty(SYSTEM_PROPERTY, ((Button) e.getSource()).getText());
 					actual = BrowserFamily.fromSystemProperty();
@@ -187,7 +189,7 @@ public enum BrowserFamily {
 					shell.close();
 					shell.dispose();
 				}
-			
+
 				public void widgetDefaultSelected(SelectionEvent e) {
 				}
 			};
@@ -198,7 +200,7 @@ public enum BrowserFamily {
 
 			shell.pack();
 			shell.open();
-			
+
 			Display display = shell.getDisplay();
 			while (!shell.isDisposed()) {
 				if (!display.readAndDispatch()) {
@@ -210,105 +212,105 @@ public enum BrowserFamily {
 		public String referenceError(String reference) {
 			return actual.referenceError(reference);
 		}
-    };
+	};
 
-    public static final String SYSTEM_PROPERTY = "twist.driver.web.browser";
+	public static final String SYSTEM_PROPERTY = "twist.driver.web.browser";
 
 	static {
-//        Logger.getLogger("").setLevel(Level.FINEST);
-//        Logger.getLogger("").getHandlers()[0].setLevel(Level.FINEST);
-    }
-    
-    Log log = LogFactory.getLog(getClass());
+		// Logger.getLogger("").setLevel(Level.FINEST);
+		// Logger.getLogger("").getHandlers()[0].setLevel(Level.FINEST);
+	}
 
-    public BrowserSession create() {
-        final Shell shell = new Shell();
-        GridLayout layout = new GridLayout();
-        shell.setLayout(layout);
-        shell.setSize(1024, 768);
-        
-        Browser.clearSessions();
-        log.debug("Creating browser: " + name());
-        Browser browser = create(shell);
-        
-        layoutBrowser(browser);
+	Log log = LogFactory.getLog(getClass());
 
-        BrowserSession session = new SWTBrowserSession(browser, this);
-        init(session);
-        browser.setUrl("about:blank");
-        session.pumpEvents();
+	public BrowserSession create() {
+		final Shell shell = new Shell();
+		GridLayout layout = new GridLayout();
+		shell.setLayout(layout);
+		shell.setSize(1024, 768);
 
-        Text location = addLocationBar(shell);
-        Label userAgent = addUserAgentLabel(shell);
+		Browser.clearSessions();
+		log.debug("Creating browser: " + name());
+		Browser browser = create(shell);
 
-        addListeners(shell, location, browser);
-        String userAgentString = session.evaluate("navigator.userAgent");
-        userAgent.setText(userAgentString);
-        log.info("Initialized BrowserSession using " + userAgentString);
+		layoutBrowser(browser);
 
-        return session;
-    }
+		BrowserSession session = new SWTBrowserSession(browser, this);
+		init(session);
+		browser.setUrl("about:blank");
+		session.pumpEvents();
 
-    private void addListeners(final Shell shell, final Text location, final Browser browser) {
-        browser.addLocationListener(new LocationListener() {
-            public void changed(LocationEvent event) {
-                if (event.top) {
-                    location.setText(event.location);
-                }
-            }
+		Text location = addLocationBar(shell);
+		Label userAgent = addUserAgentLabel(shell);
 
-            public void changing(LocationEvent event) {
-            }
-        });
-        browser.addTitleListener(new TitleListener() {
-            public void changed(TitleEvent event) {
-                shell.setText(event.title);
-            }
-        });
-    }
+		addListeners(shell, location, browser);
+		String userAgentString = session.evaluate("navigator.userAgent");
+		userAgent.setText(userAgentString);
+		log.info("Initialized BrowserSession using " + userAgentString);
 
-    private Label addUserAgentLabel(Shell shell) {
-        Label userAgent = new Label(shell, SWT.CENTER);
-        GridData data = new GridData();
-        data.horizontalAlignment = GridData.FILL;
-        data.grabExcessHorizontalSpace = true;
-        userAgent.setLayoutData(data);
-        return userAgent;
-    }
+		return session;
+	}
 
-    private void layoutBrowser(Browser browser) {
-        GridData data = new GridData();
-        data.horizontalAlignment = GridData.FILL;
-        data.verticalAlignment = GridData.FILL;
-        data.grabExcessHorizontalSpace = true;
-        data.grabExcessVerticalSpace = true;
-        browser.setLayoutData(data);
-    }
+	private void addListeners(final Shell shell, final Text location, final Browser browser) {
+		browser.addLocationListener(new LocationListener() {
+			public void changed(LocationEvent event) {
+				if (event.top) {
+					location.setText(event.location);
+				}
+			}
 
-    private Text addLocationBar(final Shell shell) {
-        Text location = new Text(shell, SWT.BORDER);
-        location.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-        GridData data = new GridData();
-        data.horizontalAlignment = GridData.FILL;
-        data.grabExcessHorizontalSpace = true;
-        location.setLayoutData(data);
-        return location;
-    }
+			public void changing(LocationEvent event) {
+			}
+		});
+		browser.addTitleListener(new TitleListener() {
+			public void changed(TitleEvent event) {
+				shell.setText(event.title);
+			}
+		});
+	}
 
-    void init(BrowserSession session) {
-    }
+	private Label addUserAgentLabel(Shell shell) {
+		Label userAgent = new Label(shell, SWT.CENTER);
+		GridData data = new GridData();
+		data.horizontalAlignment = GridData.FILL;
+		data.grabExcessHorizontalSpace = true;
+		userAgent.setLayoutData(data);
+		return userAgent;
+	}
 
-    abstract Browser create(Composite composite);
-    
-    public abstract String referenceError(String reference);
-    
-    public boolean isSupported() {
-    	return true;
-    }
-    
-    public static BrowserFamily fromSystemProperty() {
-    	return BrowserFamily.valueOf(System.getProperty(SYSTEM_PROPERTY, "mozilla").toUpperCase());
-    }
+	private void layoutBrowser(Browser browser) {
+		GridData data = new GridData();
+		data.horizontalAlignment = GridData.FILL;
+		data.verticalAlignment = GridData.FILL;
+		data.grabExcessHorizontalSpace = true;
+		data.grabExcessVerticalSpace = true;
+		browser.setLayoutData(data);
+	}
+
+	private Text addLocationBar(final Shell shell) {
+		Text location = new Text(shell, SWT.BORDER);
+		location.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+		GridData data = new GridData();
+		data.horizontalAlignment = GridData.FILL;
+		data.grabExcessHorizontalSpace = true;
+		location.setLayoutData(data);
+		return location;
+	}
+
+	void init(BrowserSession session) {
+	}
+
+	abstract Browser create(Composite composite);
+
+	public abstract String referenceError(String reference);
+
+	public boolean isSupported() {
+		return true;
+	}
+
+	public static BrowserFamily fromSystemProperty() {
+		return BrowserFamily.valueOf(System.getProperty(SYSTEM_PROPERTY, "mozilla").toUpperCase());
+	}
 
 	public String newXmlHttpRequestCode() {
 		return "new XMLHttpRequest()";

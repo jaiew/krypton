@@ -209,41 +209,27 @@ public class SWTBrowserSession implements BrowserSession {
 		for (int i = 0; i < allElements.getLength(); i++) {
 			Element element = (Element) allElements.item(i);
 			patchId(element);
-			patchAttributes(element);
+			patchAttributesForIE(element);
 		}
 	}
 
-	private void patchAttributes(Element element) {
-		if ("textarea".equals(element.getTagName())) {
-			element.setAttribute("value", evaluate(domExpression(element) + ".value"));
-			element.setTextContent(element.getAttribute("value"));
-		}
-		for (String attribute : BOOLEAN_ATTRIBUTES) {
-			element.setAttribute(attribute, element.hasAttribute(attribute) + "");
-		}
+	private void patchAttributesForIE(Element element) {
 		if (browserFamily == BrowserFamily.IE) {
-			if ("input".equals(element.getTagName())) {
-				if ("password".equals(element.getAttribute("type"))) {
-					element.setAttribute("value", evaluate(domExpression(element) + ".value"));
+			String tagName = element.getTagName();
+			String type = element.getAttribute("type");
+			String domExpression = domExpression(element);
+			for (String attribute : BOOLEAN_ATTRIBUTES) {
+				element.setAttribute(attribute, element.hasAttribute(attribute) + "");
+			}
+			if ("input".equals(tagName)) {
+				if ("password".equals(type)) {
+					element.setAttribute("value", evaluate(domExpression + ".value"));
 				}
-				if ("".equals(element.getAttribute("type"))) {
+				if ("".equals(type)) {
 					element.setAttribute("type", "text");
 				}
 				if (!element.hasAttribute("value")) {
 					element.setAttribute("value", "");
-				}
-			}
-		} else {
-			if ("option".equals(element.getTagName())) {
-				element.setAttribute("selected", evaluate(domExpression(element) + ".selected"));
-			}
-			if ("select".equals(element.getTagName())) {
-				element.setAttribute("value", evaluate(domExpression(element) + ".value"));
-			}
-			if ("input".equals(element.getTagName())) {			
-				element.setAttribute("value", evaluate(domExpression(element) + ".value"));
-				if ("radio".equals(element.getAttribute("type")) || "checkbox".equals(element.getAttribute("type"))) {
-					element.setAttribute("checked", evaluate(domExpression(element) + ".checked"));
 				}
 			}
 		}

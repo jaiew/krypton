@@ -121,6 +121,31 @@ public class BrowserSessionTest extends AbstractBaseBrowserSession {
     }
 
     @Test
+    public void shouldUseCheckedPropertyFalseForNonExistingCheckedAttributeForRadioButton() throws Exception {
+        render("<html><head/><body><input id=\"1\" type=\"radio\"/></body></html>");
+        Element radio = session.dom().getElementById("1");
+        assertEquals("radio", radio.getAttribute("type"));
+        assertEquals(Boolean.FALSE.toString(), radio.getAttribute("checked"));
+    }
+
+    @Test
+    public void shouldUseCheckedPropertyTrueForExisitingAttributeForRadioButton() throws Exception {
+        render("<html><head/><body><input id=\"1\" type=\"radio\" checked/></body></html>");
+        Element radio = session.dom().getElementById("1");
+        assertEquals(Boolean.TRUE.toString(), radio.getAttribute("checked"));
+    }
+
+    @Test
+    public void shouldUseCheckedPropertyAfterChangeForRadioButton() throws Exception {
+        render("<html><head/><body><form><input name=\"theRadio\" id=\"1\" type=\"radio\" checked=\"true\"/><input id=\"2\" name=\"theRadio\" type=\"radio\"/></form></body></html>");
+        executeAndWaitForIdle(session.domExpression(session.dom().getElementById("2")) + ".checked = true");
+        Element radio = session.dom().getElementById("1");
+        assertEquals(Boolean.FALSE.toString(), radio.getAttribute("checked"));
+        radio = session.dom().getElementById("2");
+        assertEquals(Boolean.TRUE.toString(), radio.getAttribute("checked"));
+    }
+
+    @Test
     public void shouldUseValueEmptyStringForNonExistingValueAttributeForTextField() throws Exception {
         render("<html><head/><body><input id=\"1\" type=\"text\"/></body></html>");
         Element textfield = session.dom().getElementById("1");
