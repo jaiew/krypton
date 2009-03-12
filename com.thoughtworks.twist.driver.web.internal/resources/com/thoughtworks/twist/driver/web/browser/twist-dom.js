@@ -4,32 +4,32 @@ if (!Twist) {
 }
 
 if (!Twist.dom) {
-    function escapeXml(value){
-        return (value + "").replace(/&/g, '&amp;').replace(/&amp;(\\w+);/g, '&$1;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    }
-    
-    function attributeString(name, value){
-        return " " + name + "=\"" + escapeXml(unescape(value)).replace(/"/g, '&quot;') + "\"";
-    };
-    
-    function isWhitespaceOnly(string){
-        return string.replace(/\s*/g, "").length == 0;
-    };
-    
-    function textContent(element){
-        var text = element.textContent;
-        if (!text) {
-            text = element.data;
-        }
-        if (!text) {
-            return "";
-        }
-        return escapeXml(text);
-    }
-    
     Twist.domProperties = ["checked", "value", "selected", "disabled", "readOnly", "type", "id", "name", "className", "title", "style", "action", "href", "multiple", "alt", "src", "maxLength", "length", "rows", "size", "cols", "htmlFor", "width", "height", "caption", "colSpan", "rowSpan"];
     
     Twist.dom = function(element){
+        var escapeXml = function(value){
+            return (value + "").replace(/&/g, '&amp;').replace(/&amp;(\\w+);/g, '&$1;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        };
+        
+        var attributeString = function(name, value){
+            return " " + name + "=\"" + escapeXml(unescape(value)).replace(/"/g, '&quot;') + "\"";
+        };
+        
+        var isWhitespaceOnly = function(string){
+            return string.replace(/\s*/g, "").length == 0;
+        };
+        
+        var textContent = function(element){
+            var text = element.textContent;
+            if (!text) {
+                text = element.data;
+            }
+            if (!text) {
+                return "";
+            }
+            return escapeXml(text);
+        };
+    
         if (element.nodeType === 8) {
             return "<!--" + textContent(element) + "-->";
         }
@@ -133,17 +133,19 @@ if (!Twist.dom) {
         return index;
     };
     
-    Twist.domFromInnerHTML = function(element){
-		if (isIE) {
-			var clone = element;			
+    Twist.isIE = window.ActiveXObject ? true : false;
+
+    Twist.domFromInnerHTML = function(original){
+		if (Twist.isIE) {
+			var element = original;			
 		} else {
-			var clone = element.cloneNode(true);
+			var element = original.cloneNode(true);
 		}
 
-        Twist.walkDom(clone, element);
+        Twist.walkDom(element, original);
 
-        var tagName = clone.tagName;
-        return "<" + tagName + ">" + clone.innerHTML + "</" + tagName + ">";
+        var tagName = original.tagName;
+        return "<" + tagName + ">" + element.innerHTML + "</" + tagName + ">";
     };
     
     Twist.walkDom = function(element, original){
@@ -163,22 +165,17 @@ if (!Twist.dom) {
         }
     };
     
-    var propertiesOverAttributes = ["id", "name", "className"];
-    var formPropertiesOverAttributes = propertiesOverAttributes.concat(["checked", "value", "selected", "disabled", "readOnly", "multiple", "htmlFor"]);
+    Twist.propertiesOverAttributes = ["checked", "value", "selected", "multiple", "disabled", "readOnly"];
 
-    var formElements = ["from", "input", "button", "select", "option", "textarea", "label"];
-    var isIE = window.ActiveXObject ? true : false;
-    
     Twist.updateAttributes = function(element, original, index){
         if (element.nodeType !== 1) {
             return;
         }
         element.setAttribute("twist.domindex", index);
-		if (isIE) {
+		if (Twist.isIE) {
 			return;
 		}
 
-        var properties;
         switch(element.tagName.toLowerCase()) {
             case "form":
             case "input":
@@ -187,26 +184,19 @@ if (!Twist.dom) {
             case "option":
             case "textarea":
             case "label":
-                properties = formPropertiesOverAttributes;
                 break;
             default:
-                properties = propertiesOverAttributes;    
+                return;
         };
 
-        for (var i = 0; i < properties.length; i++) {
-            var property = properties[i];
+        for (var i = 0; i < Twist.propertiesOverAttributes.length; i++) {
+            var property = Twist.propertiesOverAttributes[i];
             var value = original[property];
 
             var typeOf = typeof(value);
             if (typeOf === "undefined" || value === null) {
                 continue;
             }            
-            if (property === "className") {
-                property = "class";
-            }
-            if (property === "htmlFor") {
-                property = "for";
-            }
             
             if (value === "" && property === "value") {
                 if (element.type === "reset") {

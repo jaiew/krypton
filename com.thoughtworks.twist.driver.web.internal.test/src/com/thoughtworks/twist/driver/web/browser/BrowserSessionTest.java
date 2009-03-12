@@ -98,6 +98,21 @@ public class BrowserSessionTest extends AbstractBaseBrowserSession {
     }
 
     @Test
+    public void shouldUseIdPropertyAfterChangeForElement() throws Exception {
+        render("<html><head/><body><div id=\"1\"/></body></html>");
+        executeAndWaitForIdle(session.domExpression(session.dom().getElementById("1")) + ".id = '2'");
+        assertNull(session.dom().getElementById("1"));
+        assertNotNull(session.dom().getElementById("2"));
+    }
+
+    @Test
+    public void shouldUseNamePropertyAfterChangeForInputElement() throws Exception {
+        render("<html><head/><body><input name=\"my-name\" id=\"1\"/></body></html>");
+        executeAndWaitForIdle(session.domExpression(session.dom().getElementById("1")) + ".name = 'my-new-name'");
+        assertEquals("my-new-name", session.dom().getElementById("1").getAttribute("name"));
+    }
+
+    @Test
     public void shouldUseCheckedPropertyFalseForNonExistingCheckedAttributeForCheckbox() throws Exception {
         render("<html><head/><body><input id=\"1\" type=\"checkbox\"/></body></html>");
         Element checkbox = session.dom().getElementById("1");
@@ -202,6 +217,28 @@ public class BrowserSessionTest extends AbstractBaseBrowserSession {
     }
 
     @Test
+    public void shouldUseMultiplePropertyFalseForSingleSelect() throws Exception {
+        render("<html><head/><body><select id=\"1\"><option/></select></body></html>");
+        Element select = session.dom().getElementById("1");
+        assertEquals(Boolean.FALSE.toString(), select.getAttribute("multiple"));
+    }
+
+    @Test
+    public void shouldUseMultiplePropertyTrueAfterChangedForSingleSelect() throws Exception {
+        render("<html><head/><body><select id=\"1\"><option/></select></body></html>");
+        executeAndWaitForIdle(session.domExpression(session.dom().getElementById("1")) + ".multiple = true");
+        Element select = session.dom().getElementById("1");
+        assertEquals(Boolean.TRUE.toString(), select.getAttribute("multiple"));
+    }
+
+    @Test
+    public void shouldUseMultiplePropertyTrueForMultipleSelect() throws Exception {
+        render("<html><head/><body><select id=\"1\" multiple><option/></select></body></html>");
+        Element select = session.dom().getElementById("1");
+        assertEquals(Boolean.TRUE.toString(), select.getAttribute("multiple"));
+    }
+
+    @Test
     public void shouldUseSelectedPropertyFalseForNonExistingSelectedAttributeForOption() throws Exception {
         render("<html><head/><body><select><option/><option id=\"1\"/></select></body></html>");
         Element option = session.dom().getElementById("1");
@@ -265,6 +302,22 @@ public class BrowserSessionTest extends AbstractBaseBrowserSession {
         executeAndWaitForIdle(session.domExpression(session.dom().getElementById("1")) + ".readOnly = false");
         Element textfield = session.dom().getElementById("1");
         assertEquals(Boolean.FALSE.toString(), textfield.getAttribute("readonly"));
+    }
+
+    @Test
+    public void shouldUseForPropertyAfterHtmlForChangeForLabel() throws Exception {
+        render("<html><head/><body><label id=\"1\" for=\"2\">My Label</label><input id=\"2\" type=\"text\" readonly=\"true\"/><input id=\"3\" type=\"text\" readonly=\"true\"/></body></html>");
+        executeAndWaitForIdle(session.domExpression(session.dom().getElementById("1")) + ".htmlFor = '3'");
+        Element label = session.dom().getElementById("1");
+        assertEquals("3", label.getAttribute("for"));
+    }
+
+    @Test
+    public void shouldUseClassPropertyAfterClassNameChangeForElement() throws Exception {
+        render("<html><head/><body><input id=\"1\" type=\"text\" class=\"text-box\"/></body></html>");
+        executeAndWaitForIdle(session.domExpression(session.dom().getElementById("1")) + ".className = 'my-text-box'");
+        Element label = session.dom().getElementById("1");
+        assertEquals("my-text-box", label.getAttribute("class"));
     }
 
     @Test
