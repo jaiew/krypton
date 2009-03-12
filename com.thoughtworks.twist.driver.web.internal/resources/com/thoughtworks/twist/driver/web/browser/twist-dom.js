@@ -166,9 +166,10 @@ if (!Twist.dom) {
             return;
         }
         element.setAttribute("twist.domindex", index);
-//		if (isIE) {
-//			return;
-//		}
+		if (isIE) {
+			return;
+		}
+
 //        for (var i = 0; i < propertiesOverAttributes.length; i++) {
 //            var property = propertiesOverAttributes[i];
 //            var value = element[property];
