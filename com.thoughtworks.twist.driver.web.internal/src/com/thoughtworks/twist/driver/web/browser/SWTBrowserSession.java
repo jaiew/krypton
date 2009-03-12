@@ -221,23 +221,19 @@ public class SWTBrowserSession implements BrowserSession {
 		for (String attribute : BOOLEAN_ATTRIBUTES) {
 			element.setAttribute(attribute, element.hasAttribute(attribute) + "");
 		}
-		if (browserFamily != BrowserFamily.IE) {
-			if ("option".equals(element.getTagName())) {
-				element.setAttribute("selected", evaluate(domExpression(element) + ".selected"));
+		if ("option".equals(element.getTagName())) {
+			element.setAttribute("selected", evaluate(domExpression(element) + ".selected"));
+		}
+		if ("select".equals(element.getTagName())) {
+			element.setAttribute("value", evaluate(domExpression(element) + ".value"));
+		}
+		if ("input".equals(element.getTagName())) {			
+			element.setAttribute("value", evaluate(domExpression(element) + ".value"));
+			if ("radio".equals(element.getAttribute("type")) || "checkbox".equals(element.getAttribute("type"))) {
+				element.setAttribute("checked", evaluate(domExpression(element) + ".checked"));
 			}
-			if ("select".equals(element.getTagName())) {
-				element.setAttribute("value", evaluate(domExpression(element) + ".value"));
-			}
-			if ("input".equals(element.getTagName())) {			
-				element.setAttribute("value", evaluate(domExpression(element) + ".value"));
-				if ("radio".equals(element.getAttribute("type")) || "checkbox".equals(element.getAttribute("type"))) {
-					element.setAttribute("checked", evaluate(domExpression(element) + ".checked"));
-				}
-			}
-		} else {
-			for (String attribute : BOOLEAN_ATTRIBUTES) {
-				element.setAttribute(attribute, element.hasAttribute(attribute) + "");
-			}
+		}
+		if (browserFamily == BrowserFamily.IE) {
 			if ("input".equals(element.getTagName())) {
 				if ("password".equals(element.getAttribute("type"))) {
 					element.setAttribute("value", evaluate(domExpression(element) + ".value"));
