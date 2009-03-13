@@ -137,7 +137,7 @@ if (!Twist.dom) {
 
     Twist.domFromInnerHTML = function(original){
 		if (Twist.isIE) {
-			var element = original;			
+			var element = original;
 		} else {
 			var element = original.cloneNode(true);
 		}

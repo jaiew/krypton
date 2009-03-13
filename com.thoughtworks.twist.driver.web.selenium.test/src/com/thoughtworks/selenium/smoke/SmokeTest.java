@@ -71,7 +71,18 @@ public class SmokeTest {
 //
 //        assertTrue(browser.isTextPresent("You've got to login or join to Digg that!"));
 //        assertTrue(browser.isElementPresent("//div[@class = 'login-digg']//input[@name = 'username']"));
-//	}
+//
+//
+//        browser.click("//a[text() = 'Login now...']");
+//
+//        assertTrue(browser.isVisible("//div[@class = 'login-digg']//input[@name = 'username']"));
+//        browser.type("//div[@class = 'login-digg']//input[@name = 'username']", "digguser");
+//        assertEquals("digguser", browser.getValue("//div[@class = 'login-digg']//input[@name = 'username']"));
+//        browser.type("//div[@class = 'login-digg']//input[@name = 'password']", "diggpassword");
+//
+//        browser.click("//input[@type = 'submit' and @value = 'Login']");
+//        assertTrue(browser.isTextPresent("Your Username or Password was incorrect"));
+//    }
 
     @AfterClass
     public static void stopBrowser() {

@@ -24,7 +24,10 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,6 +35,9 @@ import org.eclipse.swt.widgets.Display;
 
 public class Decorators {
 	public static final class SWTThreadingDecorator<T> implements InvocationHandler {
+		private static final List<String> STACK_TRACE_FILTER = Arrays.asList("java.lang.Thread", "java.util.concurrent.ThreadPoolExecutor",
+								"com.thoughtworks.selenium.SeleneseTestCase", "$Proxy", "org.eclipse.swt.widgets", "org.eclipse.swt.SWT",
+								"com.thoughtworks.twist.driver.web.browser.Decorators");
 		private T anInstance;
 
 		private SWTThreadingDecorator(T anInstance) {
@@ -55,7 +61,7 @@ public class Decorators {
 						try {
 							result[0] = method.invoke(anInstance, args);
 						} catch (Exception e) {
-							throw new RuntimeException(unwind(e));
+							throw new RuntimeException(e);
 						} finally {
 							Display.getDefault().update();
 						}
@@ -63,15 +69,30 @@ public class Decorators {
 				});
 				return result[0];
 			} catch (RuntimeException e) {
-				throw unwind(e);
+				 throw unwind(e);
 			}
 		}
 
 		private Throwable unwind(Throwable t) {
-			while (t.getCause() != null) {
+			Throwable original = t;
+			List<StackTraceElement> stack = new ArrayList<StackTraceElement>();
+			do {
+				if (!(t instanceof InvocationTargetException)) {
+					stack.addAll(0, Arrays.asList(t.getStackTrace()));
+				}
+				original = t;
 				t = t.getCause();
+			} while (t != null);
+			for (Iterator<StackTraceElement> iterator = stack.iterator(); iterator.hasNext();) {
+				StackTraceElement element = (StackTraceElement) iterator.next();
+				for (String prefix : STACK_TRACE_FILTER) {
+					if (element.getClassName().startsWith(prefix)) {
+						iterator.remove();
+					}
+				}
 			}
-			return t;
+			original.setStackTrace(stack.toArray(new StackTraceElement[0]));
+			return original;
 		}
 
 		public T getInstance() {

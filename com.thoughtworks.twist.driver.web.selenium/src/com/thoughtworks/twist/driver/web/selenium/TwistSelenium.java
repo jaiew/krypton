@@ -1064,7 +1064,7 @@ public class TwistSelenium implements Selenium {
 
 	private Element locate(String locator) {
 		Element locate = session.locate(locator);
-		session.execute(session.domExpression(locate) + ".scrollIntoView()");
+		session.execute(session.domExpression(locate) + ".scrollIntoView(false)");
 		return locate;
 	}
 

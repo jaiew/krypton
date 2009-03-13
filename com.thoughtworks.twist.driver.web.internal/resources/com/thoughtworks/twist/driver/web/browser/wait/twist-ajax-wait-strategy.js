@@ -74,7 +74,9 @@ if (!Twist.ajaxWaitStrategy) {
                 if (asynchronous) {
                     increaseNumberOfActiveAjaxRequests(url);
                     this.addEventListener('load', function(event){
-                        decreaseNumberOfActiveAjaxRequests(url);
+                    	setTimeout(function() {
+	                        decreaseNumberOfActiveAjaxRequests(url);
+	                   	}, 100);
                     }, true);
                     this.addEventListener('error', function(event){
                         decreaseNumberOfActiveAjaxRequests(url);

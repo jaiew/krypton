@@ -265,12 +265,13 @@ public class SWTBrowserSession implements BrowserSession {
 	}
 
 	public Element locate(String locator) {
+		long now = System.currentTimeMillis();
 		pumpEvents();
 		for (LocatorStrategy strategy : locatorStrategies) {
 			if (strategy.canLocate(locator)) {
 				Element element = strategy.locate(this, locator);
 				if (element != null) {
-					log.debug("Located " + element + " using '" + locator + "'");
+					log.debug("Located " + element + " using '" + locator + "' (took " + (System.currentTimeMillis() - now) + " ms.)");
 					return element;
 				}
 			}
@@ -545,8 +546,8 @@ public class SWTBrowserSession implements BrowserSession {
 
 	public void setWindowExpression(String domExpression) {
 		log.debug("Changing target window to: '" + domExpression + "'");
-		inject("twist-normalize-frame.js");
 		emptyDocumentCache();
+		inject("twist-normalize-frame.js");
 		windowExpression = evaluate("Twist.normalizeFrame(" + domExpression + ")");
 		log.debug("Target window normalized as: '" + windowExpression + "'");
 	}

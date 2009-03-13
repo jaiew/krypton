@@ -32,7 +32,7 @@ import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 
 public class LocationChangedWaitStrategy implements LocationListener, WaitStrategy {
     private boolean changing;
-    
+
     List<String> exclusionPatterns = new ArrayList<String>();
     Log log = LogFactory.getLog(getClass());
 
@@ -50,27 +50,37 @@ public class LocationChangedWaitStrategy implements LocationListener, WaitStrate
         addURLExclusionPattern(".*adbrite.*");
     }
 
-    public synchronized boolean isBusy() {
+    public boolean isBusy() {
         return changing;
     }
 
-    public synchronized void changed(LocationEvent event) {
+    public void changed(LocationEvent event) {
+        String location = event.location;
+        if (isExcluded(location)) {
+            return;
+        }
         changing = false;
-        log.trace("changed: " + event.location);
+        log.trace("changed: " + location);
     }
 
-    public synchronized void changing(LocationEvent event) {
+    public void changing(LocationEvent event) {
         String location = event.location;
-
-        for (String pattern : exclusionPatterns) {
-            if (location.matches(pattern)) {
-                log.trace("skipping excluded " + location);
-                return;
-            }
+        if (isExcluded(location)) {
+            log.trace("skipping excluded " + location);
+            return;
         }
         log.trace("changing: " + location + " " + exclusionPatterns);
         changing = true;
     }
+
+	private boolean isExcluded(String location) {
+		for (String pattern : exclusionPatterns) {
+            if (location.matches(pattern)) {
+            	return true;
+            }
+        }
+		return false;
+	}
     
     public void addURLExclusionPattern(String pattern) {
         exclusionPatterns.add(pattern);
