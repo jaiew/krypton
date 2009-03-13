@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.util.Date;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -206,7 +207,13 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
         String path = "/blocking-servlet";
         handler.addServletWithMapping(BlockingHelloWorldServlet.class, path);
         int timeout = BlockingHelloWorldServlet.BLOCKING_TIME * 2;
-        AjaxWaitStrategy strategy = new AjaxWaitStrategy();
+        final long[] doneAt = new long[1];
+        AjaxWaitStrategy strategy = new AjaxWaitStrategy() {
+			public void decreaseNumberOfActiveAjaxRequests() {
+				doneAt[0] = System.currentTimeMillis();
+				super.decreaseNumberOfActiveAjaxRequests();
+			}
+        };
 		session.addWaitStrategy(strategy);
 
         session.openBrowser();
@@ -215,6 +222,9 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
         doLocalAjaxRequest(path);
         assertEquals(1, strategy.getNumberOfActiveAjaxRequests());
         timedWaitForIdle();
+        
+        long ajaxDoneAt = Long.parseLong(session.evaluate("Twist.ajaxDoneAt"));
+        assertTrue("onreadystate call back was called after strategy became idle.", ajaxDoneAt < doneAt[0]);
 
         assertTrue("idle < timeout: " + idleTime + " < " + timeout, idleTime < timeout);
         assertTrue("idle >= blocking: " + idleTime + " >= " + BlockingHelloWorldServlet.BLOCKING_TIME, idleTime >= BlockingHelloWorldServlet.BLOCKING_TIME);

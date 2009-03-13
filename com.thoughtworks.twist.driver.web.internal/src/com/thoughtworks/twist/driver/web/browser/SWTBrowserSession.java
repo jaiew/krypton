@@ -39,6 +39,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
@@ -81,6 +82,7 @@ public class SWTBrowserSession implements BrowserSession {
 	private Map<String, String> resourcesByName = new HashMap<String, String>();
 	private Set<String> verifiedJavaScripts = new HashSet<String>();
 	private Map<String, String> minifiedJavaScripts = new HashMap<String, String>();
+	private Map<String, XPathExpression> compiledXPaths = new HashMap<String, XPathExpression>();
 
 	private Shell shell;
 	private DocumentBuilder documentBuilder;
@@ -281,9 +283,14 @@ public class SWTBrowserSession implements BrowserSession {
 
 	public List<Node> locateAll(String xpathExpression) {
 		try {
+			XPathExpression compiled = compiledXPaths.get(xpathExpression);
+			if (compiled == null) {
+				compiled = xpath.compile(xpathExpression);
+				compiledXPaths.put(xpathExpression, compiled);
+			}
 			log.debug("Locating all elements using '" + xpathExpression + "'");
 			List<Node> result = new ArrayList<Node>();
-			NodeList nodeList = (NodeList) xpath.evaluate(xpathExpression, dom(), XPathConstants.NODESET);
+			NodeList nodeList = (NodeList) compiled.evaluate(dom(), XPathConstants.NODESET);
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				result.add(nodeList.item(i));
 			}

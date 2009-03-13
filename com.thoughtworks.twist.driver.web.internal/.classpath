@@ -8,5 +8,7 @@
 	<classpathentry kind="lib" path="lib/xercesImpl-2.9.1.jar" sourcepath="lib/src/Xerces-J-src.2.9.1.zip"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="lib" path="/Users/Admin/Downloads/css-validator.jar"/>
+	<classpathentry kind="lib" path="/Users/Admin/Downloads/velocity-1.6.1/velocity-1.6.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

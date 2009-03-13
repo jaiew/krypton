@@ -47,6 +47,16 @@ public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
 		this.session.getBrowser().addLocationListener(this);
 	}
 
+	public void increaseNumberOfActiveAjaxRequests() {
+		numberOfActiveAjaxRequests++;
+		log.debug("new Ajax request, total: " + numberOfActiveAjaxRequests);
+	}
+
+	public void decreaseNumberOfActiveAjaxRequests() {
+		numberOfActiveAjaxRequests--;
+		log.debug("done Ajax request, total: " + numberOfActiveAjaxRequests);
+	}
+
 	public void changed(LocationEvent event) {
 		if (event.top) {
 			numberOfActiveAjaxRequests = 0;
@@ -56,8 +66,7 @@ public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
 			increaseNumberOfActiveAjaxRequests = new BrowserFunction(session.getBrowser(), "increaseNumberOfActiveAjaxRequests") {
 				public Object function(Object[] arguments) {
 					if (!isUrlExcluded(arguments[0].toString())) {
-						numberOfActiveAjaxRequests++;
-						log.debug("new Ajax request, total: " + numberOfActiveAjaxRequests);
+						increaseNumberOfActiveAjaxRequests();
 					}
 					return null;
 				}
@@ -68,8 +77,7 @@ public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
 			decreaseNumberOfActiveAjaxRequests = new BrowserFunction(session.getBrowser(), "decreaseNumberOfActiveAjaxRequests") {
 				public Object function(Object[] arguments) {
 					if (!isUrlExcluded(arguments[0].toString())) {						
-						numberOfActiveAjaxRequests--;
-						log.debug("done Ajax request, total: " + numberOfActiveAjaxRequests);
+						decreaseNumberOfActiveAjaxRequests();
 					}
 					return null;
 				}

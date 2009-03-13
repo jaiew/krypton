@@ -1,3 +1,4 @@
+
 if (!Twist) {
     var Twist = {};
 }
@@ -20,7 +21,7 @@ if (!Twist.ajaxWaitStrategy) {
                 if (aClass.toLowerCase().indexOf('xmlhttp') != -1) {
                     var self = this;
                     this.open = function(type, url, asynchronous, username, password){
-						self.url = url;
+                        self.url = url;
                         increaseNumberOfActiveAjaxRequests(url);
                         base.onreadystatechange = function(){
                             self.readyState = base.readyState;
@@ -69,17 +70,20 @@ if (!Twist.ajaxWaitStrategy) {
             if (window.XMLHttpRequest.prototype.realOpen) {
                 return;
             }
+            
             window.XMLHttpRequest.prototype.realOpen = window.XMLHttpRequest.prototype.open;
             window.XMLHttpRequest.prototype.open = function(type, url, asynchronous, username, password){
                 if (asynchronous) {
                     increaseNumberOfActiveAjaxRequests(url);
                     this.addEventListener('load', function(event){
-                    	setTimeout(function() {
-	                        decreaseNumberOfActiveAjaxRequests(url);
-	                   	}, 100);
+                        setTimeout(function(){
+                            decreaseNumberOfActiveAjaxRequests(url);
+                        }, 10);
                     }, true);
                     this.addEventListener('error', function(event){
-                        decreaseNumberOfActiveAjaxRequests(url);
+                        setTimeout(function(){
+                            decreaseNumberOfActiveAjaxRequests(url);
+                        }, 10);
                     }, true);
                 }
                 return this.realOpen(type, url, asynchronous, username, password);
@@ -92,6 +96,5 @@ if (!Twist.ajaxWaitStrategy) {
         else {
             interceptXMLHttpRequest();
         }
-    }
-();
+    }();
 }

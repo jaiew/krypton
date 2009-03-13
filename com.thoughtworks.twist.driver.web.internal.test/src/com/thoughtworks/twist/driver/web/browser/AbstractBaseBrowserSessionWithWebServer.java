@@ -80,7 +80,7 @@ public abstract class AbstractBaseBrowserSessionWithWebServer extends AbstractBa
     }
 
     protected void doLocalAjaxRequest(String path) throws MalformedURLException {
-        session.execute("var http = " + createXMLHttpRequest() + "; http.open('GET', '" + localUrl(path) + "', true);  http.send('');");
+        session.execute("var http = " + createXMLHttpRequest() + "; http.onreadystatechange = function() { if (this.readyState == 4) { Twist.ajaxDoneAt = new Date().getTime(); } }; http.open('GET', '" + localUrl(path) + "', true); http.send('');");
         session.pumpEvents();
     }
 
