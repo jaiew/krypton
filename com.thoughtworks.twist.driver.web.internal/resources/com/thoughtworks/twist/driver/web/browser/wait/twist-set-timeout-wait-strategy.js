@@ -8,8 +8,8 @@ if (!Twist.setTimeoutWaitStrategy) {
     
     Twist.setTimeoutWaitStrategy = function(){
 
-        var realSetTimeout = window.setTimeout;
-        var realClearTimeout = window.clearTimeout;
+        Twist.realSetTimeout = window.setTimeout;
+        Twist.realClearTimeout = window.clearTimeout;
         var inSetTimeout = false;
         
         window.setTimeout = function(){
@@ -32,7 +32,7 @@ if (!Twist.setTimeoutWaitStrategy) {
             if (delay > 0 && delay < Twist.setTimeoutMaxDelay && !inSetTimeout) {
                 arguments[0] = wrapped;
             }
-            var timeoutID = Function.prototype.apply.call(realSetTimeout, this, arguments);
+            var timeoutID = Function.prototype.apply.call(Twist.realSetTimeout, this, arguments);
             if (wrapped === arguments[0]) {
 	            wrapped.timeoutID = timeoutID;
 				addActiveSetTimeout(timeoutID);
@@ -42,7 +42,7 @@ if (!Twist.setTimeoutWaitStrategy) {
         
         window.clearTimeout = function(timeoutID){
 			removeActiveSetTimeout(timeoutID);
-            realClearTimeout(timeoutID);
+            Twist.realClearTimeout(timeoutID);
         };
     }();
 }

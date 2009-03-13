@@ -56,7 +56,7 @@ public class BrowserSessionTest extends AbstractBaseBrowserSession {
         try {
             inject("test-does-not-exist.js");
             fail();
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
         }
     }
 

@@ -79,10 +79,10 @@ public class SWTBrowserSession implements BrowserSession {
 
 	private static final int DEFAULT_EVENTLOOP_TIMEOUT = 10 * 1000;
 
-	private Map<String, String> resourcesByName = new HashMap<String, String>();
-	private Set<String> verifiedJavaScripts = new HashSet<String>();
-	private Map<String, String> minifiedJavaScripts = new HashMap<String, String>();
-	private Map<String, XPathExpression> compiledXPaths = new HashMap<String, XPathExpression>();
+	private static Map<String, String> resourcesByName = new HashMap<String, String>();
+	private static Set<String> verifiedJavaScripts = new HashSet<String>();
+	private static Map<String, String> minifiedJavaScripts = new HashMap<String, String>();
+	private static Map<String, XPathExpression> compiledXPaths = new HashMap<String, XPathExpression>();
 
 	private Shell shell;
 	private DocumentBuilder documentBuilder;
@@ -164,9 +164,13 @@ public class SWTBrowserSession implements BrowserSession {
 
 	public void inject(final String script, final Class<?> baseClass) {
 		log.trace("Injecting " + script + " base class is " + baseClass);
-		String code = readResource(script, baseClass);
-		verifyJavaScript(code);
-		code = minifyJavaScript(script, code);
+		String code = minifiedJavaScripts.get(script);
+		if (code == null) {
+			code = readResource(script, baseClass);
+			verifyJavaScript(code);
+			code = minifyJavaScript(script, code);
+			minifiedJavaScripts.put(script, code);
+		}
 		browser.execute(code);
 	}
 
@@ -392,7 +396,12 @@ public class SWTBrowserSession implements BrowserSession {
 		}
 		InputStream in = null;
 		try {
-			in = new BufferedInputStream(baseClass.getResourceAsStream(resource));
+			InputStream resourceAsStream = baseClass.getResourceAsStream(resource);
+			if (resourceAsStream == null) {
+				throw new IllegalArgumentException("Could not find resource " + resource + " baseclass is " + baseClass.getName());
+			}
+
+			in = new BufferedInputStream(resourceAsStream);
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			int b = -1;
 			while ((b = in.read()) != -1) {
@@ -431,14 +440,11 @@ public class SWTBrowserSession implements BrowserSession {
 	}
 
 	private String minifyJavaScript(String script, String code) {
-		if (minifiedJavaScripts.containsKey(script)) {
-			return minifiedJavaScripts.get(script);
-		}
 		try {
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			new JSMin(new ByteArrayInputStream(code.getBytes("UTF-8")), out).jsmin();
 			String minified = new String(out.toByteArray(), "UTF-8");
-			minifiedJavaScripts.put(script, minified);
+			log.debug("Minified script " + script + " from " + code.length() + " to " + minified.length());
 			return minified;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
