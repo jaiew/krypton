@@ -7,13 +7,13 @@ Includes:
  - Eclipse, Copyright 2003, 2008 IBM Corporation and others. (Eclipse Public License v1.0)
  - Equinox, Copyright 2008 IBM Corporation and others. (Eclipse Public License v1.0)
  - OSGi, Copyright 2000-2008 OSGi Alliance. (Apache License, Version 2.0)
- - Commons Logging Pacakge, (Apache License, Version 2.0)
  - Rhino, Copyright 1997-2000 Mozilla Foundation. (Mozilla Public License, Version 1.1)
  - Selenium RC, Copyright 2006 ThoughtWorks, Inc. (Apache License, Version 2.0)
  - cssQuery, Copyright 2004-2005, Dave Edvards. (Lesser Gnu Public License 2.1)
  - domready.js, Copyright 2009 John Resig. (MIT License)
  - nekohtml, Copyright 2002-2008, Andy Clark. (Apache License, Version 2.0)
  - Xerces2 Java, Copyright 1999-2007, The Apache Software Foundation. (Apache License, Version 2.0)
+ - SLF4J, Copyright 2004-2008, QOS.ch. (MIT License)
 
 
 The Twist Driver for Web drives the SWT Browser using native OS events.
