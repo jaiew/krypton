@@ -23,8 +23,8 @@ package com.thoughtworks.twist.driver.web.browser.wait;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
 
@@ -34,7 +34,7 @@ public class LocationChangedWaitStrategy implements LocationListener, WaitStrate
     private boolean changing;
 
     List<String> exclusionPatterns = new ArrayList<String>();
-    Log log = LogFactory.getLog(getClass());
+    Logger log = LoggerFactory.getLogger(getClass());
 
     public void init(BrowserSession session) {
         session.getBrowser().addLocationListener(this);
@@ -60,16 +60,16 @@ public class LocationChangedWaitStrategy implements LocationListener, WaitStrate
             return;
         }
         changing = false;
-        log.trace("changed: " + location);
+        log.trace("changed: {}", location);
     }
 
     public void changing(LocationEvent event) {
         String location = event.location;
         if (isExcluded(location)) {
-            log.trace("skipping excluded " + location);
+            log.trace("skipping excluded {}", location);
             return;
         }
-        log.trace("changing: " + location + " " + exclusionPatterns);
+        log.trace("changing: {} {}", location, exclusionPatterns);
         changing = true;
     }
 

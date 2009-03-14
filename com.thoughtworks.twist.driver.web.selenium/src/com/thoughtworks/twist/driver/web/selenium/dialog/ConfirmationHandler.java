@@ -23,8 +23,8 @@ package com.thoughtworks.twist.driver.web.selenium.dialog;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
@@ -37,7 +37,7 @@ public class ConfirmationHandler implements LocationListener, DialogHandler {
 	private boolean confirmationAnswer = true;
 	private BrowserFunction confirm;
 
-	Log log = LogFactory.getLog(getClass());
+ Logger log = LoggerFactory.getLogger(getClass());
 
 	public ConfirmationHandler(BrowserSession session) {
 		this.session = session;
@@ -51,7 +51,9 @@ public class ConfirmationHandler implements LocationListener, DialogHandler {
 			}
 			confirm = new BrowserFunction(session.getBrowser(), "confirm") {
 				public Object function(Object[] arguments) {
-					confirmations.add((String) arguments[0]);
+					String message = (String) arguments[0];
+					confirmations.add(message);
+					log.info("confirmation: {}: {}", message, confirmationAnswer);
 					boolean result = confirmationAnswer;
 					confirmationAnswer = true;
 					return result;

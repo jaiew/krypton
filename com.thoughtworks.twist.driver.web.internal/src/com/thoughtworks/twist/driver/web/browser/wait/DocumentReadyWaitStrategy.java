@@ -20,8 +20,8 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.browser.wait;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
@@ -29,7 +29,7 @@ import org.eclipse.swt.browser.LocationListener;
 import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 
 public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener {
-	Log log = LogFactory.getLog(getClass());
+ Logger log = LoggerFactory.getLogger(getClass());
 
 	private BrowserSession session;
 	private boolean isDomReady = true;
@@ -50,7 +50,7 @@ public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener
 			documentIsReady = new BrowserFunction(session.getBrowser(), "documentIsReady") {
 				public Object function(Object[] arguments) {
 					isDomReady = true;
-					log.debug("DOM is ready: " + event.location);
+					log.debug("DOM is ready: {}", event.location);
 					return null;
 				}
 			};

@@ -29,8 +29,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.eclipse.swt.widgets.Display;
 
 public class Decorators {
@@ -102,16 +102,16 @@ public class Decorators {
 
 	private static final class LoggingDecorator<T> implements InvocationHandler {
 		private T anInstance;
-		private Log log;
+		private Logger log;
 
 		private LoggingDecorator(T anInstance) {
 			this.anInstance = anInstance;
-			this.log = LogFactory.getLog(anInstance.getClass());
+			this.log = LoggerFactory.getLogger(anInstance.getClass());
 		}
 
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			try {
-				log.debug(method.getName() + ": " + Arrays.toString(args));
+				log.debug("{}: {}", method.getName(), args);
 				return method.invoke(anInstance, args);
 			} catch (InvocationTargetException e) {
 				throw e.getCause();

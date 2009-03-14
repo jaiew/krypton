@@ -23,8 +23,8 @@ package com.thoughtworks.twist.driver.web.browser.wait;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
@@ -35,7 +35,7 @@ import com.thoughtworks.twist.driver.web.browser.JavascriptException;
 public class SetTimeoutWaitStrategy implements LocationListener, WaitStrategy {
 	private static final int DEFAULT_SET_TIMEOUT_MAX_DELAY = 2500;
 	BrowserSession session;
-    Log log = LogFactory.getLog(getClass());
+    Logger log = LoggerFactory.getLogger(getClass());
 
     private int setTimeoutMaxDelay = DEFAULT_SET_TIMEOUT_MAX_DELAY;
 	private BrowserFunction addActiveSetTimeout;
@@ -57,7 +57,7 @@ public class SetTimeoutWaitStrategy implements LocationListener, WaitStrategy {
 				public Object function(Object[] arguments) {
 					int timeoutId = ((Number) arguments[0]).intValue();
 					activeSetTimeouts.add(timeoutId);
-					log.debug("new setTimeout: " + timeoutId + " total: " + activeSetTimeouts.size());
+					log.debug("new setTimeout: {} total: {}", timeoutId, activeSetTimeouts.size());
 					return null;
 				}
 			};
@@ -68,7 +68,7 @@ public class SetTimeoutWaitStrategy implements LocationListener, WaitStrategy {
 				public Object function(Object[] arguments) {
 					int timeoutId = ((Number) arguments[0]).intValue();
 					activeSetTimeouts.remove(timeoutId);
-					log.debug("done setTimeout: " + timeoutId + " total: " + activeSetTimeouts.size());
+					log.debug("done setTimeout: {} total: {}", timeoutId, activeSetTimeouts.size());
 					return null;
 				}
 			};

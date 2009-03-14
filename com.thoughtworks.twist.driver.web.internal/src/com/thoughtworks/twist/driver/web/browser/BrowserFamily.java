@@ -20,11 +20,8 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.browser;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationEvent;
@@ -216,12 +213,7 @@ public enum BrowserFamily {
 
 	public static final String SYSTEM_PROPERTY = "twist.driver.web.browser";
 
-	static {
-//		 Logger.getLogger("").setLevel(Level.FINEST);
-//		 Logger.getLogger("").getHandlers()[0].setLevel(Level.FINEST);
-	}
-
-	Log log = LogFactory.getLog(getClass());
+	Logger log = LoggerFactory.getLogger(getClass());
 
 	public BrowserSession create() {
 		final Shell shell = new Shell();
@@ -230,7 +222,7 @@ public enum BrowserFamily {
 		shell.setSize(1024, 768);
 
 		Browser.clearSessions();
-		log.debug("Creating browser: " + name());
+		log.debug("Creating browser: {}", name());
 		Browser browser = create(shell);
 
 		layoutBrowser(browser);
@@ -246,7 +238,7 @@ public enum BrowserFamily {
 		addListeners(shell, location, browser);
 		String userAgentString = session.evaluate("navigator.userAgent");
 		userAgent.setText(userAgentString);
-		log.info("Initialized BrowserSession using " + userAgentString);
+		log.info("Initialized BrowserSession using {}", userAgentString);
 
 		return session;
 	}

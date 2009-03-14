@@ -182,16 +182,7 @@ public class SeleneseTestCase extends TestCase {
 	}
 
 	private static int findAvailablePort() {
-		for (int i = WEBSERVER_PORT; i < Short.MAX_VALUE * 2 - 1; i++) {
-			try {
-				ServerSocket socket = new ServerSocket(i);
-				Thread.sleep(1000);
-				socket.close();
-				return i;
-			} catch (Exception tryNextPort) {
-			}
-		}
-		throw new IllegalStateException("Could not find an available port!");
+		return WEBSERVER_PORT + BrowserFamily.fromSystemProperty().ordinal();
 	}
 
 	/**

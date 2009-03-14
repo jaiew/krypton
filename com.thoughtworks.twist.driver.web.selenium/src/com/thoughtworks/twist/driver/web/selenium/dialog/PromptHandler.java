@@ -23,8 +23,8 @@ package com.thoughtworks.twist.driver.web.selenium.dialog;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
@@ -34,7 +34,7 @@ import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 public class PromptHandler implements LocationListener, DialogHandler {
 	private final BrowserSession session;
 	private List<String> prompts = new ArrayList<String>();
-	Log log = LogFactory.getLog(getClass());
+ Logger log = LoggerFactory.getLogger(getClass());
 
 	private String answer = "";
 
@@ -52,8 +52,10 @@ public class PromptHandler implements LocationListener, DialogHandler {
 			}
 			prompt = new BrowserFunction(session.getBrowser(), "prompt") {
 				public Object function(Object[] arguments) {
-					prompts.add((String) arguments[0]);
+					String message = (String) arguments[0];
+					prompts.add(message);
 					String result = arguments.length == 2 ? arguments[1] + "" : answer;
+					log.info("prompt: {}: {}", message, result);
 					answer = "";
 					return result;
 				}

@@ -43,8 +43,8 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.xerces.parsers.DOMParser;
 import org.cyberneko.html.HTMLConfiguration;
 import org.eclipse.swt.browser.Browser;
@@ -65,6 +65,7 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.sun.tools.javac.util.Position;
 import com.thoughtworks.twist.driver.web.browser.jsmin.JSMin;
 import com.thoughtworks.twist.driver.web.browser.locator.ElementNotFoundException;
 import com.thoughtworks.twist.driver.web.browser.locator.LocatorStrategy;
@@ -101,7 +102,7 @@ public class SWTBrowserSession implements BrowserSession {
 
 	private String windowExpression = "window";
 
-	private Log log = LogFactory.getLog(getClass());
+	private Logger log = LoggerFactory.getLogger(getClass());
 
 	private BrowserFamily browserFamily;
 
@@ -124,7 +125,7 @@ public class SWTBrowserSession implements BrowserSession {
 
 			parser = new DOMParser(configuration);
 
-			log.info("Created BrowserSession using browser " + getBrowserFamily());
+			log.info("Created BrowserSession using browser {}", getBrowserFamily());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -163,7 +164,7 @@ public class SWTBrowserSession implements BrowserSession {
 	}
 
 	public void inject(final String script, final Class<?> baseClass) {
-		log.trace("Injecting " + script + " base class is " + baseClass);
+		log.trace("Injecting {} base class is {}", script, baseClass);
 		String code = minifiedJavaScripts.get(script);
 		if (code == null) {
 			code = readResource(script, baseClass);
@@ -198,7 +199,7 @@ public class SWTBrowserSession implements BrowserSession {
 		parser.parse(new InputSource(new StringReader(dom)));
 		document = parser.getDocument();
 		postProcessAttributes(document);
-		log.warn("innerHTML took: " + (System.currentTimeMillis() - now) + " ms. (" + dom.length() + " chars)");
+		log.warn("innerHTML took: {} ms. ({} chars)", (System.currentTimeMillis() - now), dom.length());
 		return document;
 	}
 
@@ -206,7 +207,7 @@ public class SWTBrowserSession implements BrowserSession {
 		long now = System.currentTimeMillis();
 		String dom = XHTML1_STRICT_DOCTYPE + domAsString();
 		document = documentBuilder.parse(new InputSource(new StringReader(dom)));
-		log.warn("Parsing DOM took: " + (System.currentTimeMillis() - now) + " ms. (" + dom.length() + " chars)");
+		log.warn("Parsing DOM took: {} ms. ({} chars)", (System.currentTimeMillis() - now), dom.length());
 		return document;
 	}
 
@@ -259,14 +260,14 @@ public class SWTBrowserSession implements BrowserSession {
 		String[] values = rectangle.split(",");
 		Rectangle boundingRectangle = new Rectangle(Integer.parseInt(values[0]), Integer.parseInt(values[1]), Integer.parseInt(values[2]),
 				Integer.parseInt(values[3]));
-		log.trace("Bounding rectangle of " + element + " is " + boundingRectangle);
+		log.trace("Bounding rectangle of {} is {}", element, boundingRectangle);
 		return boundingRectangle;
 	}
 
 	public Point center(Element element) {
 		Rectangle rectangle = boundingRectangle(element);
 		Point center = new Point(rectangle.x + rectangle.width / 2, rectangle.y + rectangle.height / 2);
-		log.trace("Center of " + element + " is " + center);
+		log.trace("Center of {}  is {}", element, center);
 		return center;
 	}
 
@@ -277,7 +278,7 @@ public class SWTBrowserSession implements BrowserSession {
 			if (strategy.canLocate(locator)) {
 				Element element = strategy.locate(this, locator);
 				if (element != null) {
-					log.debug("Located " + element + " using '" + locator + "' (took " + (System.currentTimeMillis() - now) + " ms.)");
+					log.debug("Located {} using '{}' (took {} ms.)", new Object[] {element, locator, (System.currentTimeMillis() - now)});
 					return element;
 				}
 			}
@@ -292,7 +293,7 @@ public class SWTBrowserSession implements BrowserSession {
 				compiled = xpath.compile(xpathExpression);
 				compiledXPaths.put(xpathExpression, compiled);
 			}
-			log.debug("Locating all elements using '" + xpathExpression + "'");
+			log.debug("Locating all elements using '{}'", xpathExpression);
 			List<Node> result = new ArrayList<Node>();
 			NodeList nodeList = (NodeList) compiled.evaluate(dom(), XPathConstants.NODESET);
 			for (int i = 0; i < nodeList.getLength(); i++) {
@@ -306,20 +307,20 @@ public class SWTBrowserSession implements BrowserSession {
 
 	public void fireEvent(Element element, String eventName) {
 		inject("twist-events.js", getClass());
-		log.debug("Firing JavaScript event '" + eventName + "' on " + element);
+		log.debug("Firing JavaScript event '{}' on {}",  eventName, element);
 		execute("Twist.fireEvent(" + domExpression(element) + ", '" + eventName + "')");
 	}
 
 	public void setCursorPosition(Element element, int position) {
 		inject("twist-cursor-position.js", getClass());
-		log.debug("Setting cursor positon to " + position + " at " + element);
+		log.debug("Setting cursor positon to {} at {}", position, element);
 		execute("Twist.setCursorPosition(" + domExpression(element) + ", " + position + ")");
 	}
 
 	public int getCursorPosition(Element element) {
 		inject("twist-cursor-position.js", getClass());
 		int position = Integer.parseInt(evaluate("Twist.getCursorPosition(" + domExpression(element) + ")"));
-		log.debug("Cursor positon is " + position + " at " + element);
+		log.debug("Cursor positon is {} at {}", position, element);
 		return position;
 	}
 
@@ -381,7 +382,7 @@ public class SWTBrowserSession implements BrowserSession {
 			element = (Element) element.getParentNode();
 		}
 		String domExpression = getDocumentExpression() + ".documentElement" + expression;
-		log.trace("DOM Expression of " + original + " is '" + domExpression + "'");
+		log.trace("DOM Expression of {} is '{}'", original, domExpression);
 		return domExpression;
 	}
 
@@ -444,7 +445,7 @@ public class SWTBrowserSession implements BrowserSession {
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			new JSMin(new ByteArrayInputStream(code.getBytes("UTF-8")), out).jsmin();
 			String minified = new String(out.toByteArray(), "UTF-8");
-			log.debug("Minified script " + script + " from " + code.length() + " to " + minified.length());
+			log.debug("Minified script {} from {} to {}", new Object[] {script, code.length(), minified.length()});
 			return minified;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -486,7 +487,7 @@ public class SWTBrowserSession implements BrowserSession {
 		}
 
 		public String evaluate(final String expression) {
-			log.debug("Executing JavaScript: " + expression);
+			log.debug("Executing JavaScript: {}", expression);
 			String script = "try { window.status = '" + RETURN_VALUE + "' + (" + expression + ");} catch (e) { window.status = '"
 					+ EXCEPTION + "' + e; }";
 			verifyJavaScript(script);
@@ -502,14 +503,14 @@ public class SWTBrowserSession implements BrowserSession {
 				log.debug("Caught JavaScript exception", exception);
 				throw exception;
 			}
-			log.debug("JavaScript returned: " + returnValue);
+			log.debug("JavaScript returned: {}", returnValue);
 			return returnValue;
 		}
 	}
 
 	public String getText(Node node) {
 		String text = normalizeNewlines(escapeAposForIE(getText(node, false))).trim();
-		log.debug("Text of " + node + " is: " + text);
+		log.debug("Text of {} is: {}", node, text);
 		return text;
 	}
 
@@ -558,11 +559,11 @@ public class SWTBrowserSession implements BrowserSession {
 	}
 
 	public void setWindowExpression(String domExpression) {
-		log.debug("Changing target window to: '" + domExpression + "'");
+		log.debug("Changing target window to: '{}'", domExpression);
 		emptyDocumentCache();
 		inject("twist-normalize-frame.js");
 		windowExpression = evaluate("Twist.normalizeFrame(" + domExpression + ")");
-		log.debug("Target window normalized as: '" + windowExpression + "'");
+		log.debug("Target window normalized as: '{}'", windowExpression);
 	}
 
 	private void emptyDocumentCache() {
