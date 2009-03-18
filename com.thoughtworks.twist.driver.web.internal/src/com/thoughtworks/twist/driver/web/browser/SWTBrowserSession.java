@@ -43,8 +43,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.apache.xerces.parsers.DOMParser;
 import org.cyberneko.html.HTMLConfiguration;
 import org.eclipse.swt.browser.Browser;
@@ -56,6 +54,8 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.Parser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -65,7 +65,6 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import com.sun.tools.javac.util.Position;
 import com.thoughtworks.twist.driver.web.browser.jsmin.JSMin;
 import com.thoughtworks.twist.driver.web.browser.locator.ElementNotFoundException;
 import com.thoughtworks.twist.driver.web.browser.locator.LocatorStrategy;
@@ -74,9 +73,6 @@ import com.thoughtworks.twist.driver.web.browser.wait.WaitTimedOutException;
 
 public class SWTBrowserSession implements BrowserSession {
 	private static final String[] BOOLEAN_ATTRIBUTES = { "checked", "selected", "disabled", "readonly", "multiple" };
-
-	private static final String XHTML1_STRICT_DOCTYPE = "<!DOCTYPE html\n" + "PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n"
-			+ "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n";
 
 	private static final int DEFAULT_EVENTLOOP_TIMEOUT = 10 * 1000;
 
@@ -124,7 +120,7 @@ public class SWTBrowserSession implements BrowserSession {
 			configuration.setProperty("http://cyberneko.org/html/properties/names/attrs", "lower");
 
 			parser = new DOMParser(configuration);
-
+			
 			log.info("Created BrowserSession using browser {}", getBrowserFamily());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -200,14 +196,6 @@ public class SWTBrowserSession implements BrowserSession {
 		document = parser.getDocument();
 		postProcessAttributes(document);
 		log.warn("innerHTML took: {} ms. ({} chars)", (System.currentTimeMillis() - now), dom.length());
-		return document;
-	}
-
-	private Document parseDOMUsingConstructedXML() throws SAXException, IOException {
-		long now = System.currentTimeMillis();
-		String dom = XHTML1_STRICT_DOCTYPE + domAsString();
-		document = documentBuilder.parse(new InputSource(new StringReader(dom)));
-		log.warn("Parsing DOM took: {} ms. ({} chars)", (System.currentTimeMillis() - now), dom.length());
 		return document;
 	}
 
