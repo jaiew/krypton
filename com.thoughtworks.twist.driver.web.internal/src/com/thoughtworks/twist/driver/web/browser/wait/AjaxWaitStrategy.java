@@ -33,11 +33,11 @@ import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 import com.thoughtworks.twist.driver.web.browser.JavascriptException;
 
 public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
-    Logger log = LoggerFactory.getLogger(getClass());
+	Logger log = LoggerFactory.getLogger(getClass());
 
-    BrowserSession session;
+	BrowserSession session;
 	List<String> exclusionPatterns = new ArrayList<String>();
-	
+
 	private int numberOfActiveAjaxRequests = 0;
 	private BrowserFunction increaseNumberOfActiveAjaxRequests;
 	private BrowserFunction decreaseNumberOfActiveAjaxRequests;
@@ -60,38 +60,36 @@ public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
 	public void changed(LocationEvent event) {
 		if (event.top) {
 			numberOfActiveAjaxRequests = 0;
-			if (increaseNumberOfActiveAjaxRequests != null) {
-				increaseNumberOfActiveAjaxRequests.dispose();
-			}
-			increaseNumberOfActiveAjaxRequests = new BrowserFunction(session.getBrowser(), "increaseNumberOfActiveAjaxRequests") {
-				public Object function(Object[] arguments) {
-					if (!isUrlExcluded(arguments[0].toString())) {
-						increaseNumberOfActiveAjaxRequests();
+			if (increaseNumberOfActiveAjaxRequests == null) {
+				increaseNumberOfActiveAjaxRequests = new BrowserFunction(session.getBrowser(), "increaseNumberOfActiveAjaxRequests") {
+					public Object function(Object[] arguments) {
+						if (!isUrlExcluded(arguments[0].toString())) {
+							increaseNumberOfActiveAjaxRequests();
+						}
+						return null;
 					}
-					return null;
-				}
-			};
-			if (decreaseNumberOfActiveAjaxRequests != null) {
-				decreaseNumberOfActiveAjaxRequests.dispose();
+				};
 			}
-			decreaseNumberOfActiveAjaxRequests = new BrowserFunction(session.getBrowser(), "decreaseNumberOfActiveAjaxRequests") {
-				public Object function(Object[] arguments) {
-					if (!isUrlExcluded(arguments[0].toString())) {						
-						decreaseNumberOfActiveAjaxRequests();
+			if (decreaseNumberOfActiveAjaxRequests == null) {
+				decreaseNumberOfActiveAjaxRequests = new BrowserFunction(session.getBrowser(), "decreaseNumberOfActiveAjaxRequests") {
+					public Object function(Object[] arguments) {
+						if (!isUrlExcluded(arguments[0].toString())) {
+							decreaseNumberOfActiveAjaxRequests();
+						}
+						return null;
 					}
-					return null;
-				}
-			};
+				};
+			}
 			session.inject("twist-ajax-wait-strategy.js", getClass());
 		}
 	}
 
 	protected boolean isUrlExcluded(String url) {
-        for (String pattern : exclusionPatterns) {
-            if (url.matches(pattern)) {
-                return true;
-            }
-        }
+		for (String pattern : exclusionPatterns) {
+			if (url.matches(pattern)) {
+				return true;
+			}
+		}
 		return false;
 	}
 

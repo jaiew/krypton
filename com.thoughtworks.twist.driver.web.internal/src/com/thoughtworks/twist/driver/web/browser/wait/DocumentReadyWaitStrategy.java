@@ -20,13 +20,12 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.browser.wait;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.thoughtworks.twist.driver.web.browser.BrowserFamily;
 import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 
 public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener {

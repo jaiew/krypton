@@ -34,7 +34,7 @@ import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 public class AlertHandler implements LocationListener, DialogHandler {
 	private final BrowserSession session;
 	private List<String> alerts = new ArrayList<String>();
-    Logger log = LoggerFactory.getLogger(getClass());
+	Logger log = LoggerFactory.getLogger(getClass());
 
 	private BrowserFunction alert;
 
@@ -45,17 +45,16 @@ public class AlertHandler implements LocationListener, DialogHandler {
 
 	public void changed(LocationEvent event) {
 		if (event.top) {
-			if (alert != null) {
-				alert.dispose();
+			if (alert == null) {
+				alert = new BrowserFunction(session.getBrowser(), "alert") {
+					public Object function(Object[] arguments) {
+						String message = arguments[0] + "";
+						log.info("alert: {}", message);
+						alerts.add(message);
+						return null;
+					}
+				};
 			}
-			alert = new BrowserFunction(session.getBrowser(), "alert") {
-				public Object function(Object[] arguments) {
-					String message = arguments[0] + "";
-					log.info("alert: {}", message);
-					alerts.add(message);
-					return null;
-				}
-			};
 		}
 	}
 

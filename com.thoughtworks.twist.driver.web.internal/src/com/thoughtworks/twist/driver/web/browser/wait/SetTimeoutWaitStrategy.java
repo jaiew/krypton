@@ -35,43 +35,41 @@ import com.thoughtworks.twist.driver.web.browser.JavascriptException;
 public class SetTimeoutWaitStrategy implements LocationListener, WaitStrategy {
 	private static final int DEFAULT_SET_TIMEOUT_MAX_DELAY = 2500;
 	BrowserSession session;
-    Logger log = LoggerFactory.getLogger(getClass());
+	Logger log = LoggerFactory.getLogger(getClass());
 
-    private int setTimeoutMaxDelay = DEFAULT_SET_TIMEOUT_MAX_DELAY;
+	private int setTimeoutMaxDelay = DEFAULT_SET_TIMEOUT_MAX_DELAY;
 	private BrowserFunction addActiveSetTimeout;
 	private BrowserFunction removeActiveSetTimeout;
 	private Set<Integer> activeSetTimeouts = new HashSet<Integer>();
 
 	public void init(BrowserSession session) {
 		this.session = session;
-        session.getBrowser().addLocationListener(this);
-    }
+		session.getBrowser().addLocationListener(this);
+	}
 
 	public void changed(LocationEvent event) {
 		if (event.top) {
 			activeSetTimeouts.clear();
-			if (addActiveSetTimeout != null) {
-				addActiveSetTimeout.dispose();
+			if (addActiveSetTimeout == null) {
+				addActiveSetTimeout = new BrowserFunction(session.getBrowser(), "addActiveSetTimeout") {
+					public Object function(Object[] arguments) {
+						int timeoutId = ((Number) arguments[0]).intValue();
+						activeSetTimeouts.add(timeoutId);
+						log.debug("new setTimeout: {} total: {}", timeoutId, activeSetTimeouts.size());
+						return null;
+					}
+				};
 			}
-			addActiveSetTimeout = new BrowserFunction(session.getBrowser(), "addActiveSetTimeout") {
-				public Object function(Object[] arguments) {
-					int timeoutId = ((Number) arguments[0]).intValue();
-					activeSetTimeouts.add(timeoutId);
-					log.debug("new setTimeout: {} total: {}", timeoutId, activeSetTimeouts.size());
-					return null;
-				}
-			};
-			if (removeActiveSetTimeout != null) {
-				removeActiveSetTimeout.dispose();
+			if (removeActiveSetTimeout == null) {
+				removeActiveSetTimeout = new BrowserFunction(session.getBrowser(), "removeActiveSetTimeout") {
+					public Object function(Object[] arguments) {
+						int timeoutId = ((Number) arguments[0]).intValue();
+						activeSetTimeouts.remove(timeoutId);
+						log.debug("done setTimeout: {} total: {}", timeoutId, activeSetTimeouts.size());
+						return null;
+					}
+				};
 			}
-			removeActiveSetTimeout = new BrowserFunction(session.getBrowser(), "removeActiveSetTimeout") {
-				public Object function(Object[] arguments) {
-					int timeoutId = ((Number) arguments[0]).intValue();
-					activeSetTimeouts.remove(timeoutId);
-					log.debug("done setTimeout: {} total: {}", timeoutId, activeSetTimeouts.size());
-					return null;
-				}
-			};
 			session.inject("twist-set-timeout-wait-strategy.js", getClass());
 			session.execute("Twist.setTimeoutMaxDelay = " + setTimeoutMaxDelay);
 		}
@@ -91,7 +89,7 @@ public class SetTimeoutWaitStrategy implements LocationListener, WaitStrategy {
 		}
 	}
 
-    public void setSetTimeoutMaxDelay(int maxDelay) {
+	public void setSetTimeoutMaxDelay(int maxDelay) {
 		this.setTimeoutMaxDelay = maxDelay;
 	}
 

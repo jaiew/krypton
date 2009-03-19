@@ -34,7 +34,7 @@ import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 public class PromptHandler implements LocationListener, DialogHandler {
 	private final BrowserSession session;
 	private List<String> prompts = new ArrayList<String>();
- Logger log = LoggerFactory.getLogger(getClass());
+	Logger log = LoggerFactory.getLogger(getClass());
 
 	private String answer = "";
 
@@ -46,20 +46,19 @@ public class PromptHandler implements LocationListener, DialogHandler {
 	}
 
 	public void changed(LocationEvent event) {
-		if (event.top) {			
-			if (prompt != null) {
-				prompt.dispose();
+		if (event.top) {
+			if (prompt == null) {
+				prompt = new BrowserFunction(session.getBrowser(), "prompt") {
+					public Object function(Object[] arguments) {
+						String message = (String) arguments[0];
+						prompts.add(message);
+						String result = arguments.length == 2 ? arguments[1] + "" : answer;
+						log.info("prompt: {}: {}", message, result);
+						answer = "";
+						return result;
+					}
+				};
 			}
-			prompt = new BrowserFunction(session.getBrowser(), "prompt") {
-				public Object function(Object[] arguments) {
-					String message = (String) arguments[0];
-					prompts.add(message);
-					String result = arguments.length == 2 ? arguments[1] + "" : answer;
-					log.info("prompt: {}: {}", message, result);
-					answer = "";
-					return result;
-				}
-			};
 		}
 	}
 

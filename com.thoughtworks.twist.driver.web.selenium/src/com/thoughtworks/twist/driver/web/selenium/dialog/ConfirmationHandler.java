@@ -37,7 +37,7 @@ public class ConfirmationHandler implements LocationListener, DialogHandler {
 	private boolean confirmationAnswer = true;
 	private BrowserFunction confirm;
 
- Logger log = LoggerFactory.getLogger(getClass());
+	Logger log = LoggerFactory.getLogger(getClass());
 
 	public ConfirmationHandler(BrowserSession session) {
 		this.session = session;
@@ -45,20 +45,19 @@ public class ConfirmationHandler implements LocationListener, DialogHandler {
 	}
 
 	public void changed(LocationEvent event) {
-		if (event.top) {			
-			if (confirm != null) {
-				confirm.dispose();
+		if (event.top) {
+			if (confirm == null) {
+				confirm = new BrowserFunction(session.getBrowser(), "confirm") {
+					public Object function(Object[] arguments) {
+						String message = (String) arguments[0];
+						confirmations.add(message);
+						log.info("confirmation: {}: {}", message, confirmationAnswer);
+						boolean result = confirmationAnswer;
+						confirmationAnswer = true;
+						return result;
+					}
+				};
 			}
-			confirm = new BrowserFunction(session.getBrowser(), "confirm") {
-				public Object function(Object[] arguments) {
-					String message = (String) arguments[0];
-					confirmations.add(message);
-					log.info("confirmation: {}: {}", message, confirmationAnswer);
-					boolean result = confirmationAnswer;
-					confirmationAnswer = true;
-					return result;
-				}
-			};
 		}
 	}
 

@@ -120,7 +120,7 @@ public class SWTBrowserSession implements BrowserSession {
 			configuration.setProperty("http://cyberneko.org/html/properties/names/attrs", "lower");
 
 			parser = new DOMParser(configuration);
-			
+
 			log.info("Created BrowserSession using browser {}", getBrowserFamily());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
