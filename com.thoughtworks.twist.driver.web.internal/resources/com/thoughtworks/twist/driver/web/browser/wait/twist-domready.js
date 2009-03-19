@@ -5,7 +5,7 @@ if (!Twist) {
 
 if (!Twist.DomReady) {
     (function(){
-    
+
         var DomReady = window.Twist.DomReady = {};
         
         // Everything that has to do with properly supporting our document ready event. Brought over from the most awesome jQuery. 
@@ -18,6 +18,17 @@ if (!Twist.DomReady) {
             msie: (/msie/.test(userAgent)) && (!/opera/.test(userAgent)),
             mozilla: (/mozilla/.test(userAgent)) && (!/(compatible|webkit)/.test(userAgent))
         };
+		
+		if (browser.msie) {
+			Twist.reload = window.location.reload;
+			window.location.reload = function(force) {
+				if (force) {				
+					window.location = window.location;
+				} else {
+					Twist.reload(false);
+				}
+			};			
+		}
 		
         var readyBound = false;
         var isReady = false;

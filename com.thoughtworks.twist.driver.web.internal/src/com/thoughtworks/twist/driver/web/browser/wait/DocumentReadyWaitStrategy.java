@@ -26,6 +26,7 @@ import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
 
+import com.thoughtworks.twist.driver.web.browser.BrowserFamily;
 import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 
 public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener {
