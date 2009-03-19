@@ -19,6 +19,7 @@ if (!Twist.DomReady) {
             mozilla: (/mozilla/.test(userAgent)) && (!/(compatible|webkit)/.test(userAgent))
         };
 		
+		// TODO: Figure out a better way to detect different kind of reloads in IE.
 		if (browser.msie) {
 			Twist.reload = window.location.reload;
 			window.location.reload = function(force) {
@@ -27,7 +28,7 @@ if (!Twist.DomReady) {
 				} else {
 					Twist.reload(false);
 				}
-			};			
+			};
 		}
 		
         var readyBound = false;
