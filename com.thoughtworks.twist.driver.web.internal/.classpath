@@ -6,8 +6,8 @@
 	<classpathentry kind="lib" path="lib/nekohtml-1.9.11.jar" sourcepath="lib/src/nekohtml-1.9.11.zip"/>
 	<classpathentry kind="lib" path="lib/xercesImpl-2.9.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/slf4j-api-1.5.6.jar" sourcepath="lib/src/slf4j-api-1.5.6-sources.jar"/>
-	<classpathentry kind="lib" path="lib/slf4j-simple-1.5.6.jar" sourcepath="lib/slf4j-simple-1.5.6.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry exported="true" kind="lib" path="lib/slf4j-jdk14-1.5.6.jar" sourcepath="lib/src/slf4j-jdk14-1.5.6-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
