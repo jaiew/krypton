@@ -18,7 +18,7 @@ if (!Twist.DomReady) {
             msie: (/msie/.test(userAgent)) && (!/opera/.test(userAgent)),
             mozilla: (/mozilla/.test(userAgent)) && (!/(compatible|webkit)/.test(userAgent))
         };
-        
+		
         var readyBound = false;
         var isReady = false;
         var readyList = [];

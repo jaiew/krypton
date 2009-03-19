@@ -20,11 +20,15 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.browser.wait;
 
+import static com.thoughtworks.twist.driver.web.browser.BrowserFamily.IE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.util.Date;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -35,10 +39,6 @@ import org.junit.Test;
 
 import com.thoughtworks.twist.driver.web.browser.AbstractBaseBrowserSessionWithWebServer;
 import com.thoughtworks.twist.driver.web.browser.BrowserFamily;
-
-import static org.junit.Assert.*;
-
-import static com.thoughtworks.twist.driver.web.browser.BrowserFamily.*;
 
 public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer {
     private static final int SET_TIMEOUT_PRECISION = 50;
@@ -72,7 +72,7 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
 
         load(localUrl(path));
 
-        assertEquals("Hello World", session.dom().getDocumentElement().getTextContent());
+        assertEquals("Hello World", session.dom().getElementsByTagName("body").item(0).getTextContent());
     }
 
     @Test
@@ -121,10 +121,8 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
                 return busy;
             }
         };
-        
-        if (IE != session.getBrowserFamily()) { 
-            session.addWaitStrategy(new LocationChangedWaitStrategy());
-        }
+
+        session.addWaitStrategy(new LocationChangedWaitStrategy());
         session.addWaitStrategy(waitStrategy);
 
         session.openBrowser();
@@ -133,7 +131,11 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
         for (i = 0; i < REFRESHES; i++) {
             wasBusy[0] = false;
             assertReloadHelloWorld(path, timeout);
-            assertTrue(wasBusy[0]);
+
+            // The IE LocationListener fires changed on DocumentComplete, so no way to capture this in this using events way.
+            if (IE != session.getBrowserFamily()) { 
+            	assertTrue(wasBusy[0]);
+            }
         }
         assertEquals(REFRESHES, i);
     }

@@ -7,11 +7,11 @@ if (!Twist.dom) {
     Twist.isIE = window.ActiveXObject ? true : false;
 
     Twist.domFromInnerHTML = function(original){
-		if (Twist.isIE) {
-			var element = original;
-		} else {
+//		if (Twist.isIE) {
+//			var element = original;
+//		} else {
 			var element = original.cloneNode(true);
-		}
+//		}
 
         Twist.walkDom(element, original);
 
@@ -27,12 +27,15 @@ if (!Twist.dom) {
             Twist.walkDom(element.firstChild, original.firstChild);
     
             if (element.nodeName.toLowerCase() === "textarea") {
-                element.textContent = original.value;
+				if (!Twist.isIE) {					
+	                element.textContent = original.value;
+				}
             }
             
             element = element.nextSibling;
             original = original.nextSibling;
-            index++;
+
+			index++;
         }
     };
     
@@ -43,7 +46,7 @@ if (!Twist.dom) {
             return;
         }
         element.setAttribute("twist.domindex", index);
-		if (Twist.isIE) {
+		if (Twist.isIE && element === original) {
 			return;
 		}
 
@@ -67,7 +70,7 @@ if (!Twist.dom) {
             var typeOf = typeof(value);
             if (typeOf === "undefined" || value === null) {
                 continue;
-            }            
+            }
             
             if (value === "" && property === "value") {
                 if (element.type === "reset") {
@@ -81,7 +84,9 @@ if (!Twist.dom) {
                 }
             }
 			
-			if (value !== "" || property === "value") {
+			if (Twist.isIE) {
+				element[property] = value;
+			} else if (value !== "" || property === "value") {
                 element.setAttribute(property, value.toString());
             }
         }

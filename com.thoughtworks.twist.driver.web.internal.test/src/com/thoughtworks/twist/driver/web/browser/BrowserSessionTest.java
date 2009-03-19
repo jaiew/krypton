@@ -185,6 +185,13 @@ public class BrowserSessionTest extends AbstractBaseBrowserSession {
     }
 
     @Test
+    public void shouldUseValueForExistingValueAttributeForPasswordTextField() throws Exception {
+        render("<html><head/><body><input id=\"1\" type=\"password\" value=\"hello\"/></body></html>");
+        Element textfield = session.dom().getElementById("1");
+        assertEquals("hello", textfield.getAttribute("value"));
+    }
+
+    @Test
     public void shouldUseValueEmptyStringForNonExistingValueAttributeForTextArea() throws Exception {
         render("<html><head/><body><textarea id=\"1\"></textarea></body></html>");
         Element textarea = session.dom().getElementById("1");

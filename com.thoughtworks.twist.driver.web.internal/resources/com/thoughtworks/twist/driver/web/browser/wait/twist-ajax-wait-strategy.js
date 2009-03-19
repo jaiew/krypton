@@ -31,7 +31,9 @@ if (!Twist.ajaxWaitStrategy) {
                                 self.statusText = base.statusText;
                                 self.responseText = base.responseText;
                                 self.responseXML = base.responseXML;
-                                decreaseNumberOfActiveAjaxRequests(url);
+		                        setTimeout(function(){
+		                            decreaseNumberOfActiveAjaxRequests(url);
+		                        }, 10);
                             }
                             if (self.onreadystatechange) {
                                 self.onreadystatechange();

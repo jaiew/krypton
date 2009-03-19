@@ -216,6 +216,9 @@ public class SWTBrowserSession implements BrowserSession {
 			for (String attribute : BOOLEAN_ATTRIBUTES) {
 				element.setAttribute(attribute, element.hasAttribute(attribute) + "");
 			}
+			if ("textarea".equals(tagName)) {
+				element.setAttribute("value", element.getTextContent());
+			}
 			if ("input".equals(tagName)) {
 				if ("password".equals(type)) {
 					element.setAttribute("value", evaluate(domExpression + ".value"));
@@ -226,6 +229,9 @@ public class SWTBrowserSession implements BrowserSession {
 				if (!element.hasAttribute("value")) {
 					element.setAttribute("value", "");
 				}
+				if (element.hasAttribute("name")) {
+					element.setAttribute("name", evaluate(domExpression + ".name"));					
+				}
 			}
 		}
 	}
@@ -235,11 +241,6 @@ public class SWTBrowserSession implements BrowserSession {
 		if (id != null) {
 			element.setIdAttributeNode(id, true);
 		}
-	}
-
-	private String domAsString() {
-		inject("twist-dom.js");
-		return evaluate("Twist.dom(" + getDocumentExpression() + ".documentElement)");
 	}
 
 	public Rectangle boundingRectangle(Element element) {
