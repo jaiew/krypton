@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 
 public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener {
- Logger log = LoggerFactory.getLogger(getClass());
+	Logger log = LoggerFactory.getLogger(getClass());
 
 	private BrowserSession session;
 	private boolean isDomReady = true;

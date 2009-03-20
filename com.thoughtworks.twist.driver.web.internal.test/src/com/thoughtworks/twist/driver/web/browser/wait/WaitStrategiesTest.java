@@ -514,7 +514,8 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
 				response.setContentType("image/" + IMAGE_FORMAT);
 				OutputStream os = response.getOutputStream();
 				int chunkSize = IMAGE_BYTES.length / CHUNKS;
-				for (servedBytes = 0; servedBytes < IMAGE_BYTES.length;) {
+				servedBytes = 0;
+				for (int i = 0; i < CHUNKS; i++) {
 					os.write(IMAGE_BYTES, servedBytes, chunkSize);
 					os.flush();
 					Thread.sleep(BLOCKING_TIME * 2 / CHUNKS);
