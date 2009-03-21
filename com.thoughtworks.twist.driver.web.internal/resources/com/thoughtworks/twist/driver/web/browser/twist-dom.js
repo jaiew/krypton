@@ -7,14 +7,16 @@ if (!Twist.dom) {
     Twist.isIE = window.ActiveXObject ? true : false;
 
     Twist.domFromInnerHTML = function(original){
-//		if (Twist.isIE) {
-//			var element = original;
-//		} else {
+		if (Twist.isIE) {
+			var element = original;
+		} else {
 			var element = original.cloneNode(true);
-//		}
+		}
 
         Twist.walkDom(element, original);
-
+		if (Twist.isIE) {
+			return element.outerHTML;
+		}
         var tagName = original.tagName;
         return "<" + tagName + ">" + element.innerHTML + "</" + tagName + ">";
     };

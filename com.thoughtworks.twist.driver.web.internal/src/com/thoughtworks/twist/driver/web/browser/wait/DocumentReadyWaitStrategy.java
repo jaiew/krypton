@@ -26,6 +26,7 @@ import org.eclipse.swt.browser.LocationListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thoughtworks.twist.driver.web.browser.BrowserFamily;
 import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 
 public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener {
@@ -33,15 +34,17 @@ public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener
 
 	private BrowserSession session;
 	private boolean isDomReady = true;
+	private boolean unloaded;
+
 	private BrowserFunction documentIsReady;
 
-	public void init(final BrowserSession session) {
+	public void init(BrowserSession session) {
 		this.session = session;
 		session.getBrowser().addLocationListener(this);
 	}
 
 	public void changed(final LocationEvent event) {
-		if (event.top) {
+		if (event.top && BrowserFamily.IE != session.getBrowserFamily()) {
 			isDomReady = false;
 
 			if (documentIsReady != null) {
@@ -56,13 +59,34 @@ public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener
 			};
 			session.inject("twist-domready.js", getClass());
 			session.execute("Twist.DomReady.ready(documentIsReady)");
+		} else {
+			// TODO: We only need the window.location.reload override here really.
+			session.inject("twist-domready.js", getClass());
+			isDomReady = true;
 		}
 	}
 
 	public void changing(LocationEvent event) {
+		// TODO: The exclusion patterns need to be reused somehow.
+		if (event.location.startsWith("javascript:")) {
+			return;
+		}
+		isDomReady = false;
+		unloaded = false;
 	}
 
 	public boolean isBusy() {
+		if (BrowserFamily.IE == session.getBrowserFamily()) {			
+			if (isDomReady) {
+				return false;
+			}
+			boolean canScroll = session.getBrowser().execute("document.documentElement.doScroll('left');");
+			if (!canScroll) {
+				unloaded = true;
+			}
+			isDomReady = unloaded && canScroll;
+		}
 		return !isDomReady;
 	}
+
 }
