@@ -256,7 +256,7 @@ public enum BrowserFamily {
 		});
 		browser.addTitleListener(new TitleListener() {
 			public void changed(TitleEvent event) {
-				shell.setText(event.title);
+				shell.setText(name() + " - " + event.title);
 			}
 		});
 	}

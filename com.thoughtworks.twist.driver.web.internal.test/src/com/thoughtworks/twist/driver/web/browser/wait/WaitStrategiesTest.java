@@ -114,7 +114,7 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
 	public void shouldWaitForPageToLoadUsingDocumentReadyWaitStrategy() throws Exception {
 		String path = "/blocking-servlet";
 		handler.addServletWithMapping(SlowDocumentHelloWorldServlet.class, path);
-		int timeout = BLOCKING_TIME * 2; // 3
+		int timeout = BLOCKING_TIME * 2;
 
 		final boolean[] wasBusy = new boolean[1];
 		DocumentReadyWaitStrategy waitStrategy = new DocumentReadyWaitStrategy() {
@@ -143,10 +143,10 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
 
 	@Test
 	public void shouldWaitForPageButNotLargeImageToLoadUsingDocumentReadyWaitStrategy() throws Exception {
-		String path = "/blocking-servlet";
+		String path = "/blocking-servlet-with-image";
 		handler.addServletWithMapping(SlowDocumentHelloWorldServletWithImage.class, path);
 		handler.addServletWithMapping(SlowLoadingImageServlet.class, "/image-servlet/*");
-		int timeout = BLOCKING_TIME * 2; // 3
+		int timeout = BLOCKING_TIME * 2;
 
 		final boolean[] wasBusy = new boolean[1];
 		final int[] timesBusy = new int[1];
@@ -189,7 +189,7 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
 	public void shouldNotWaitForPageToLoadUsingDocumentReadyWaitStrategyForFastDOM() throws Exception {
 		String path = "/blocking-servlet";
 		handler.addServletWithMapping(BlockingHelloWorldServlet.class, path);
-		int timeout = BLOCKING_TIME * 2; // 3
+		int timeout = BLOCKING_TIME * 2;
 
 		final boolean[] wasBusy = new boolean[1];
 		DocumentReadyWaitStrategy waitStrategy = new DocumentReadyWaitStrategy() {
@@ -484,7 +484,7 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
 			try {
 				response.setHeader("Cache-Control", "no-cache");
 				OutputStreamWriter writer = new OutputStreamWriter(response.getOutputStream());
-				writer.write("<html><head></head><body>");
+				writer.write("<html><head/><body>");
 				writer.write("<div>" + CHUNK_OF_DATA.toString() + "</div><img src=\"/image-servlet/" + System.currentTimeMillis() + "\"/>");
 				writer.flush();
 				Thread.sleep(BLOCKING_TIME);
@@ -521,11 +521,12 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
 		// requests to the image and we use a static to track the number of
 		// served bytes.
 		public synchronized void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+			OutputStream os = null;
 			try {
 				timesCalled++;
 				response.setHeader("Cache-Control", "no-cache");
 				response.setContentType("image/" + IMAGE_FORMAT);
-				OutputStream os = response.getOutputStream();
+				os = response.getOutputStream();
 				int chunkSize = IMAGE_BYTES.length / CHUNKS;
 				servedBytes = 0;
 				for (int i = 0; i < CHUNKS; i++) {
@@ -534,8 +535,11 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
 					Thread.sleep(BLOCKING_TIME * 2 / CHUNKS);
 					servedBytes += chunkSize;
 				}
-				os.close();
 			} catch (InterruptedException e) {
+			} finally {
+				if (os != null) {					
+					os.close();
+				}
 			}
 		}
 	}
