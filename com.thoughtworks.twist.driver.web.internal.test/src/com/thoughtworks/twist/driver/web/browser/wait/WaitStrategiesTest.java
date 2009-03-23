@@ -20,11 +20,6 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.browser.wait;
 
-import static com.thoughtworks.twist.driver.web.browser.BrowserFamily.IE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -40,15 +35,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.swt.browser.BrowserFunction;
-import org.eclipse.swt.browser.LocationEvent;
-import org.eclipse.swt.browser.LocationListener;
-import org.eclipse.swt.browser.ProgressEvent;
-import org.eclipse.swt.browser.ProgressListener;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.thoughtworks.twist.driver.web.browser.AbstractBaseBrowserSessionWithWebServer;
 import com.thoughtworks.twist.driver.web.browser.BrowserFamily;
+
+import static org.junit.Assert.*;
 
 public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer {
 	private static final int BLOCKING_TIME = 500;
@@ -92,7 +85,7 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
 		String path = "/blocking-servlet";
 		handler.addServletWithMapping(BlockingHelloWorldServlet.class, path);
 		int timeout = BLOCKING_TIME * 2;
-		session.addWaitStrategy(new LocationChangedWaitStrategy());
+		session.addWaitStrategy(new DocumentReadyWaitStrategy());
 
 		session.openBrowser();
 
@@ -134,7 +127,6 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
 			}
 		};
 
-//		session.addWaitStrategy(new LocationChangedWaitStrategy());
 		session.addWaitStrategy(waitStrategy);
 
 		session.openBrowser();
@@ -171,7 +163,6 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
 			}
 		};
 
-//		session.addWaitStrategy(new LocationChangedWaitStrategy());
 		session.addWaitStrategy(waitStrategy);
 
 		session.openBrowser();
@@ -211,7 +202,6 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
 			}
 		};
 
-//		session.addWaitStrategy(new LocationChangedWaitStrategy());
 		session.addWaitStrategy(waitStrategy);
 
 		session.openBrowser();
@@ -228,6 +218,24 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
 		}
 		assertEquals(REFRESHES, i);
 	}
+	
+	@Test
+	public void shouldNotWaitForExcludedUrlUsinDocumentReadyWaitStrategy() throws Exception {
+		String path = "/blocking-servlet";
+		handler.addServletWithMapping(BlockingHelloWorldServlet.class, path);
+		DocumentReadyWaitStrategy strategy = new DocumentReadyWaitStrategy();
+		strategy.addURLExclusionPattern(".*/blocking-.*");
+		session.addWaitStrategy(strategy);
+
+		session.openBrowser();
+		load(localUrl(path));
+
+		session.getBrowser().execute("window.location = '" + localUrl(path) + "'");
+		timedWaitForIdle();
+
+		assertTrue("idle < blocking: " + idleTime + " < " + BLOCKING_TIME, idleTime < BLOCKING_TIME);
+	}
+
 	
 	// This just doesn't work
 

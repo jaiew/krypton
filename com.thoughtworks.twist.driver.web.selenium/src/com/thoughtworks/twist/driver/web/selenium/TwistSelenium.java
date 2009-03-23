@@ -20,8 +20,6 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.selenium;
 
-import static java.util.Arrays.asList;
-
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
@@ -53,7 +51,6 @@ import com.thoughtworks.twist.driver.web.browser.locator.ElementNotFoundExceptio
 import com.thoughtworks.twist.driver.web.browser.locator.XPathLocatorStrategy;
 import com.thoughtworks.twist.driver.web.browser.wait.AjaxWaitStrategy;
 import com.thoughtworks.twist.driver.web.browser.wait.DocumentReadyWaitStrategy;
-import com.thoughtworks.twist.driver.web.browser.wait.LocationChangedWaitStrategy;
 import com.thoughtworks.twist.driver.web.browser.wait.SetTimeoutWaitStrategy;
 import com.thoughtworks.twist.driver.web.selenium.dialog.AlertHandler;
 import com.thoughtworks.twist.driver.web.selenium.dialog.ConfirmationHandler;
@@ -72,6 +69,8 @@ import com.thoughtworks.twist.driver.web.selenium.stringmatch.RegexpMatcher;
 import com.thoughtworks.twist.driver.web.selenium.stringmatch.StringMatcher;
 import com.thoughtworks.twist.driver.web.user.User;
 import com.thoughtworks.twist.driver.web.user.UserFactory;
+
+import static java.util.Arrays.*;
 
 public class TwistSelenium implements Selenium {
 	private static final Pattern COOKIE_PATH_PATTERN = Pattern.compile("path=([\\w|/|-]+)");
@@ -93,7 +92,7 @@ public class TwistSelenium implements Selenium {
 	private ConfirmationHandler confirmationHandler;
 	private PromptHandler promptHandler;
 	private AjaxWaitStrategy ajaxWaitStrategy;
-	private LocationChangedWaitStrategy locationChangedWaitStrategy;
+	private DocumentReadyWaitStrategy documentReadyWaitStrategy;
 	private User user;
 
 	public TwistSelenium(String browserURL) {
@@ -1048,11 +1047,11 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void addLocationURLExclusionPattern(String pattern) {
-		locationChangedWaitStrategy.addURLExclusionPattern(pattern);
+		documentReadyWaitStrategy.addURLExclusionPattern(pattern);
 	}
 
 	private void removeLocationURLExclusionPattern(String pattern) {
-		locationChangedWaitStrategy.removeURLExclusionPattern(pattern);
+		documentReadyWaitStrategy.removeURLExclusionPattern(pattern);
 	}
 
 	public void setExcludedWaitURLs(String urls) {
@@ -1088,11 +1087,10 @@ public class TwistSelenium implements Selenium {
 	}
 
 	private void addWaitStrategies(final BrowserSession session) {
-		locationChangedWaitStrategy = new LocationChangedWaitStrategy();
-		session.addWaitStrategy(locationChangedWaitStrategy);
 		ajaxWaitStrategy = new AjaxWaitStrategy();
 		session.addWaitStrategy(ajaxWaitStrategy);
-		session.addWaitStrategy(new DocumentReadyWaitStrategy());
+		documentReadyWaitStrategy = new DocumentReadyWaitStrategy();
+		session.addWaitStrategy(documentReadyWaitStrategy);
 		session.addWaitStrategy(new SetTimeoutWaitStrategy());
 	}
 

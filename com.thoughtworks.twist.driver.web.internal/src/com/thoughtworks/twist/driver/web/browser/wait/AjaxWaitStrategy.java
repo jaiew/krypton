@@ -20,14 +20,15 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.browser.wait;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.twist.driver.web.browser.BrowserSession;
 import com.thoughtworks.twist.driver.web.browser.JavascriptException;
@@ -36,7 +37,7 @@ public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
 	Logger log = LoggerFactory.getLogger(getClass());
 
 	BrowserSession session;
-	List<String> exclusionPatterns = new ArrayList<String>();
+    Map<String,Pattern> exclusionPatterns = new HashMap<String,Pattern>();
 
 	private int numberOfActiveAjaxRequests = 0;
 	private BrowserFunction increaseNumberOfActiveAjaxRequests;
@@ -63,7 +64,7 @@ public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
 			if (increaseNumberOfActiveAjaxRequests == null) {
 				increaseNumberOfActiveAjaxRequests = new BrowserFunction(session.getBrowser(), "increaseNumberOfActiveAjaxRequests") {
 					public Object function(Object[] arguments) {
-						if (!isUrlExcluded(arguments[0].toString())) {
+						if (!isExcluded(arguments[0].toString())) {
 							increaseNumberOfActiveAjaxRequests();
 						}
 						return null;
@@ -73,7 +74,7 @@ public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
 			if (decreaseNumberOfActiveAjaxRequests == null) {
 				decreaseNumberOfActiveAjaxRequests = new BrowserFunction(session.getBrowser(), "decreaseNumberOfActiveAjaxRequests") {
 					public Object function(Object[] arguments) {
-						if (!isUrlExcluded(arguments[0].toString())) {
+						if (!isExcluded(arguments[0].toString())) {
 							decreaseNumberOfActiveAjaxRequests();
 						}
 						return null;
@@ -82,15 +83,6 @@ public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
 			}
 			session.inject("twist-ajax-wait-strategy.js", getClass());
 		}
-	}
-
-	protected boolean isUrlExcluded(String url) {
-		for (String pattern : exclusionPatterns) {
-			if (url.matches(pattern)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	public void changing(LocationEvent event) {
@@ -109,13 +101,22 @@ public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
 		}
 	}
 
-	public void addURLExclusionPattern(String pattern) {
-		exclusionPatterns.add(pattern);
+	private boolean isExcluded(String location) {
+		for (Pattern pattern : exclusionPatterns.values()) {
+            if (pattern.matcher(location).matches()) {
+            	return true;
+            }
+        }
+		return false;
 	}
+    
+    public void addURLExclusionPattern(String pattern) {
+        exclusionPatterns.put(pattern, Pattern.compile(pattern));
+    }
 
-	public void removeURLExclusionPattern(String pattern) {
-		exclusionPatterns.remove(pattern);
-	}
+    public void removeURLExclusionPattern(String pattern) {
+        exclusionPatterns.remove(pattern);
+    }
 
 	public int getNumberOfActiveAjaxRequests() {
 		return numberOfActiveAjaxRequests;

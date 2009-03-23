@@ -20,6 +20,10 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.browser.wait;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
+
 import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
@@ -38,12 +42,27 @@ public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener
 
 	private BrowserFunction documentIsReady;
 
-	public void init(BrowserSession session) {
+    Map<String,Pattern> exclusionPatterns = new HashMap<String,Pattern>();
+
+    public void init(BrowserSession session) {
 		this.session = session;
-		session.getBrowser().addLocationListener(this);
-	}
+        session.getBrowser().addLocationListener(this);
+
+        addURLExclusionPattern("javascript:.*");
+        addURLExclusionPattern("about:blank");
+        addURLExclusionPattern("about:config");
+
+        // This obviously needs to be configurable somehow.
+        addURLExclusionPattern(".*analytics.live.com.*");
+        addURLExclusionPattern(".*www.google.com/ig/ifpc_relay.*");
+        addURLExclusionPattern(".*doubleclick.net.*");
+        addURLExclusionPattern(".*adbrite.*");
+    }
 
 	public void changed(final LocationEvent event) {
+        if (isExcluded(event.location)) {
+            return;
+        }
 		if (event.top && BrowserFamily.IE != session.getBrowserFamily()) {
 			isDomReady = false;
 
@@ -67,8 +86,13 @@ public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener
 	}
 
 	public void changing(LocationEvent event) {
+        String location = event.location;
+		if (isExcluded(location)) {
+            log.trace("skipping excluded {}", location);
+            return;
+        }
 		// TODO: The exclusion patterns need to be reused somehow.
-		if (event.location.startsWith("javascript:")) {
+		if (location.startsWith("javascript:")) {
 			return;
 		}
 		isDomReady = false;
@@ -88,5 +112,21 @@ public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener
 		}
 		return !isDomReady;
 	}
+	
+	private boolean isExcluded(String location) {
+		for (Pattern pattern : exclusionPatterns.values()) {
+            if (pattern.matcher(location).matches()) {
+            	return true;
+            }
+        }
+		return false;
+	}
+    
+    public void addURLExclusionPattern(String pattern) {
+        exclusionPatterns.put(pattern, Pattern.compile(pattern));
+    }
 
+    public void removeURLExclusionPattern(String pattern) {
+        exclusionPatterns.remove(pattern);
+    }
 }
