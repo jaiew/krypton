@@ -148,7 +148,9 @@ public class SWTBrowserSession implements BrowserSession {
 
 	public synchronized void execute(String statements) {
 		verifyJavaScript(statements);
-		browser.execute(statements);
+		if (!browser.execute(statements)) {
+			throw new JavascriptException("Javascript Failed");
+		}
 	}
 
 	public synchronized String evaluate(String expression) {

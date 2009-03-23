@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.twist.driver.web.browser.BrowserFamily;
 import com.thoughtworks.twist.driver.web.browser.BrowserSession;
+import com.thoughtworks.twist.driver.web.browser.JavascriptException;
 
 public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener {
 	Logger log = LoggerFactory.getLogger(getClass());
@@ -42,27 +43,27 @@ public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener
 
 	private BrowserFunction documentIsReady;
 
-    Map<String,Pattern> exclusionPatterns = new HashMap<String,Pattern>();
+	Map<String, Pattern> exclusionPatterns = new HashMap<String, Pattern>();
 
-    public void init(BrowserSession session) {
+	public void init(BrowserSession session) {
 		this.session = session;
-        session.getBrowser().addLocationListener(this);
+		session.getBrowser().addLocationListener(this);
 
-        addURLExclusionPattern("javascript:.*");
-        addURLExclusionPattern("about:blank");
-        addURLExclusionPattern("about:config");
+		addURLExclusionPattern("javascript:.*");
+		addURLExclusionPattern("about:blank");
+		addURLExclusionPattern("about:config");
 
-        // This obviously needs to be configurable somehow.
-        addURLExclusionPattern(".*analytics.live.com.*");
-        addURLExclusionPattern(".*www.google.com/ig/ifpc_relay.*");
-        addURLExclusionPattern(".*doubleclick.net.*");
-        addURLExclusionPattern(".*adbrite.*");
-    }
+		// This obviously needs to be configurable somehow.
+		addURLExclusionPattern(".*analytics.live.com.*");
+		addURLExclusionPattern(".*www.google.com/ig/ifpc_relay.*");
+		addURLExclusionPattern(".*doubleclick.net.*");
+		addURLExclusionPattern(".*adbrite.*");
+	}
 
 	public void changed(final LocationEvent event) {
-        if (isExcluded(event.location)) {
-            return;
-        }
+		if (isExcluded(event.location)) {
+			return;
+		}
 		if (event.top && BrowserFamily.IE != session.getBrowserFamily()) {
 			isDomReady = false;
 
@@ -79,20 +80,17 @@ public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener
 			session.inject("twist-domready.js", getClass());
 			session.execute("Twist.DomReady.ready(documentIsReady)");
 		} else {
-			// TODO: We only need the window.location.reload override here really.
+			// TODO: We only need the window.location.reload override here
+			// really.
 			session.inject("twist-domready.js", getClass());
 			isDomReady = true;
 		}
 	}
 
 	public void changing(LocationEvent event) {
-        String location = event.location;
+		String location = event.location;
 		if (isExcluded(location)) {
-            log.trace("skipping excluded {}", location);
-            return;
-        }
-		// TODO: The exclusion patterns need to be reused somehow.
-		if (location.startsWith("javascript:")) {
+			log.trace("skipping excluded {}", location);
 			return;
 		}
 		isDomReady = false;
@@ -100,33 +98,41 @@ public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener
 	}
 
 	public boolean isBusy() {
-		if (BrowserFamily.IE == session.getBrowserFamily()) {			
+		if (BrowserFamily.IE == session.getBrowserFamily()) {
 			if (isDomReady) {
 				return false;
 			}
-			boolean canScroll = session.getBrowser().execute("document.documentElement.doScroll('left');");
-			if (!canScroll) {
+			if (!canScrollDocument()) {
 				unloaded = true;
 			}
-			isDomReady = unloaded && canScroll;
+			isDomReady = unloaded && canScrollDocument();
 		}
 		return !isDomReady;
 	}
-	
+
+	private boolean canScrollDocument() {
+		try {
+			session.execute("document.documentElement.doScroll('left');");
+			return true;
+		} catch (JavascriptException documentIsNotReady) {
+			return false;
+		}
+	}
+
 	private boolean isExcluded(String location) {
 		for (Pattern pattern : exclusionPatterns.values()) {
-            if (pattern.matcher(location).matches()) {
-            	return true;
-            }
-        }
+			if (pattern.matcher(location).matches()) {
+				return true;
+			}
+		}
 		return false;
 	}
-    
-    public void addURLExclusionPattern(String pattern) {
-        exclusionPatterns.put(pattern, Pattern.compile(pattern));
-    }
 
-    public void removeURLExclusionPattern(String pattern) {
-        exclusionPatterns.remove(pattern);
-    }
+	public void addURLExclusionPattern(String pattern) {
+		exclusionPatterns.put(pattern, Pattern.compile(pattern));
+	}
+
+	public void removeURLExclusionPattern(String pattern) {
+		exclusionPatterns.remove(pattern);
+	}
 }
