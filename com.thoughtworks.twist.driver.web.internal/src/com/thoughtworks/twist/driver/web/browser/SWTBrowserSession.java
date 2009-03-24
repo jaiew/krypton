@@ -249,7 +249,7 @@ public class SWTBrowserSession implements BrowserSession {
 		inject("twist-bounding-rectangle.js");
 		String rectangle = evaluate("Twist.boundingRectangle(" + domExpression(element) + ")");
 		String[] values = rectangle.split(",");
-		Rectangle boundingRectangle = new Rectangle(Integer.parseInt(values[0]), Integer.parseInt(values[1]), Integer.parseInt(values[2]),
+		Rectangle boundingRectangle = new Rectangle(Double.valueOf(values[0]).intValue(), Double.valueOf(values[1]).intValue(), Integer.parseInt(values[2]),
 				Integer.parseInt(values[3]));
 		log.trace("Bounding rectangle of {} is {}", element, boundingRectangle);
 		return boundingRectangle;

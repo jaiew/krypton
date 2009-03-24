@@ -70,7 +70,7 @@ if (!Twist.boundingRectangle) {
 		    return top - scroll;
 		};
 
-        if (window.ActiveXObject) {
+        if (element.getBoundingClientRect) {
             var x = 0, y = 0;
             
             var e = element;
@@ -78,7 +78,7 @@ if (!Twist.boundingRectangle) {
                 var box = e.getBoundingClientRect();
                 x += box.left;
                 y += box.top;
-                
+
                 if (e.ownerDocument.parentWindow && e.ownerDocument.parentWindow.frameElement) {
                     e = e.ownerDocument.parentWindow.frameElement;
                 } else if (e.ownerDocument.defaultView && e.ownerDocument.defaultView.frameElement) {
