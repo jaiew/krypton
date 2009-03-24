@@ -214,7 +214,7 @@ public class SWTBrowserSession implements BrowserSession {
 		if (browserFamily == BrowserFamily.IE) {
 			String tagName = element.getTagName();
 			String type = element.getAttribute("type");
-			String domExpression = domExpression(element);
+			String domExpression = domExpressionWithoutLogging(element);
 			for (String attribute : BOOLEAN_ATTRIBUTES) {
 				element.setAttribute(attribute, element.hasAttribute(attribute) + "");
 			}
@@ -366,14 +366,19 @@ public class SWTBrowserSession implements BrowserSession {
 	}
 
 	public String domExpression(Element element) {
-		String expression = "";
 		Element original = element;
+		String domExpression = domExpressionWithoutLogging(element);
+		log.trace("DOM Expression of {} is '{}'", original, domExpression);
+		return domExpression;
+	}
+
+	private String domExpressionWithoutLogging(Element element) {
+		String expression = "";
 		while (!(element.getParentNode() instanceof Document)) {
 			expression = ".childNodes[" + element.getAttribute("twist.domindex") + "]" + expression;
 			element = (Element) element.getParentNode();
 		}
 		String domExpression = getDocumentExpression() + ".documentElement" + expression;
-		log.trace("DOM Expression of {} is '{}'", original, domExpression);
 		return domExpression;
 	}
 

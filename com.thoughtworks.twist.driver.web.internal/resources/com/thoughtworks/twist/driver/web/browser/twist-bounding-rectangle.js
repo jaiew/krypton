@@ -70,6 +70,29 @@ if (!Twist.boundingRectangle) {
 		    return top - scroll;
 		};
 
-	    return xPosition(element) + "," + yPosition(element) + "," + element.offsetWidth + "," + element.offsetHeight;
+        if (window.ActiveXObject) {
+            var x = 0, y = 0;
+            
+            var e = element;
+            while (true) {
+                var box = e.getBoundingClientRect();
+                x += box.left;
+                y += box.top;
+                
+                if (e.ownerDocument.parentWindow && e.ownerDocument.parentWindow.frameElement) {
+                    e = e.ownerDocument.parentWindow.frameElement;
+                } else if (e.ownerDocument.defaultView && e.ownerDocument.defaultView.frameElement) {
+                    e = e.ownerDocument.defaultView.frameElement;
+                } else {
+                    break;
+                }
+            }
+			x -= document.documentElement.scrollLeft;
+			y -= document.documentElement.scrollTop;
+	        
+			return x + "," + y + "," + element.offsetWidth + "," + element.offsetHeight;
+        } else {
+		    return xPosition(element) + "," + yPosition(element) + "," + element.offsetWidth + "," + element.offsetHeight;
+		}
 	};
 }

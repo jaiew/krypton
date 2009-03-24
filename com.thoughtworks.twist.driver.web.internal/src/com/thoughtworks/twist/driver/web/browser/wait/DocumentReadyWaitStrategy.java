@@ -93,6 +93,7 @@ public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener
 			log.trace("skipping excluded {}", location);
 			return;
 		}
+        log.trace("changing: {} {}", location, exclusionPatterns.values());
 		isDomReady = false;
 		unloaded = false;
 	}

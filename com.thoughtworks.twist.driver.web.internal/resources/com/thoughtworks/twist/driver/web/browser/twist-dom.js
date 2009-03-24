@@ -14,9 +14,7 @@ if (!Twist.dom) {
 		}
 
         Twist.walkDom(element, original);
-		if (Twist.isIE) {
-			return element.outerHTML;
-		}
+
         var tagName = original.tagName;
         return "<" + tagName + ">" + element.innerHTML + "</" + tagName + ">";
     };
