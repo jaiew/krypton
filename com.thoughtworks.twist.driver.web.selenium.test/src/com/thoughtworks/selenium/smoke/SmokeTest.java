@@ -72,7 +72,8 @@ public class SmokeTest {
 //        assertTrue(browser.isTextPresent("You've got to login or join to Digg that!"));
 //        assertTrue(browser.isElementPresent("//div[@class = 'login-digg']//input[@name = 'username']"));
 //
-//
+//        assertTrue(browser.isElementPresent("//a[text() = 'Login now...']"));
+//        assertTrue(browser.isVisible("//a[text() = 'Login now...']"));
 //        browser.click("//a[text() = 'Login now...']");
 //
 //        assertTrue(browser.isVisible("//div[@class = 'login-digg']//input[@name = 'username']"));

@@ -55,7 +55,7 @@ public class SetTimeoutWaitStrategy implements LocationListener, WaitStrategy {
 					public Object function(Object[] arguments) {
 						int timeoutId = ((Number) arguments[0]).intValue();
 						activeSetTimeouts.add(timeoutId);
-						log.debug("new setTimeout: {} total: {}", timeoutId, activeSetTimeouts.size());
+						log.debug("new setTimeout: {} (total: {})", timeoutId, activeSetTimeouts.size());
 						return null;
 					}
 				};
@@ -65,7 +65,7 @@ public class SetTimeoutWaitStrategy implements LocationListener, WaitStrategy {
 					public Object function(Object[] arguments) {
 						int timeoutId = ((Number) arguments[0]).intValue();
 						activeSetTimeouts.remove(timeoutId);
-						log.debug("done setTimeout: {} total: {}", timeoutId, activeSetTimeouts.size());
+						log.debug("done setTimeout: {} (total: {})", timeoutId, activeSetTimeouts.size());
 						return null;
 					}
 				};

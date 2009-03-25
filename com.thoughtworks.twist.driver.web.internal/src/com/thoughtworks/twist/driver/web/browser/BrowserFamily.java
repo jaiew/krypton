@@ -214,11 +214,11 @@ public enum BrowserFamily {
 	public static final String SYSTEM_PROPERTY = "twist.driver.web.browser";
 
 	Logger log = LoggerFactory.getLogger(getClass());
-	
+
 //    static {
 //        java.util.logging.Logger.getLogger("").setLevel(java.util.logging.Level.FINEST);
 //        java.util.logging.Logger.getLogger("").getHandlers()[0].setLevel(java.util.logging.Level.FINEST);
- //   }
+//    }
 
 	public BrowserSession create() {
 		final Shell shell = new Shell();

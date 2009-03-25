@@ -286,9 +286,9 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
 
 		};
 		AjaxWaitStrategy strategy = new AjaxWaitStrategy() {
-			public void decreaseNumberOfActiveAjaxRequests() {
+			public void decreaseNumberOfActiveAjaxRequests(String url) {
 				doneOrder[0] += "strategy";
-				super.decreaseNumberOfActiveAjaxRequests();
+				super.decreaseNumberOfActiveAjaxRequests(url);
 			}
 		};
 		session.addWaitStrategy(strategy);

@@ -5,6 +5,8 @@ if (!Twist) {
 
 if (!Twist.ajaxWaitStrategy) {
     Twist.ajaxWaitStrategy = function(){
+        var setTimeoutFunction = Twist.realSetTimeout ? Twist.realSetTimeout : window.setTimeout;
+
         function interceptActiveXObject(){
             if (window.RealActiveXObject) {
                 return;
@@ -31,7 +33,7 @@ if (!Twist.ajaxWaitStrategy) {
                                 self.statusText = base.statusText;
                                 self.responseText = base.responseText;
                                 self.responseXML = base.responseXML;
-		                        setTimeout(function(){
+		                        setTimeoutFunction(function(){
 		                            decreaseNumberOfActiveAjaxRequests(url);
 		                        }, 10);
                             }
@@ -72,22 +74,20 @@ if (!Twist.ajaxWaitStrategy) {
             if (window.XMLHttpRequest.prototype.realOpen) {
                 return;
             }
-            
+
             window.XMLHttpRequest.prototype.realOpen = window.XMLHttpRequest.prototype.open;
             window.XMLHttpRequest.prototype.open = function(type, url, asynchronous, username, password){
-                if (asynchronous) {
-                    increaseNumberOfActiveAjaxRequests(url);
-                    this.addEventListener('load', function(event){
-                        setTimeout(function(){
-                            decreaseNumberOfActiveAjaxRequests(url);
-                        }, 10);
-                    }, true);
-                    this.addEventListener('error', function(event){
-                        setTimeout(function(){
-                            decreaseNumberOfActiveAjaxRequests(url);
-                        }, 10);
-                    }, true);
-                }
+                increaseNumberOfActiveAjaxRequests(url);
+                this.addEventListener('load', function(event){
+                    setTimeoutFunction(function(){
+                        decreaseNumberOfActiveAjaxRequests(url);
+                    }, 10);
+                }, true);
+                this.addEventListener('error', function(event){
+                    setTimeoutFunction(function(){
+                        decreaseNumberOfActiveAjaxRequests(url);
+                    }, 10);
+                }, true);
                 return this.realOpen(type, url, asynchronous, username, password);
             };
         }

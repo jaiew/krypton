@@ -103,10 +103,11 @@ public class DocumentReadyWaitStrategy implements WaitStrategy, LocationListener
 			if (isDomReady) {
 				return false;
 			}
-			if (!canScrollDocument()) {
+			boolean canScrollDocument = canScrollDocument();
+			if (!canScrollDocument) {
 				unloaded = true;
 			}
-			isDomReady = unloaded && canScrollDocument();
+			isDomReady = unloaded && canScrollDocument;
 		}
 		return !isDomReady;
 	}

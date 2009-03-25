@@ -48,14 +48,14 @@ public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
 		this.session.getBrowser().addLocationListener(this);
 	}
 
-	public void increaseNumberOfActiveAjaxRequests() {
+	public void increaseNumberOfActiveAjaxRequests(String url) {
 		numberOfActiveAjaxRequests++;
-		log.debug("new Ajax request, total: {}", numberOfActiveAjaxRequests);
+		log.debug("new Ajax request: {} (total: {})", url, numberOfActiveAjaxRequests);
 	}
 
-	public void decreaseNumberOfActiveAjaxRequests() {
+	public void decreaseNumberOfActiveAjaxRequests(String url) {
 		numberOfActiveAjaxRequests--;
-		log.debug("done Ajax request, total: {}", numberOfActiveAjaxRequests);
+		log.debug("done Ajax request: {} (total: {})", url, numberOfActiveAjaxRequests);
 	}
 
 	public void changed(LocationEvent event) {
@@ -64,8 +64,9 @@ public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
 			if (increaseNumberOfActiveAjaxRequests == null) {
 				increaseNumberOfActiveAjaxRequests = new BrowserFunction(session.getBrowser(), "increaseNumberOfActiveAjaxRequests") {
 					public Object function(Object[] arguments) {
-						if (!isExcluded(arguments[0].toString())) {
-							increaseNumberOfActiveAjaxRequests();
+						String url = arguments[0].toString();
+						if (!isExcluded(url)) {
+							increaseNumberOfActiveAjaxRequests(url);
 						}
 						return null;
 					}
@@ -74,8 +75,9 @@ public class AjaxWaitStrategy implements LocationListener, WaitStrategy {
 			if (decreaseNumberOfActiveAjaxRequests == null) {
 				decreaseNumberOfActiveAjaxRequests = new BrowserFunction(session.getBrowser(), "decreaseNumberOfActiveAjaxRequests") {
 					public Object function(Object[] arguments) {
-						if (!isExcluded(arguments[0].toString())) {
-							decreaseNumberOfActiveAjaxRequests();
+						String url = arguments[0].toString();
+						if (!isExcluded(url)) {
+							decreaseNumberOfActiveAjaxRequests(url);
 						}
 						return null;
 					}
