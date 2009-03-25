@@ -382,6 +382,34 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
 		assertEquals(0, waitStrategy.getNumberOfActiveSetTimeouts());
 	}
 
+	@Test
+	public void shouldWaitForSetIntervalForAsLongAsTheMaxSetTimeoutDelayUsingSetTimeoutWaitStrategy() throws Exception {
+		String path = "/hello-world-servlet";
+		handler.addServletWithMapping(HelloWorldServlet.class, path);
+		int timeout = BLOCKING_TIME * 2;
+		SetTimeoutWaitStrategy waitStrategy = new SetTimeoutWaitStrategy();
+		session.addWaitStrategy(waitStrategy);
+
+		session.openBrowser();
+		waitStrategy.setSetTimeoutMaxDelay(BLOCKING_TIME);
+		load(localUrl(path));
+
+		doSetIntervalCall("'Hello'", BLOCKING_TIME);
+		assertEquals(1, waitStrategy.getNumberOfActiveSetTimeouts());
+
+		timedWaitForIdle();
+
+		int slowTimeoutID = Integer.parseInt(session.evaluate("slowTimeoutID"));
+		assertTrue("slowTimeoutID > 0: " + slowTimeoutID + " > 0", slowTimeoutID > 0);
+
+		assertTrue("idle < timeout: " + idleTime + " < " + timeout, idleTime < timeout);
+		assertTrue("idle == blocking (precision " + SET_TIMEOUT_PRECISION + "): " + idleTime + " == " + BLOCKING_TIME, Math.abs(idleTime
+				- BLOCKING_TIME) < SET_TIMEOUT_PRECISION);
+
+		assertEquals(getExpectedMessageAsIEDoesntSupportParameters(), session.evaluate("Twist.slowSetTimeoutCalledWith"));
+		assertEquals(0, waitStrategy.getNumberOfActiveSetTimeouts());
+	}
+
 	private String getExpectedMessageAsIEDoesntSupportParameters() {
 		return BrowserFamily.IE == BrowserFamily.fromSystemProperty() ? "Hello IE" : "Hello";
 	}
@@ -432,6 +460,12 @@ public class WaitStrategiesTest extends AbstractBaseBrowserSessionWithWebServer 
 
 	private void doSetTimeoutCall(String parameter, int delay) {
 		session.execute("slowTimeoutID = window.setTimeout(slowSetTimeout, " + delay + ", " + parameter
+				+ "); function slowSetTimeout(message) { Twist.slowSetTimeoutCalledWith = message ? message : 'Hello IE'; }");
+		session.pumpEvents();
+	}
+
+	private void doSetIntervalCall(String parameter, int delay) {
+		session.execute("slowTimeoutID = window.setInterval(slowSetTimeout, " + delay / 2 + ", " + parameter
 				+ "); function slowSetTimeout(message) { Twist.slowSetTimeoutCalledWith = message ? message : 'Hello IE'; }");
 		session.pumpEvents();
 	}
