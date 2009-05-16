@@ -5,6 +5,8 @@ if (!Twist) {
 if (!Twist.cssQuery) {
 
 	Twist.cssQuery = function() {
+
+    var isMSIE = window.ActiveXObject ? true : false;
 	
 	var $COMMA = /\s*,\s*/;
 	var cssQuery = function($selector, $$from) {
@@ -50,8 +52,7 @@ if (!Twist.cssQuery) {
 		cssQuery.error = $error;
 		return [];
 	}};
-	
-	
+
 	cssQuery.toString = function() {
 		return "function cssQuery() {\n  [version " + version + "]\n}";
 	};
@@ -68,13 +69,31 @@ if (!Twist.cssQuery) {
 	var modules = {};
 	var loaded = false;
 	cssQuery.addModule = function($name, $script) {
-		if (loaded) eval("$script=" + String($script));
+		if (loaded) cssQuery.globalEval("$script=" + String($script));
 		modules[$name] = new $script();;
 	};
 	
 	cssQuery.valueOf = function($code) {
 		return $code ? eval($code) : this;
 	};
+    
+    cssQuery.globalEval = function($code) {
+		// Inspired by code by Andrea Giammarchi
+		// http://webreflection.blogspot.com/2007/08/global-scope-evaluation-and-dom.html
+		var head = document.getElementsByTagName("head")[0] || document.documentElement,
+			script = document.createElement("script");
+
+		script.type = "text/javascript";
+		if ( !window.ActiveXObject )
+			script.appendChild( document.createTextNode( $code ) );
+		else
+			script.text = $code;
+
+		// Use insertBefore instead of appendChild  to circumvent an IE6 bug.
+		// This arises when a base node is used (#2709).
+		head.insertBefore( script, head.firstChild );
+		head.removeChild( script );        
+    };
 	
 	var selectors = {};
 	var pseudoClasses = {};
@@ -155,7 +174,7 @@ if (!Twist.cssQuery) {
 		return $childElements;
 	};
 	
-	var isMSIE = true;
+//	var isMSIE = true;
 	
 	var isXML = function($element) {
 		var $document = getDocument($element);
@@ -260,7 +279,264 @@ if (!Twist.cssQuery) {
 	function regEscape($string) {
 		return $string.replace($ESCAPE, "\\$1");
 	};
-	
+    
+    // Standard
+    if (!isMSIE) {
+    	getElementsByTagName = function($element, $tagName, $namespace) {
+    		return $namespace ? $element.getElementsByTagNameNS("*", $tagName) :
+    			$element.getElementsByTagName($tagName);
+    	};
+    
+    	compareNamespace = function($element, $namespace) {
+    		return !$namespace || ($namespace == "*") || ($element.prefix == $namespace);
+    	};
+    
+    	isXML = document.contentType ? function($element) {
+    		return /xml/i.test(getDocument($element).contentType);
+    	} : function($element) {
+    		return getDocument($element).documentElement.tagName != "HTML";
+    	};
+    
+    	getTextContent = function($element) {
+    		return $element.textContent || $element.innerText || _getTextContent($element);
+    	};
+    
+    	function _getTextContent($element) {
+    		var $textContent = "", $node, i;
+    		for (i = 0; ($node = $element.childNodes[i]); i++) {
+    			switch ($node.nodeType) {
+    				case 11:
+    				case 1: $textContent += _getTextContent($node); break;
+    				case 3: $textContent += $node.nodeValue; break;
+    			}
+    		}
+    		return $textContent;
+    	};
+    }
+
+    // Level 2    
+    selectors[">"] = function($results, $from, $tagName, $namespace) {
+    	var $element, i, j;
+    	for (i = 0; i < $from.length; i++) {
+    		var $subset = childElements($from[i]);
+    		for (j = 0; ($element = $subset[j]); j++)
+    			if (compareTagName($element, $tagName, $namespace))
+    				$results.push($element);
+    	}
+    };
+    
+    selectors["+"] = function($results, $from, $tagName, $namespace) {
+    	for (var i = 0; i < $from.length; i++) {
+    		var $element = nextElementSibling($from[i]);
+    		if ($element && compareTagName($element, $tagName, $namespace))
+    			$results.push($element);
+    	}
+    };
+    
+    selectors["@"] = function($results, $from, $attributeSelectorID) {
+    	var $test = attributeSelectors[$attributeSelectorID].test;
+    	var $element, i;
+    	for (i = 0; ($element = $from[i]); i++)
+    		if ($test($element)) $results.push($element);
+    };
+    
+    pseudoClasses["first-child"] = function($element) {
+    	return !previousElementSibling($element);
+    };
+    
+    pseudoClasses["lang"] = function($element, $code) {
+    	$code = new RegExp("^" + $code, "i");
+    	while ($element && !$element.getAttribute("lang")) $element = $element.parentNode;
+    	return $element && $code.test($element.getAttribute("lang"));
+    };
+    
+    AttributeSelector.NS_IE = /\\:/g;
+    AttributeSelector.PREFIX = "@";
+    
+    AttributeSelector.tests = {};
+    
+    AttributeSelector.replace = function($match, $attribute, $namespace, $compare, $value) {
+    	var $key = this.PREFIX + $match;
+    	if (!attributeSelectors[$key]) {
+    		$attribute = this.create($attribute, $compare || "", $value || "");
+    		attributeSelectors[$key] = $attribute;
+    		attributeSelectors.push($attribute);
+    	}
+    	return attributeSelectors[$key].id;
+    };
+    AttributeSelector.parse = function($selector) {
+    	$selector = $selector.replace(this.NS_IE, "|");
+    	var $match;
+    	while ($match = $selector.match(this.match)) {
+    		var $replace = this.replace($match[0], $match[1], $match[2], $match[3], $match[4]);
+    		$selector = $selector.replace(this.match, $replace);
+    	}
+    	return $selector;
+    };
+    AttributeSelector.create = function($propertyName, $test, $value) {
+    	var $attributeSelector = {};
+    	$attributeSelector.id = this.PREFIX + attributeSelectors.length;
+    	$attributeSelector.name = $propertyName;
+    	$test = this.tests[$test];
+    	$test = $test ? $test(this.getAttribute($propertyName), getText($value)) : false;
+    	$attributeSelector.test = new Function("e", "return " + $test);
+    	return $attributeSelector;
+    };
+    AttributeSelector.getAttribute = function($name) {
+    	switch ($name.toLowerCase()) {
+    		case "id":
+    			return "e.id";
+    		case "class":
+    			return "e.className";
+    		case "for":
+    			return "e.htmlFor";
+    		case "href":
+    			if (isMSIE) {
+    				return "String((e.outerHTML.match(/href=\\x22?([^\\s\\x22]*)\\x22?/)||[])[1]||'')";
+    			}
+    	}
+    	return "e.getAttribute('" + $name.replace($NAMESPACE, ":") + "')";
+    };
+    
+    AttributeSelector.tests[""] = function($attribute) {
+    	return $attribute;
+    };
+    
+    AttributeSelector.tests["="] = function($attribute, $value) {
+    	return $attribute + "==" + Quote.add($value);
+    };
+    
+    AttributeSelector.tests["~="] = function($attribute, $value) {
+    	return "/(^| )" + regEscape($value) + "( |$)/.test(" + $attribute + ")";
+    };
+    
+    AttributeSelector.tests["|="] = function($attribute, $value) {
+    	return "/^" + regEscape($value) + "(-|$)/.test(" + $attribute + ")";
+    };
+    
+    var _parseSelector = parseSelector;
+    parseSelector = function($selector) {
+    	return _parseSelector(AttributeSelector.parse($selector));
+    };
+
+    // Level 3
+    selectors["~"] = function($results, $from, $tagName, $namespace) {
+    	var $element, i;
+    	for (i = 0; ($element = $from[i]); i++) {
+    		while ($element = nextElementSibling($element)) {
+    			if (compareTagName($element, $tagName, $namespace))
+    				$results.push($element);
+    		}
+    	}
+    };
+    
+    pseudoClasses["contains"] = function($element, $text) {
+    	$text = new RegExp(regEscape(getText($text)));
+    	return $text.test(getTextContent($element));
+    };
+    
+    pseudoClasses["root"] = function($element) {
+    	return $element == getDocument($element).documentElement;
+    };
+    
+    pseudoClasses["empty"] = function($element) {
+    	var $node, i;
+    	for (i = 0; ($node = $element.childNodes[i]); i++) {
+    		if (thisElement($node) || $node.nodeType == 3) return false;
+    	}
+    	return true;
+    };
+    
+    pseudoClasses["last-child"] = function($element) {
+    	return !nextElementSibling($element);
+    };
+    
+    pseudoClasses["only-child"] = function($element) {
+    	$element = $element.parentNode;
+    	return firstElementChild($element) == lastElementChild($element);
+    };
+    
+    pseudoClasses["not"] = function($element, $selector) {
+    	var $negated = cssQuery($selector, getDocument($element));
+    	for (var i = 0; i < $negated.length; i++) {
+    		if ($negated[i] == $element) return false;
+    	}
+    	return true;
+    };
+    
+    pseudoClasses["nth-child"] = function($element, $arguments) {
+    	return nthChild($element, $arguments, previousElementSibling);
+    };
+    
+    pseudoClasses["nth-last-child"] = function($element, $arguments) {
+    	return nthChild($element, $arguments, nextElementSibling);
+    };
+    
+    pseudoClasses["target"] = function($element) {
+    	return $element.id == location.hash.slice(1);
+    };
+    
+    pseudoClasses["checked"] = function($element) {
+    	return $element.checked;
+    };
+    
+    pseudoClasses["enabled"] = function($element) {
+    	return $element.disabled === false;
+    };
+    
+    pseudoClasses["disabled"] = function($element) {
+    	return $element.disabled;
+    };
+    
+    pseudoClasses["indeterminate"] = function($element) {
+    	return $element.indeterminate;
+    };
+    
+    AttributeSelector.tests["^="] = function($attribute, $value) {
+    	return "/^" + regEscape($value) + "/.test(" + $attribute + ")";
+    };
+    
+    AttributeSelector.tests["$="] = function($attribute, $value) {
+    	return "/" + regEscape($value) + "$/.test(" + $attribute + ")";
+    };
+    
+    AttributeSelector.tests["*="] = function($attribute, $value) {
+    	return "/" + regEscape($value) + "/.test(" + $attribute + ")";
+    };
+    
+    function nthChild($element, $arguments, $traverse) {
+    	switch ($arguments) {
+    		case "n": return true;
+    		case "even": $arguments = "2n"; break;
+    		case "odd": $arguments = "2n+1";
+    	}
+    
+    	var $$children = childElements($element.parentNode);
+    	function _checkIndex($index) {
+    		var $index = ($traverse == nextElementSibling) ? $$children.length - $index : $index - 1;
+    		return $$children[$index] == $element;
+    	};
+    
+    	if (!isNaN($arguments)) return _checkIndex($arguments);
+    
+    	$arguments = $arguments.split("n");
+    	var $multiplier = parseInt($arguments[0]);
+    	var $step = parseInt($arguments[1]);
+    
+    	if ((isNaN($multiplier) || $multiplier == 1) && $step == 0) return true;
+    	if ($multiplier == 0 && !isNaN($step)) return _checkIndex($step);
+    	if (isNaN($step)) $step = 0;
+    
+    	var $count = 1;
+    	while ($element = $traverse($element)) $count++;
+    
+    	if (isNaN($multiplier) || $multiplier == 1)
+    		return ($traverse == nextElementSibling) ? ($count <= $step) : ($step >= $count);
+    
+    	return ($count % $multiplier) == $step;
+    };
+
+
 	loaded = true;
 	
 	return cssQuery;

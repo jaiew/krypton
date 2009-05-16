@@ -41,7 +41,6 @@ package com.thoughtworks.selenium;
 import java.io.File;
 import java.lang.reflect.Proxy;
 import java.net.BindException;
-import java.net.ServerSocket;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;

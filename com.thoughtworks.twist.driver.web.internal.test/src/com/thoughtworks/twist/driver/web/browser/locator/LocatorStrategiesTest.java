@@ -20,17 +20,13 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.browser.locator;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.junit.Test;
 import org.w3c.dom.Element;
 
 import com.thoughtworks.twist.driver.web.browser.AbstractBaseBrowserSession;
 import com.thoughtworks.twist.driver.web.browser.BrowserSession;
-import com.thoughtworks.twist.driver.web.browser.wait.SetTimeoutWaitStrategy;
+
+import static org.junit.Assert.*;
 
 public class LocatorStrategiesTest extends AbstractBaseBrowserSession {
     @Test
@@ -163,17 +159,6 @@ public class LocatorStrategiesTest extends AbstractBaseBrowserSession {
         } catch (ElementNotFoundException expected) {
             assertEquals("No element found matching locator: " + locator, expected.getMessage());
         }
-    }
-
-    // Fixed this test using an explicit SetTimeoutWaitStrategy, but should really be removed.
-    @Test
-    public void shouldReturnElementPatiently() throws Exception {
-        session.addLocatorStrategy(new DomLocatorStrategy());
-        session.addWaitStrategy(new SetTimeoutWaitStrategy());
-        render(readResource("test-locators.html"));
-        session.waitForIdle();
-        Element actualDiv = session.locate("document.getElementById('3')");
-        assertXmlEquals((Element) session.dom().getElementById("3"), actualDiv);
     }
 
     @Test

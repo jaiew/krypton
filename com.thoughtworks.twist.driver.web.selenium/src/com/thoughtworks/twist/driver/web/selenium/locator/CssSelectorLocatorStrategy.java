@@ -57,9 +57,9 @@ public class CssSelectorLocatorStrategy extends XPathLocatorStrategy {
 
     	session.inject("twist-dom-to-xpath.js", DomLocatorStrategy.class);
         session.inject("twist-cssQuery.js", getClass());
-        session.inject("twist-cssQuery-standard.js", getClass());
-        session.inject("twist-cssQuery-level2.js", getClass());
-        session.inject("twist-cssQuery-level3.js", getClass());
+//        session.inject("twist-cssQuery-standard.js", getClass());
+//        session.inject("twist-cssQuery-level2.js", getClass());
+//        session.inject("twist-cssQuery-level3.js", getClass());
         try {
 			String xpath = cssToXPath(session, locator);
 			return super.locate(session, xpath);

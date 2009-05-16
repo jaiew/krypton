@@ -7,7 +7,7 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/com.thoughtworks.twist.driver.web.user.cocoa/lib/javadoc/com.apple.cocoa-javadoc.zip!/cocoa-javadoc"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/target-eclipse/eclipse/plugins/org.eclipse.swt.cocoa.macosx_3.5.0.v3536b.jar" sourcepath="/target-eclipse/eclipse/plugins/org.eclipse.swt.cocoa.macosx.source_3.5.0.v3536b.jar"/>
+	<classpathentry kind="lib" path="/target-eclipse/eclipse/plugins/org.eclipse.swt.cocoa.macosx_3.5.0.v3545a.jar" sourcepath="/target-eclipse/eclipse/plugins/org.eclipse.swt.cocoa.macosx.source_3.5.0.v3545a.jar"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

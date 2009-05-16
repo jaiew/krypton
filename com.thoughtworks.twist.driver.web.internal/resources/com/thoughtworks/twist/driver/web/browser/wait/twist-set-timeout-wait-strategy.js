@@ -35,7 +35,21 @@ if (!Twist.setTimeoutWaitStrategy) {
 					removeActiveSetTimeout(wrapped.timeoutID);
                     inSetTimeout = true;
                     if ("string" === typeof(target)) {
-                        eval(target);
+            			// Inspired by code by Andrea Giammarchi
+            			// http://webreflection.blogspot.com/2007/08/global-scope-evaluation-and-dom.html
+            			var head = document.getElementsByTagName("head")[0] || document.documentElement,
+            				script = document.createElement("script");
+            
+            			script.type = "text/javascript";
+            			if ( !window.ActiveXObject )
+            				script.appendChild( document.createTextNode( target ) );
+            			else
+            				script.text = target;
+            
+            			// Use insertBefore instead of appendChild  to circumvent an IE6 bug.
+            			// This arises when a base node is used (#2709).
+            			head.insertBefore( script, head.firstChild );
+            			head.removeChild( script );
                     }
                     else {
                         target.apply(this, arguments);

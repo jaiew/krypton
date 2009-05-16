@@ -83,6 +83,7 @@ public abstract class AbstractBaseBrowserSession {
         }
         session.pumpEvents();
         session.getBrowser().removeLocationListener(listener);
+        session.waitForIdle();
     }
 
     private String xmlAsString(Document document) throws IOException {
