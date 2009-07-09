@@ -1,0 +1,70 @@
+
+HighPri:
+waitForCondition(String script, String timeout)
+selectWindow (String windowID)
+waitForPopup 
+openWindow
+
+Mouse:
+mouseDownRight(String locator)
+mouseDownRightAt(String locator, String coordString)
+mouseUpRight(String locator)
+mouseUpRightAt(String locator, String coordString)
+mouseDown(String locator)
+mouseDownAt(String locator, String coordString)
+mouseUp(String locator)
+mouseUpAt(String locator, String coordString)
+getMouseSpeed()
+setMouseSpeed ( String pixels )
+contextMenu(String locator)
+contextMenuAt(String locator, String coordstring)
+
+Key:
+keyDownNative(String keycode)()
+keyPressNative(String keycode)
+keyUp(String locator, String keySequence)
+keyUpNative(String keycode)
+altKeyDown()
+altKeyUp()
+metaKeyDown()
+metaKeyUp()
+controlKeyDown()
+controlKeyUp()
+
+Screen:
+captureEntirePageScreenshot(String filename, String kwargs)
+captureEntirePageScreenshotToString(String kwargs)
+captureScreenshotToString()
+
+getAll:
+getAllButtons()
+getAllFields()
+getAllLinks()
+getAllWindowIds()
+getAllWindowNames()
+
+getAttributeFromAllWindows()-not supported
+getAllWindowTitles() - not supported 
+
+Low Priority:
+attachFile()
+addLocationStrategy()
+highlight
+setBrowserLogLevel (String loglevel)
+
+NOOP:
+retrieveLastRemoteControlLogs()
+start(String optionsString)
+start(Object optionsObject)
+shutDownSeleniumServer()
+useXpathLibrary(String libraryName) - we already have our own implementation, no-op this one
+
+Misc:
+addScript(String scriptContent, String scriptTagId) - not supported
+removeScript(String scriptTagId) - not supported
+rollup(String rollupName, String kwargs) - not needed, no-op
+setExtensionJs(String extensionJs) - not needed
+showContextualBanner() - need to investigate
+showContextualBanner(String className, String methodName) - need to investigate
+getWhetherThisFrameMatchFrameExpression(String currentFrameString, String target) - useful for PI mode, not needed
+getWhetherThisWindowMatchWindowExpression(String currentWindowString, String target) - useful for PI mode, not needed
