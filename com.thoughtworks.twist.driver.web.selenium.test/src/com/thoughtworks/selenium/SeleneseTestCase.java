@@ -231,7 +231,7 @@ public class SeleneseTestCase extends TestCase {
 
 	@SuppressWarnings("unchecked")
 	private TwistSelenium getTwistSelenium() {
-		Selenium underlyingSelenium = suiteSelenium.getUnderyingSelenium();
+		Selenium underlyingSelenium = suiteSelenium.getUnderlyingSelenium();
 		if (underlyingSelenium instanceof TwistSelenium) {
 			return (TwistSelenium) underlyingSelenium;
 		}

@@ -70,7 +70,7 @@ public class DefaultSelenium implements Selenium {
 
 	private Selenium selenium;
 
-	public Selenium getUnderyingSelenium() {
+	public Selenium getUnderlyingSelenium() {
 		return selenium;
 	}
 
