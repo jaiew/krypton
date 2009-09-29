@@ -92,6 +92,7 @@ public class BrowserOperationsTest extends AbstractBaseBrowserSessionWithWebServ
         selenium.close();
         assertFalse(session.getBrowser().getShell().isVisible());
     }
+    
 
     // Selenium.getHtmlSource is supposed to return the loaded version of the page - we have no way to do that right now.
     

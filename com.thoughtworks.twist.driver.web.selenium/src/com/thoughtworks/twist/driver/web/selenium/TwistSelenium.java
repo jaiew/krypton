@@ -20,9 +20,14 @@
  ***************************************************************************/
 package com.thoughtworks.twist.driver.web.selenium;
 
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -34,6 +39,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.imageio.ImageIO;
 
 import org.eclipse.swt.SWT;
 import org.w3c.dom.Element;
@@ -159,7 +166,26 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public void captureScreenshot(String filename) {
-		throw new UnsupportedOperationException();
+		Rectangle rectangle = getScreenRectangle();
+		File file = new File(filename);
+		writeScreenRectangleToFile(rectangle, file);
+	}
+
+	private void writeScreenRectangleToFile(Rectangle rectangle, File file) {
+		try {
+			Robot robot = new Robot();
+			BufferedImage image = robot.createScreenCapture(rectangle);
+			ImageIO.write(image, "png", file);
+		} catch (Exception e) {
+			throw new RuntimeException("Unable to Get Screenshot");
+		}
+	}
+
+	private Rectangle getScreenRectangle() {
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Dimension screenDimensions = toolkit.getScreenSize();
+		Rectangle rectangle = new Rectangle(screenDimensions);
+		return rectangle;
 	}
 
 	public void check(String locator) {
