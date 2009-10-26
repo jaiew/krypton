@@ -27,11 +27,9 @@ import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -171,22 +169,17 @@ public class TwistSelenium implements Selenium {
 
 	public void captureScreenshot(String filename) {
 		Rectangle rectangle = getScreenRectangle();
-		FileOutputStream stream;
-		try {
-			stream = new FileOutputStream(filename);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Unable to Write to File:" + filename, e);
-		}
-		writeScreenRectangleToStream(rectangle, stream);
+		File file = new File(filename);
+		writeScreenRectangleToFile(rectangle, file);
 	}
 
-	private void writeScreenRectangleToStream(Rectangle rectangle, OutputStream stream) {
+	private void writeScreenRectangleToFile(Rectangle rectangle, File file) {
 		try {
 			Robot robot = new Robot();
 			BufferedImage image = robot.createScreenCapture(rectangle);
-			ImageIO.write(image, "png", stream);
+			ImageIO.write(image, "png", file);
 		} catch (Exception e) {
-			throw new RuntimeException("Unable to Get Screenshot", e);
+			throw new RuntimeException("Unable to Get Screenshot");
 		}
 	}
 
@@ -1171,13 +1164,28 @@ public class TwistSelenium implements Selenium {
 
 	public String captureScreenshotToString() {
 		Rectangle rectangle = getScreenRectangle();
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		writeScreenRectangleToStream(rectangle, stream);
-		return streamAsBase64(stream);
+		File file;
+
+		try {
+			file = File.createTempFile("screen", ".png");
+			file.deleteOnExit();
+		} catch (IOException e) {
+			throw new RuntimeException("Unable to Create Temporary File for Screenshot");
+		}
+
+		writeScreenRectangleToFile(rectangle, file);
+		return returnFileAsBase64(file);
 	}
 
-	private String streamAsBase64(ByteArrayOutputStream stream) {
-		return Base64.encode(stream.toByteArray());
+	private String returnFileAsBase64(File file) {
+		try {
+				FileInputStream stream = new FileInputStream(file);
+				byte[] array = new byte[stream.available()];
+				stream.read(array);
+				return Base64.encode(array);
+			} catch (IOException e) {
+				throw new RuntimeException("Unable to Read Temporary File for Screenshot");
+			}
 	}
 
 	public void mouseDownRight(String locator) {
