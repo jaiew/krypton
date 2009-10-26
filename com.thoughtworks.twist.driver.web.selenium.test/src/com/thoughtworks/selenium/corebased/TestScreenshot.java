@@ -34,7 +34,4 @@ public class TestScreenshot extends SeleneseTestCase {
     	file.delete();
     }
 	
-	public void testShouldGrabScreenshotAsString() throws Exception {
-		assertNotNull(selenium.captureScreenshotToString());
-	}
 }

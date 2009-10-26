@@ -28,7 +28,6 @@ import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -47,7 +46,6 @@ import org.eclipse.swt.SWT;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.sun.org.apache.xml.internal.security.utils.Base64;
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 import com.thoughtworks.selenium.Selenium;
@@ -1163,29 +1161,7 @@ public class TwistSelenium implements Selenium {
 	}
 
 	public String captureScreenshotToString() {
-		Rectangle rectangle = getScreenRectangle();
-		File file;
-
-		try {
-			file = File.createTempFile("screen", ".png");
-			file.deleteOnExit();
-		} catch (IOException e) {
-			throw new RuntimeException("Unable to Create Temporary File for Screenshot");
-		}
-
-		writeScreenRectangleToFile(rectangle, file);
-		return returnFileAsBase64(file);
-	}
-
-	private String returnFileAsBase64(File file) {
-		try {
-				FileInputStream stream = new FileInputStream(file);
-				byte[] array = new byte[stream.available()];
-				stream.read(array);
-				return Base64.encode(array);
-			} catch (IOException e) {
-				throw new RuntimeException("Unable to Read Temporary File for Screenshot");
-			}
+		throw new UnsupportedOperationException();
 	}
 
 	public void mouseDownRight(String locator) {
