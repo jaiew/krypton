@@ -12,10 +12,10 @@ Export-Package: com.thoughtworks.twist.driver.web.browser,
    org.mozilla.javascript.debug,
    org.mozilla.javascript.xml",
  org.slf4j;uses:="org.slf4j.spi,org.slf4j.helpers"
-Require-Bundle: org.eclipse.swt;bundle-version="3.5.0",
- com.thoughtworks.twist.driver.web.user;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Import-Package: org.osgi.framework;version="1.5.0"
+Require-Bundle: org.eclipse.swt,
+ com.thoughtworks.twist.driver.web.user
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: org.osgi.framework
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  resources/,

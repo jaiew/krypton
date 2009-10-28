@@ -8,12 +8,12 @@ Export-Package: com.thoughtworks.twist.driver.web.selenium,
  com.thoughtworks.twist.driver.web.selenium.dialog,
  com.thoughtworks.twist.driver.web.selenium.locator,
  com.thoughtworks.twist.driver.web.selenium.stringmatch
-Require-Bundle: com.thoughtworks.twist.driver.web.internal;bundle-version="1.0.0",
- org.eclipse.swt;bundle-version="3.5.0",
- com.thoughtworks.twist.driver.web.user;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: com.thoughtworks.twist.driver.web.internal,
+ org.eclipse.swt,
+ com.thoughtworks.twist.driver.web.user
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.thoughtworks.selenium,
  com.thoughtworks.twist.driver.web.browser,
- org.osgi.framework;version="1.5.0",
+ org.osgi.framework,
  org.slf4j
 Bundle-ActivationPolicy: lazy
