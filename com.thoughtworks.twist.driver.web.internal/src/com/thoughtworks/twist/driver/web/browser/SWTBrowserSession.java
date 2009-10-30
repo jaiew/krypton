@@ -178,9 +178,10 @@ public class SWTBrowserSession implements BrowserSession {
 	}
 
 	public Document dom() {
-		if (document != null) {
-			return document;
-		}
+		// TODO: Figure out how to properly flush the cache (problem primarily in Safari), or kill it.
+//		if (document != null) {
+//			return document;
+//		}
 		String dom = "";
 		try {
 			inject("twist-dom.js");

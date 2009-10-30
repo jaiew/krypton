@@ -225,6 +225,7 @@ public enum BrowserFamily {
 		GridLayout layout = new GridLayout();
 		shell.setLayout(layout);
 		shell.setSize(1024, 768);
+		shell.setLocation(0, 0);
 
 		Browser.clearSessions();
 		log.debug("Creating browser: {}", name());

@@ -46,8 +46,14 @@ public class CocoaUser implements User {
 	// Use -NSTraceEvents YES as application arguments to log Cocoa events to System.err.
 	private static NSWindow findCocoaWindowForShell() {
 		NSApplication application = NSApplication.sharedApplication();
-		Enumeration<?> windows = application.windows().reverseObjectEnumerator();
-		return (NSWindow) windows.nextElement();
+		Enumeration<?> windows = application.windows().objectEnumerator();
+		while (windows.hasMoreElements()) {
+			NSWindow window = (NSWindow) windows.nextElement();
+			if (window.toString().startsWith("<SWTWindow")) {
+				return window;
+			}
+		}
+		throw new IllegalStateException("Could not find the SWTWindow");
 	}
 
 	public CocoaUser(Shell shell) {
