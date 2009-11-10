@@ -79,3 +79,5 @@ Embedded OSGi:
 ==============
 
 Because it's dependency on SWT, this driver is a set of OSGi bundles. To greatly simplfy the end user experience, they are all bundled up into a single jar file as a small Eclipse distro, which gets launched internally by the EmbeddedEquinoxLauncher using reflection. Hence, all environments use the same single jar and classpath.
+
+
