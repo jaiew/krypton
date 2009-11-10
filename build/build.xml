@@ -271,7 +271,7 @@
 	<target name="smoke">
 		<property name="project.id" value="com.thoughtworks.twist.driver.web.selenium.test" />
 
-		<getSourcepath property="src.path" workspace="${workspace.dir}" projectName="${project.id}" />
+		<getSourcepath property="src.path" workspace="${workspace.dir}" allowMultipleFolders="true" projectName="${project.id}" />
 		<getOutputpath property="bin.path" workspace="${workspace.dir}" projectName="${project.id}" />
 
 		<mkdir dir="${junit.output.dir}/smoke" />
