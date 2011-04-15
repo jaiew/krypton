@@ -18,7 +18,7 @@
  *   Manish Chakravarty
  *   Pavan K S
  ***************************************************************************/
-package com.thoughtworks.twist.osgi;
+package com.thoughtworks.krypton.osgi;
 
 import java.io.File;
 import java.io.FileNotFoundException;

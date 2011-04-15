@@ -22,9 +22,9 @@ package com.thoughtworks.selenium.internal;
 
 import java.io.File;
 
+import com.thoughtworks.krypton.osgi.EmbeddedEquinoxLauncher;
 import com.thoughtworks.selenium.Selenium;
 import com.thoughtworks.selenium.SeleniumFactory;
-import com.thoughtworks.twist.osgi.EmbeddedEquinoxLauncher;
 
 
 public class SeleniumOSGiFactory implements SeleniumFactory {

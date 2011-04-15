@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: com.thoughtworks.twist.driver.web.user.win32
-Bundle-SymbolicName: com.thoughtworks.twist.driver.web.user.win32
+Bundle-SymbolicName: com.thoughtworks.krypton.driver.web.user.win32
 Bundle-Version: 1.0.0
 Export-Package: com.thoughtworks.krypton.driver.web.user.win32
 Require-Bundle: org.eclipse.swt
