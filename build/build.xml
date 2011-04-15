@@ -34,9 +34,18 @@
 	<pathconvert property="workspace.dir">
 		<path location="${basedir}/.." />
 	</pathconvert>
+
+	<exec executable="git" outputproperty="svn.version" dir="${workspace.dir}" failifexecutionfails="false">
+	  <arg line="log --pretty=format:'%h' -1" />
+  </exec>
+	
+
 	<property name="target.eclipse.dir" value="${workspace.dir}/target-eclipse" />
 
 	<property name="dist.dir" value="${workspace.dir}/dist" />
+	<property name="dist.jar.name" value="${outer.project}-full-${svn.version}.jar" />
+	<property name="dist.jar" value="${dist.dir}/${dist.jar.name}" />
+
 	<property name="dist.archive.dir" value="${dist.dir}/archive" />
 	<property name="junit.output.dir" value="${workspace.dir}/reports" />
 
@@ -58,11 +67,7 @@
 
 	<property name="twist.driver.web.browser" value="mozilla" />
 
-	<target name="init-svn.version" unless="svn.version">
-		<exec executable="svnversion" outputproperty="svn.version" dir="${workspace.dir}" failifexecutionfails="false" />
-	</target>
-
-	<target name="init" depends="init-svn.version">
+	<target name="init">
 		<mkdir dir="${dist.dir}" />
 	</target>
 
@@ -118,8 +123,6 @@
 	</target>
 
 	<target name="dist" depends="clean-dist, build-feature">
-		<property name="dist.jar.name" value="${outer.project}-full-${svn.version}.jar" />
-		<property name="dist.jar" value="${dist.dir}/${dist.jar.name}" />
 
 		<delete dir="${dist.archive.dir}" />
 		<delete dir="${java.io.tmpdir}/${dist.jar.name}" />
@@ -255,7 +258,7 @@
 
 				<jvmarg value="${extra.jvm.arg}" />
 				<jvmarg value="-Dtwist.driver.web.browser=@{browser}" />
-				<jvmarg value="-Dorg.eclipse.swt.browser.XULRunnerPath=${org.eclipse.swt.browser.XULRunnerPath}" />
+        <jvmarg value="-Dorg.eclipse.swt.browser.XULRunnerPath=${org.eclipse.swt.browser.XULRunnerPath}" />
 
 				<formatter type="xml" />
 
@@ -289,7 +292,7 @@
 			<formatter type="xml" />
 
 			<batchtest todir="${junit.output.dir}/smoke/">
-				<fileset dir="${src.path}">
+				<fileset dir="${workspace.dir}/com.thoughtworks.twist.driver.web.selenium.test/src">
 					<include name="**/smoke/*Test.java" />
 				</fileset>
 			</batchtest>
