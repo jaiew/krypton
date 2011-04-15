@@ -3,5 +3,5 @@ Bundle-ManifestVersion: 2
 Bundle-SymbolicName: com.thoughtworks.krypton.driver.web
 Bundle-Version: 1.0.0
 Export-Package: com.thoughtworks.selenium
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Name: com.thoughtworks.krypton.driver.web

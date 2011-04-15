@@ -13,5 +13,5 @@ Require-Bundle: com.thoughtworks.krypton.driver.web.selenium,
  org.eclipse.swt,
  com.thoughtworks.krypton.driver.web.user,
  com.thoughtworks.krypton.driver.web.internal.test
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.thoughtworks.selenium

@@ -4,7 +4,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: com.thoughtworks.krypton.driver.web.user
 Bundle-SymbolicName: com.thoughtworks.krypton.driver.web.user
 Bundle-Version: 1.0.0
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: com.thoughtworks.krypton.driver.web.user
 Require-Bundle: org.eclipse.swt
 Import-Package: org.osgi.framework
