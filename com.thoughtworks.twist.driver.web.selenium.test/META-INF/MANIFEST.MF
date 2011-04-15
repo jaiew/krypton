@@ -1,17 +1,17 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: com.thoughtworks.twist.driver.web.selenium.test
-Bundle-SymbolicName: com.thoughtworks.twist.driver.web.selenium.test
+Bundle-SymbolicName: com.thoughtworks.krypton.driver.web.selenium.test
 Bundle-Version: 1.0.0
-Export-Package: com.thoughtworks.selenium.corebased,
- com.thoughtworks.selenium.corebasedskip,
- com.thoughtworks.twist.driver.web.selenium,
- com.thoughtworks.twist.driver.web.selenium.locator,
- com.thoughtworks.twist.driver.web.selenium.stringmatch
-Require-Bundle: com.thoughtworks.twist.driver.web.selenium,
- com.thoughtworks.twist.driver.web.internal,
+Export-Package: com.thoughtworks.krypton.driver.web.selenium,
+ com.thoughtworks.krypton.driver.web.selenium.locator,
+ com.thoughtworks.krypton.driver.web.selenium.stringmatch,
+ com.thoughtworks.selenium.corebased,
+ com.thoughtworks.selenium.corebasedskip
+Require-Bundle: com.thoughtworks.krypton.driver.web.selenium,
+ com.thoughtworks.krypton.driver.web.internal,
  org.eclipse.swt,
- com.thoughtworks.twist.driver.web.user,
- com.thoughtworks.twist.driver.web.internal.test
+ com.thoughtworks.krypton.driver.web.user,
+ com.thoughtworks.krypton.driver.web.internal.test
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Import-Package: com.thoughtworks.selenium

@@ -1,19 +1,19 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: com.thoughtworks.twist.driver.web.selenium
-Bundle-SymbolicName: com.thoughtworks.twist.driver.web.selenium
+Bundle-SymbolicName: com.thoughtworks.krypton.driver.web.selenium
 Bundle-Version: 1.0.0
-Bundle-Activator: com.thoughtworks.twist.driver.web.selenium.SeleniumActivator
-Export-Package: com.thoughtworks.twist.driver.web.selenium,
- com.thoughtworks.twist.driver.web.selenium.dialog,
- com.thoughtworks.twist.driver.web.selenium.locator,
- com.thoughtworks.twist.driver.web.selenium.stringmatch
-Require-Bundle: com.thoughtworks.twist.driver.web.internal,
+Bundle-Activator: com.thoughtworks.krypton.driver.web.selenium.SeleniumActivator
+Export-Package: com.thoughtworks.krypton.driver.web.selenium,
+ com.thoughtworks.krypton.driver.web.selenium.dialog,
+ com.thoughtworks.krypton.driver.web.selenium.locator,
+ com.thoughtworks.krypton.driver.web.selenium.stringmatch
+Require-Bundle: com.thoughtworks.krypton.driver.web.internal,
  org.eclipse.swt,
- com.thoughtworks.twist.driver.web.user
+ com.thoughtworks.krypton.driver.web.user
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Import-Package: com.thoughtworks.selenium,
- com.thoughtworks.twist.driver.web.browser,
+Import-Package: com.thoughtworks.krypton.driver.web.browser,
+ com.thoughtworks.selenium,
  org.osgi.framework,
  org.slf4j
 Bundle-ActivationPolicy: lazy

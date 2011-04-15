@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Name: com.thoughtworks.twist.driver.web.user.win32
 Bundle-SymbolicName: com.thoughtworks.twist.driver.web.user.win32
 Bundle-Version: 1.0.0
-Export-Package: com.thoughtworks.twist.driver.web.user.win32
+Export-Package: com.thoughtworks.krypton.driver.web.user.win32
 Require-Bundle: org.eclipse.swt
 Eclipse-PlatformFilter: (& (osgi.ws=win32) (osgi.os=win32))
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Fragment-Host: com.thoughtworks.twist.driver.web.user
+Fragment-Host: com.thoughtworks.krypton.driver.web.user

@@ -1,21 +1,21 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: com.thoughtworks.twist.driver.web.internal.test
-Bundle-SymbolicName: com.thoughtworks.twist.driver.web.internal.test
+Bundle-SymbolicName: com.thoughtworks.krypton.driver.web.internal.test
 Bundle-Version: 1.0.0
 Bundle-ClassPath: lib/junit-4.4.jar,
  lib/servlet-api-2.5-6.1.9.jar,
  .,
  lib/jetty-6.1.15.jar,
  lib/jetty-util-6.1.15.jar
-Export-Package: com.thoughtworks.twist.driver.web.browser;
+Export-Package: com.thoughtworks.krypton.driver.web.browser;
   uses:="javax.servlet.http,
    org.mortbay.jetty.servlet,
    org.w3c.dom,
    org.mortbay.jetty",
- com.thoughtworks.twist.driver.web.browser.locator;uses:="com.thoughtworks.twist.driver.web.browser",
- com.thoughtworks.twist.driver.web.browser.wait;uses:="javax.servlet.http,com.thoughtworks.twist.driver.web.browser",
- com.thoughtworks.twist.driver.web.user,
+ com.thoughtworks.krypton.driver.web.browser.locator;uses:="com.thoughtworks.twist.driver.web.browser",
+ com.thoughtworks.krypton.driver.web.browser.wait;uses:="javax.servlet.http,com.thoughtworks.twist.driver.web.browser",
+ com.thoughtworks.krypton.driver.web.user,
  javax.servlet,
  javax.servlet.http;uses:="javax.servlet",
  javax.servlet.jsp.resources,
@@ -127,7 +127,7 @@ Export-Package: com.thoughtworks.twist.driver.web.browser;
    javax.servlet,
    new org.mortbay.util.ajax",
  org.mortbay.xml;uses:="org.xml.sax,javax.xml.parsers"
-Require-Bundle: com.thoughtworks.twist.driver.web.internal,
+Require-Bundle: com.thoughtworks.krypton.driver.web.internal,
  org.eclipse.swt,
- com.thoughtworks.twist.driver.web.user
+ com.thoughtworks.krypton.driver.web.user
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

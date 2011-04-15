@@ -54,9 +54,9 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.webapp.WebAppContext;
 
-import com.thoughtworks.twist.driver.web.browser.BrowserFamily;
-import com.thoughtworks.twist.driver.web.browser.Decorators.SWTThreadingDecorator;
-import com.thoughtworks.twist.driver.web.selenium.TwistSelenium;
+import com.thoughtworks.krypton.driver.web.browser.BrowserFamily;
+import com.thoughtworks.krypton.driver.web.browser.Decorators.SWTThreadingDecorator;
+import com.thoughtworks.krypton.driver.web.selenium.TwistSelenium;
 
 /**
  * Provides a JUnit TestCase base class that implements some handy functionality
