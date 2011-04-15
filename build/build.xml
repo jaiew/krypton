@@ -232,7 +232,7 @@
 	<macrodef name="integration-tests">
 		<attribute name="browser" />
 		<sequential>
-			<run-tests browser="@{browser}" project.id="com.thoughtworks.twist.driver.web.internal.test">
+			<run-tests browser="@{browser}" project.id="com.thoughtworks.krypton.driver.web.internal.test">
 				<tests>
 					<include name="**/*Test*.java" />
 				</tests>
@@ -272,7 +272,7 @@
 	</macrodef>
 
 	<target name="smoke">
-		<property name="project.id" value="com.thoughtworks.twist.driver.web.selenium.test" />
+		<property name="project.id" value="com.thoughtworks.krypton.driver.web.selenium.test" />
 
 		<getSourcepath property="src.path" workspace="${workspace.dir}" allowMultipleFolders="true" projectName="${project.id}" />
 		<getOutputpath property="bin.path" workspace="${workspace.dir}" projectName="${project.id}" />
@@ -292,7 +292,7 @@
 			<formatter type="xml" />
 
 			<batchtest todir="${junit.output.dir}/smoke/">
-				<fileset dir="${workspace.dir}/com.thoughtworks.twist.driver.web.selenium.test/src">
+				<fileset dir="${workspace.dir}/com.thoughtworks.krypton.driver.web.selenium.test/src">
 					<include name="**/smoke/*Test.java" />
 				</fileset>
 			</batchtest>

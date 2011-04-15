@@ -26,8 +26,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.junit.Test;
 
+import com.thoughtworks.krypton.driver.web.user.User;
 import com.thoughtworks.krypton.driver.web.user.UserFactory;
-import com.thoughtworks.twist.driver.web.user.User;
 
 
 public class UserFactoryTest {

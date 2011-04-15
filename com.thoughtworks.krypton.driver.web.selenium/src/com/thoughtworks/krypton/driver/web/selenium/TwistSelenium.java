@@ -66,9 +66,9 @@ import com.thoughtworks.krypton.driver.web.selenium.stringmatch.ExactMatcher;
 import com.thoughtworks.krypton.driver.web.selenium.stringmatch.GlobMatcher;
 import com.thoughtworks.krypton.driver.web.selenium.stringmatch.RegexpMatcher;
 import com.thoughtworks.krypton.driver.web.selenium.stringmatch.StringMatcher;
+import com.thoughtworks.krypton.driver.web.user.User;
 import com.thoughtworks.krypton.driver.web.user.UserFactory;
 import com.thoughtworks.selenium.Selenium;
-import com.thoughtworks.twist.driver.web.user.User;
 
 import static java.util.Arrays.*;
 

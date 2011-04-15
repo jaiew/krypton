@@ -24,8 +24,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.internal.win32.OS;
 import org.eclipse.swt.widgets.Shell;
 
-import com.thoughtworks.twist.driver.web.user.KeyTranslator;
-import com.thoughtworks.twist.driver.web.user.User;
+import com.thoughtworks.krypton.driver.web.user.KeyTranslator;
+import com.thoughtworks.krypton.driver.web.user.User;
 
 public class WindowsUser implements User {
 	private final Shell shell;

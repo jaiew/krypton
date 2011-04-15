@@ -29,8 +29,8 @@ import org.eclipse.swt.internal.gtk.OS;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
-import com.thoughtworks.twist.driver.web.user.KeyTranslator;
-import com.thoughtworks.twist.driver.web.user.User;
+import com.thoughtworks.krypton.driver.web.user.KeyTranslator;
+import com.thoughtworks.krypton.driver.web.user.User;
 
 public class GtkUser implements User {
 	private static final int GDK_MOTION_NOTIFY = 3;

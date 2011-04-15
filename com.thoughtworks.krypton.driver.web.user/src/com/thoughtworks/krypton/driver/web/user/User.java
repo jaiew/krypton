@@ -18,20 +18,26 @@
  *   Manish Chakravarty
  *   Pavan K S
  ***************************************************************************/
-package com.thoughtworks.twist.driver.web.user;
+package com.thoughtworks.krypton.driver.web.user;
 
-public interface KeyTranslator {
-    public static class TransaltedKey {
-        public final int charCode;
-        public final int keyCode;
+public interface User {
+    void click(int x, int y);
 
-        public TransaltedKey(int charCode, int keyCode) {
-            this.charCode = charCode;
-            this.keyCode = keyCode;
-        }
-    }
+    void rightClick(int x, int y);
 
-    TransaltedKey translate(int virtualKey);
+    void doubleClick(int x, int y);
 
-    boolean shouldTranslateKey(int virtualKey);
+    void dragAndDrop(int startX, int startY, int endX, int endY);
+
+    void type(String string);
+
+    void key(int keyCode);
+
+    void key(int keyCode, int modifiers);
+
+    void shiftDown();
+
+    void shiftUp();
+
+    boolean isShiftDown();
 }

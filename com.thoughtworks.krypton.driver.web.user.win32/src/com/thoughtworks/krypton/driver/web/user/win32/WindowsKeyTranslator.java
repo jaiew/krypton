@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
 
 import org.eclipse.swt.widgets.Display;
 
-import com.thoughtworks.twist.driver.web.user.KeyTranslator;
+import com.thoughtworks.krypton.driver.web.user.KeyTranslator;
 
 public class WindowsKeyTranslator implements KeyTranslator {
     private static Method untranslateKey;

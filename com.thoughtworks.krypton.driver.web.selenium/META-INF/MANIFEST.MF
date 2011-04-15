@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: com.thoughtworks.twist.driver.web.selenium
+Bundle-Name: com.thoughtworks.krypton.driver.web.selenium
 Bundle-SymbolicName: com.thoughtworks.krypton.driver.web.selenium
 Bundle-Version: 1.0.0
 Bundle-Activator: com.thoughtworks.krypton.driver.web.selenium.SeleniumActivator

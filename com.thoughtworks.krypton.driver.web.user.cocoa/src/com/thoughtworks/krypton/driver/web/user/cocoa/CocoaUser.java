@@ -30,8 +30,8 @@ import com.thoughtworks.krypton.driver.cocoa.InitializeCocoa;
 import com.thoughtworks.krypton.driver.cocoa.NSApplication;
 import com.thoughtworks.krypton.driver.cocoa.NSEvent;
 import com.thoughtworks.krypton.driver.cocoa.NSWindow;
-import com.thoughtworks.twist.driver.web.user.KeyTranslator.TransaltedKey;
-import com.thoughtworks.twist.driver.web.user.User;
+import com.thoughtworks.krypton.driver.web.user.User;
+import com.thoughtworks.krypton.driver.web.user.KeyTranslator.TransaltedKey;
 
 @SuppressWarnings({ "deprecation" })
 public class CocoaUser implements User {

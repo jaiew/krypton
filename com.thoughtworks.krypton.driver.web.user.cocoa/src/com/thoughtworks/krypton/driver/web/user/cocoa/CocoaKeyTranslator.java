@@ -26,7 +26,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 
 import com.thoughtworks.krypton.driver.cocoa.NSEvent;
-import com.thoughtworks.twist.driver.web.user.KeyTranslator;
+import com.thoughtworks.krypton.driver.web.user.KeyTranslator;
 
 @SuppressWarnings("deprecation")
 public class CocoaKeyTranslator implements KeyTranslator {

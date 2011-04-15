@@ -22,8 +22,8 @@ package com.thoughtworks.krypton.driver.web.user;
 
 import org.eclipse.swt.widgets.Shell;
 
+import com.thoughtworks.krypton.driver.web.user.User;
 import com.thoughtworks.krypton.driver.web.user.gtk.GtkUser;
-import com.thoughtworks.twist.driver.web.user.User;
 
 public class UserFactory {
     public User createUser(Shell shell) {
