@@ -25,7 +25,7 @@ import java.lang.reflect.Method;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 
-import com.apple.cocoa.application.NSEvent;
+import com.thoughtworks.krypton.driver.cocoa.NSEvent;
 import com.thoughtworks.twist.driver.web.user.KeyTranslator;
 
 @SuppressWarnings("deprecation")

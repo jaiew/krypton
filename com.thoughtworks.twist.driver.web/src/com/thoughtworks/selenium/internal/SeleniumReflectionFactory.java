@@ -26,7 +26,7 @@ import com.thoughtworks.selenium.SeleniumFactory;
 public class SeleniumReflectionFactory implements SeleniumFactory {
 	public Selenium create(String browserURL) {
 		try {
-			Class<?> internalSeleniumFactory = Class.forName("com.thoughtworks.twist.driver.web.selenium.InternalSeleniumFactory");
+			Class<?> internalSeleniumFactory = Class.forName("com.thoughtworks.krypton.driver.web.selenium.InternalSeleniumFactory");
 			SeleniumFactory factory = (SeleniumFactory) internalSeleniumFactory.newInstance();
 			return factory.create(browserURL);
 		} catch (Exception e) {

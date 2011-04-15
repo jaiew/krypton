@@ -20,19 +20,20 @@
  ***************************************************************************/
 package com.thoughtworks.krypton.driver.web.user.cocoa;
 
-import java.util.Enumeration;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
+import org.rococoa.Rococoa;
+import org.rococoa.cocoa.foundation.NSArray;
+import org.rococoa.cocoa.foundation.NSPoint;
 
-import com.apple.cocoa.application.NSApplication;
-import com.apple.cocoa.application.NSEvent;
-import com.apple.cocoa.application.NSWindow;
-import com.apple.cocoa.foundation.NSPoint;
-import com.thoughtworks.twist.driver.web.user.User;
+import com.thoughtworks.krypton.driver.cocoa.InitializeCocoa;
+import com.thoughtworks.krypton.driver.cocoa.NSApplication;
+import com.thoughtworks.krypton.driver.cocoa.NSEvent;
+import com.thoughtworks.krypton.driver.cocoa.NSWindow;
 import com.thoughtworks.twist.driver.web.user.KeyTranslator.TransaltedKey;
+import com.thoughtworks.twist.driver.web.user.User;
 
-@SuppressWarnings( { "deprecation" })
+@SuppressWarnings({ "deprecation" })
 public class CocoaUser implements User {
 	private static final boolean CARBON = "carbon".equals(SWT.getPlatform());
 	private static final int LEFT = 1;
@@ -43,14 +44,15 @@ public class CocoaUser implements User {
 	private int modifiers;
 	private final Shell shell;
 
-	// Use -NSTraceEvents YES as application arguments to log Cocoa events to System.err.
+	// Use -NSTraceEvents YES as application arguments to log Cocoa events to
+	// System.err.
 	private static NSWindow findCocoaWindowForShell() {
-		NSApplication application = NSApplication.sharedApplication();
-		Enumeration<?> windows = application.windows().objectEnumerator();
-		while (windows.hasMoreElements()) {
-			NSWindow window = (NSWindow) windows.nextElement();
+		NSApplication application = NSApplication.CLASS.sharedApplication();
+		NSArray windows = application.windows();
+		for (int i = 0; i < windows.count(); i++) {
+			NSWindow window = Rococoa.cast(windows.objectAtIndex(i), NSWindow.class);
 			if (window.toString().startsWith("<SWTWindow")) {
-				return window;
+				return (NSWindow) window;
 			}
 		}
 		throw new IllegalStateException("Could not find the SWTWindow");
@@ -94,10 +96,10 @@ public class CocoaUser implements User {
 	// button, int speed) {
 	// int x = startX;
 	// int y = startY;
-	//        
+	//
 	// int xDelta = startX < endX ? speed : -speed;
 	// int yDelta = startY < endY ? speed : -speed;
-	//        
+	//
 	// while (xDelta != 0 || yDelta != 0) {
 	// if (Math.abs(y - endY) < speed) {
 	// yDelta = 0;
@@ -121,12 +123,13 @@ public class CocoaUser implements User {
 		} finally {
 			window.enableFlushWindow();
 			window.flushWindowIfNeeded();
-//			window.display();
+			// window.display();
 		}
 	}
 
 	private void pumpEvents() {
-		while (!shell.isDisposed() && shell.getDisplay().readAndDispatch());
+		while (!shell.isDisposed() && shell.getDisplay().readAndDispatch())
+			;
 	}
 
 	public void key(int c) {
@@ -221,11 +224,11 @@ public class CocoaUser implements User {
 	}
 
 	private void mouseEvent(int type, final int x, final int y, int button, int clickCount, float pressure) {
-		NSEvent mouseEvent = NSEvent.mouseEvent(type, new NSPoint(x, window.contentView().frame().height() - y), NSEvent.MouseEnteredMask,
-				0.0, window.windowNumber(), NSApplication.sharedApplication().context(), 0, clickCount, pressure);
+		NSEvent mouseEvent = NSEvent.CLASS.mouseEventWithType_location_modifierFlags_timestamp_windowNumber_context_eventNumber_clickCount_pressure(type, new NSPoint(x, window.contentView().frame().size.height.intValue() - y),
+		NSEvent.MouseEnteredMask, 0.0, window.windowNumber(), NSApplication.CLASS.sharedApplication().context(), 0, clickCount, pressure);
 
 		ensureWindowCanAcceptEvents();
-		window.postEvent(mouseEvent, false);
+		window.postEvent_atStart(mouseEvent, false);
 	}
 
 	private void keyEvent(int type, final char c, final short keyCode, boolean wasTranslated) {
@@ -237,19 +240,24 @@ public class CocoaUser implements User {
 		// OtherMouseDraggedMask;
 		// }
 
-		NSEvent keyEvent = NSEvent.keyEvent(type, new NSPoint(), mask, 0.0, 0, NSApplication.sharedApplication().context(), string, string,
-				false, keyCode);
+		NSEvent keyEvent = NSEvent.CLASS.keyEventWithType_location_modifierFlags_timestamp_windowNumber_context_characters_charactersIgnoringModifiers_isARepeat_keyCode(
+		type, new NSPoint(), mask, 0.0, 0, NSApplication.CLASS.sharedApplication()
+						.context(), string, string, false, keyCode);
 
 		ensureWindowCanAcceptEvents();
-		window.postEvent(keyEvent, false);
+		window.postEvent_atStart(keyEvent, false);
 	}
 
 	private void ensureWindowCanAcceptEvents() {
-		if (CARBON) {			
+		if (CARBON) {
 			shell.setFocus();
 		}
 		if (window != null) {
 			window.becomeKeyWindow();
 		}
+	}
+
+	static {
+		InitializeCocoa.init();
 	}
 }
